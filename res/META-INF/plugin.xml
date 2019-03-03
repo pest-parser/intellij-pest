@@ -1,0 +1,15 @@
+<idea-plugin>
+	<name>Pest</name>
+	<vendor email="ice1000kotlin@foxmail.com" url="https://ice1000.org">ice1000</vendor>
+	<idea-version since-build="162.0"/>
+
+	<depends>com.intellij.modules.lang</depends>
+	<extensions defaultExtensionNs="com.intellij">
+		<fileTypeFactory implementation="rs.pest.PestFileTypeFactory"/>
+		<errorHandler implementation="rs.pest.error.GitHubErrorReporter"/>
+		<liveTemplateContext implementation="rs.pest.PestContext"/>
+		<lang.commenter
+			language="Pest"
+			implementationClass="rs.pest.editing.PestCommenter"/>
+	</extensions>
+</idea-plugin>
