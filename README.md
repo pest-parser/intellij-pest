@@ -10,7 +10,11 @@
  [tv-url]: https://travis-ci.org/pest-parser/intellij-pest
  [tv-svg]: https://travis-ci.org/pest-parser/intellij-pest.svg?branch=master
 
-The IntelliJ IDEA plugin for [Pest](https://pest.rs)
+The IntelliJ IDEA plugin for [Pest](https://pest.rs).
+
+## Features
+
+See [JetBrains Plugin Marketplace][jb] page.
 
 ## Maintainer
 

@@ -23,5 +23,6 @@
 		<backspaceHandlerDelegate implementation="rs.pest.editing.PestPairBackspaceHandler"/>
 		<annotator language="Pest" implementationClass="rs.pest.editing.PestAnnotator"/>
 		<lang.foldingBuilder language="Pest" implementationClass="rs.pest.editing.PestFoldingBuilder"/>
+		<lang.psiStructureViewFactory language="Pest" implementationClass="rs.pest.editing.PestStructureViewFactory"/>
 	</extensions>
 </idea-plugin>
