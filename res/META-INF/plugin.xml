@@ -15,5 +15,7 @@
 		<colorSettingsPage implementation="rs.pest.PestColorSettingsPage"/>
 		<todoIndexer filetype="Pest" implementationClass="rs.pest.editing.PestTodoIndexer"/>
 		<indexPatternBuilder implementation="rs.pest.editing.PestTodoIndexPatternBuilder"/>
+		<lang.refactoringSupport language="Pest" implementationClass="rs.pest.editing.PestRefactoringSupportProvider"/>
+		<lang.namesValidator language="Pest" implementationClass="rs.pest.editing.PestRuleNameValidator"/>
 	</extensions>
 </idea-plugin>

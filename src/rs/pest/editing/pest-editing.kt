@@ -3,7 +3,11 @@ package rs.pest.editing
 import com.intellij.lang.BracePair
 import com.intellij.lang.Commenter
 import com.intellij.lang.PairedBraceMatcher
+import com.intellij.lang.refactoring.NamesValidator
+import com.intellij.lang.refactoring.RefactoringSupportProvider
 import com.intellij.lexer.Lexer
+import com.intellij.openapi.project.Project
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.impl.cache.impl.BaseFilterLexer
 import com.intellij.psi.impl.cache.impl.OccurrenceConsumer
@@ -13,10 +17,7 @@ import com.intellij.psi.impl.search.IndexPatternBuilder
 import com.intellij.psi.search.UsageSearchContext
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.TokenSet
-import rs.pest.PEST_BLOCK_COMMENT_BEGIN
-import rs.pest.PEST_BLOCK_COMMENT_END
-import rs.pest.PestFile
-import rs.pest.lexer
+import rs.pest.*
 import rs.pest.psi.PestTokenType
 import rs.pest.psi.PestTypes
 
@@ -71,4 +72,13 @@ class PestTodoIndexPatternBuilder : IndexPatternBuilder {
 	override fun getCommentTokenSet(file: PsiFile): TokenSet? = if (file is PestFile) PestTokenType.COMMENTS else null
 	override fun getCommentStartDelta(tokenType: IElementType?) = 0
 	override fun getCommentEndDelta(tokenType: IElementType?) = 0
+}
+
+class PestRuleNameValidator : NamesValidator {
+	override fun isKeyword(name: String, project: Project?) = "?!@#$%^&*()[]{}<>,./|\\~`'\" \r\n\t".any { it in name } || name in BUILTIN_RULES
+	override fun isIdentifier(name: String, project: Project?) = !isKeyword(name, project)
+}
+
+class PestRefactoringSupportProvider : RefactoringSupportProvider() {
+	override fun isMemberInplaceRenameAvailable(element: PsiElement, context: PsiElement?) = true
 }

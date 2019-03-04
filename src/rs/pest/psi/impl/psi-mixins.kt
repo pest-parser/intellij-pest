@@ -26,7 +26,7 @@ abstract class PestGrammarRuleMixin(node: ASTNode) : ASTWrapperPsiElement(node),
 		val nameIdentifier = firstChild
 		return when (nameIdentifier) {
 			is PestIdentifier -> {
-				nameIdentifier.replace(PestTokenType.fromText(newName, project))
+				cache = references.mapNotNull { it.handleElementRename(newName)?.reference }.toTypedArray()
 				this@PestGrammarRuleMixin
 			}
 			is PestBuiltin -> throw IncorrectOperationException("Cannot rename a builtin rule!")
