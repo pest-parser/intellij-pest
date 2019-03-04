@@ -1,5 +1,7 @@
 package rs.pest.psi
 
+import com.intellij.openapi.project.Project
+import com.intellij.psi.PsiFileFactory
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.TokenSet
 import rs.pest.PestLanguage
@@ -12,5 +14,6 @@ class PestTokenType(debugName: String) : IElementType(debugName, PestLanguage.IN
 		@JvmField val BLOCK_COMMENT = PestTokenType("block comment")
 		@JvmField val COMMENTS = TokenSet.create(LINE_COMMENT, BLOCK_COMMENT)
 		@JvmField val STRINGS = TokenSet.create(PestTypes.STRING, PestTypes.STRING_TOKEN, PestTypes.CHARACTER, PestTypes.CHAR_TOKEN)
+		fun fromText(text: String, project: Project) = PsiFileFactory.getInstance(project).createFileFromText(PestLanguage.INSTANCE, text).firstChild
 	}
 }
