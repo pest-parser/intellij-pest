@@ -5,8 +5,8 @@
 
 	<depends>com.intellij.modules.lang</depends>
 	<extensions defaultExtensionNs="com.intellij">
-		<additionalTextAttributes scheme="Default" file="/colorScheme/Pest.xml"/>
-		<additionalTextAttributes scheme="Darcula" file="/colorScheme/Pest_dark.xml"/>
+		<additionalTextAttributes scheme="Default" file="/colorSchemes/Pest.xml"/>
+		<additionalTextAttributes scheme="Darcula" file="/colorSchemes/Pest_dark.xml"/>
 		<fileTypeFactory implementation="rs.pest.PestFileTypeFactory"/>
 		<errorHandler implementation="rs.pest.error.GitHubErrorReporter"/>
 		<liveTemplateContext implementation="rs.pest.PestContext"/>
@@ -28,4 +28,12 @@
 			forClass="rs.pest.psi.impl.PestStringMixin"
 			implementationClass="rs.pest.psi.PestStringManipulator"/>
 	</extensions>
+
+	<actions>
+		<action
+			id="Pest.NewPestFile"
+			class="rs.pest.action.NewPestFile">
+			<add-to-group group-id="NewGroup" anchor="after" relative-to-action="NewFile"/>
+		</action>
+	</actions>
 </idea-plugin>

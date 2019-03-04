@@ -1,0 +1,7 @@
+//
+// Created by intellij-pest on ${YEAR}-${MONTH}-${DAY}
+// ${NAME}
+// Author: ${USER}
+//
+
+${NAME_SNAKE} = { "Hello World!" }
