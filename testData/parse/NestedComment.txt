@@ -1,0 +1,11 @@
+FILE
+  PsiComment(block comment)('/*Joesph Joestar/*/**/*/ Oh My God*/')
+  PsiWhiteSpace('\n')
+  PestGrammarRuleImpl(GRAMMAR_RULE)
+    PestIdentifierImpl(IDENTIFIER)
+      PsiElement(IDENTIFIER_TOKEN)('rule')
+    PsiElement(ASSIGNMENT_OPERATOR)('=')
+    PsiElement(OPENING_BRACE)('{')
+    PestStringImpl(STRING)
+      PsiElement(STRING_TOKEN)('""')
+    PsiElement(CLOSING_BRACE)('}')
