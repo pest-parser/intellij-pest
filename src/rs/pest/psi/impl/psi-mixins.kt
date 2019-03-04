@@ -5,12 +5,16 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement
 import com.intellij.lang.ASTNode
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.*
-import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.IncorrectOperationException
 import icons.PestIcons
+import rs.pest.PestFile
 import rs.pest.psi.*
 
-abstract class PestGrammarRuleMixin(node: ASTNode) : ASTWrapperPsiElement(node), PestGrammarRule {
+abstract class PestElement(node: ASTNode) : ASTWrapperPsiElement(node) {
+	val containingPestFile get() = containingFile as PestFile
+}
+
+abstract class PestGrammarRuleMixin(node: ASTNode) : PestElement(node), PestGrammarRule {
 	private var refCache: Array<PsiReference>? = null
 	private fun refreshCache(myName: String) = collectFrom<PestIdentifier>(containingFile, myName, this).also { refCache = it }
 	override fun getReference() = references.firstOrNull()
@@ -47,7 +51,7 @@ abstract class PestGrammarRuleMixin(node: ASTNode) : ASTWrapperPsiElement(node),
 		}.also { typeCache = it }
 }
 
-abstract class PestIdentifierMixin(node: ASTNode) : ASTWrapperPsiElement(node), PsiPolyVariantReference, PsiNameIdentifierOwner {
+abstract class PestIdentifierMixin(node: ASTNode) : PestElement(node), PsiPolyVariantReference, PsiNameIdentifierOwner {
 	private val range = TextRange(0, textLength)
 	override fun getNameIdentifier() = this
 	override fun getName(): String? = text
@@ -65,7 +69,7 @@ abstract class PestIdentifierMixin(node: ASTNode) : ASTWrapperPsiElement(node), 
 	override fun multiResolve(incomplete: Boolean): Array<ResolveResult> = updateCache().toTypedArray()
 	override fun getReference() = this
 	override fun getReferences() = arrayOf(this)
-	private fun allGrammarRules(): Collection<PestGrammarRuleMixin> = PsiTreeUtil.findChildrenOfType(containingFile, PestGrammarRuleMixin::class.java).filter { it.nameIdentifier != null }
+	private fun allGrammarRules(): Collection<PestGrammarRuleMixin> = containingPestFile.rules().values.filter { it.nameIdentifier != null }
 	override fun handleElementRename(newName: String): PsiElement = setName(newName)
 	override fun getElement() = this
 	override fun bindToElement(element: PsiElement): PsiElement = throw IncorrectOperationException("Unsupported")

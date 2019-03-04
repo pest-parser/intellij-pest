@@ -4,7 +4,7 @@
 
   parserClass="rs.pest.psi.PestParser"
 
-  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+  extends="rs.pest.psi.impl.PestElement"
 
   psiClassPrefix="Pest"
   psiImplClassSuffix="Impl"
