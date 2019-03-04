@@ -11,7 +11,7 @@
   psiImplPackage="rs.pest.psi.impl"
 
   elementTypeHolderClass="rs.pest.psi.PestTypes"
-  elementTypeClass="rs.pest.psi.PestTokenType"
+  elementTypeClass="rs.pest.psi.PestElementType"
   tokenTypeClass="rs.pest.psi.PestTokenType"
 }
 

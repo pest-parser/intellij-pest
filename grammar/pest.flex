@@ -2,7 +2,8 @@ package rs.pest.psi;
 
 import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.tree.IElementType;
-import static rs.pest.psi.PestTokenType.PEST_COMMENT;
+import static rs.pest.psi.PestTokenType.Static.LINE_COMMENT;
+import static rs.pest.psi.PestTokenType.Static.BLOCK_COMMENT;
 import static rs.pest.psi.PestTypes.*;
 
 import static com.intellij.psi.TokenType.BAD_CHARACTER;
@@ -41,7 +42,7 @@ HEXDIGIT=[a-fA-F0-9]
 
 <INSIDE_COMMENT> {
 	"/*" { ++nestedLeftComment; }
-	"*/" { if (--nestedLeftComment <= 0) {yybegin(YYINITIAL); return PEST_COMMENT;} }
+	"*/" { if (--nestedLeftComment <= 0) {yybegin(YYINITIAL); return BLOCK_COMMENT;} }
 	[^\*]+ { }
 	[^/]+ { }
 	\/[^\*]+ { }
@@ -55,7 +56,7 @@ PUSH { return PUSH_TOKEN; }
 PEEK { return PEEK_TOKEN; }
 "_" { return SILENT_MODIFIER; }
 {IDENTIFIER} { return IDENTIFIER_TOKEN; }
-"//"[^\r\n]]* { yybegin(YYINITIAL); }
+"//"[^\r\n]* { return LINE_COMMENT; }
 "=" { return ASSIGNMENT_OPERATOR; }
 "{" { return OPENING_BRACE; }
 "}" { return CLOSING_BRACE; }
@@ -73,6 +74,7 @@ PEEK { return PEEK_TOKEN; }
 "*" { return REPEAT_OPERATOR; }
 "+" { return REPEAT_ONCE_OPERATOR; }
 "^" { return INSENSITIVE_OPERATOR; }
+".." { return RANGE_OPERATOR; }
 {STRING_LITERAL} { return STRING_TOKEN; }
 {CHAR_LITERAL} { return CHAR_TOKEN; }
 {WHITE_SPACE} { return WHITE_SPACE; }
