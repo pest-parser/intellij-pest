@@ -1,10 +1,12 @@
 package rs.pest.psi
 
+import com.intellij.openapi.editor.colors.TextAttributesKey
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFileFactory
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.TokenSet
 import rs.pest.PestBundle
+import rs.pest.PestHighlighter
 import rs.pest.PestLanguage
 
 class PestElementType(debugName: String) : IElementType(debugName, PestLanguage.INSTANCE)
@@ -26,8 +28,12 @@ class PestTokenType(debugName: String) : IElementType(debugName, PestLanguage.IN
 	}
 }
 
-enum class PestRuleType {
-	Simple, Silent, Atomic, CompoundAtomic, NonAtomic;
+enum class PestRuleType(val highlight: TextAttributesKey) {
+	Simple(PestHighlighter.SIMPLE),
+	Silent(PestHighlighter.SILENT),
+	Atomic(PestHighlighter.ATOMIC),
+	CompoundAtomic(PestHighlighter.COMPOUND_ATOMIC),
+	NonAtomic(PestHighlighter.NON_ATOMIC);
 
 	fun help() = when (this) {
 		Simple -> PestBundle.message("pest.rule.help.simple")

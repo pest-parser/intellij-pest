@@ -1,6 +1,7 @@
 package rs.pest
 
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors
+import com.intellij.openapi.editor.HighlighterColors
 import com.intellij.openapi.editor.colors.TextAttributesKey
 import com.intellij.openapi.fileTypes.SyntaxHighlighter
 import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory
@@ -19,11 +20,11 @@ import rs.pest.psi.PestTypes
 object PestHighlighter : SyntaxHighlighter {
 	@JvmField val KEYWORD = TextAttributesKey.createTextAttributesKey("PEST_KEYWORD", DefaultLanguageHighlighterColors.KEYWORD)
 	@JvmField val IDENTIFIER = TextAttributesKey.createTextAttributesKey("PEST_IDENTIFIER", DefaultLanguageHighlighterColors.IDENTIFIER)
-	@JvmField val UNRESOLVED = TextAttributesKey.createTextAttributesKey("PEST_UNRESOLVED", DefaultLanguageHighlighterColors.IDENTIFIER)
+	@JvmField val UNRESOLVED = TextAttributesKey.createTextAttributesKey("PEST_UNRESOLVED", HighlighterColors.BAD_CHARACTER)
 	@JvmField val SIMPLE = TextAttributesKey.createTextAttributesKey("PEST_SIMPLE", DefaultLanguageHighlighterColors.FUNCTION_DECLARATION)
-	@JvmField val SILENT = TextAttributesKey.createTextAttributesKey("PEST_SILENT", DefaultLanguageHighlighterColors.LOCAL_VARIABLE)
-	@JvmField val ATOMIC = TextAttributesKey.createTextAttributesKey("PEST_ATOMIC", DefaultLanguageHighlighterColors.CONSTANT)
-	@JvmField val COMPOUND_ATOMIC = TextAttributesKey.createTextAttributesKey("PEST_COMPOUND_ATOMIC", DefaultLanguageHighlighterColors.CONSTANT)
+	@JvmField val SILENT = TextAttributesKey.createTextAttributesKey("PEST_SILENT", DefaultLanguageHighlighterColors.FUNCTION_DECLARATION)
+	@JvmField val ATOMIC = TextAttributesKey.createTextAttributesKey("PEST_ATOMIC", DefaultLanguageHighlighterColors.LOCAL_VARIABLE)
+	@JvmField val COMPOUND_ATOMIC = TextAttributesKey.createTextAttributesKey("PEST_COMPOUND_ATOMIC", DefaultLanguageHighlighterColors.LOCAL_VARIABLE)
 	@JvmField val NON_ATOMIC = TextAttributesKey.createTextAttributesKey("PEST_NON_ATOMIC", DefaultLanguageHighlighterColors.REASSIGNED_LOCAL_VARIABLE)
 	@JvmField val NUMBER = TextAttributesKey.createTextAttributesKey("PEST_NUMBER", DefaultLanguageHighlighterColors.NUMBER)
 	@JvmField val STRING = TextAttributesKey.createTextAttributesKey("PEST_STRING", DefaultLanguageHighlighterColors.STRING)
@@ -107,7 +108,12 @@ class PestHighlighterFactory : SyntaxHighlighterFactory() {
 class PestColorSettingsPage : ColorSettingsPage {
 	private companion object DescriptorHolder {
 		private val DESCRIPTORS = arrayOf(
-			AttributesDescriptor(PestBundle.message("pest.highlighter.settings.identifier"), PestHighlighter.IDENTIFIER),
+			AttributesDescriptor(PestBundle.message("pest.highlighter.settings.unresolved"), PestHighlighter.UNRESOLVED),
+			AttributesDescriptor(PestBundle.message("pest.highlighter.settings.simple"), PestHighlighter.SIMPLE),
+			AttributesDescriptor(PestBundle.message("pest.highlighter.settings.silent"), PestHighlighter.SILENT),
+			AttributesDescriptor(PestBundle.message("pest.highlighter.settings.atomic"), PestHighlighter.ATOMIC),
+			AttributesDescriptor(PestBundle.message("pest.highlighter.settings.compound-atomic"), PestHighlighter.COMPOUND_ATOMIC),
+			AttributesDescriptor(PestBundle.message("pest.highlighter.settings.non-atomic"), PestHighlighter.NON_ATOMIC),
 			AttributesDescriptor(PestBundle.message("pest.highlighter.settings.number"), PestHighlighter.NUMBER),
 			AttributesDescriptor(PestBundle.message("pest.highlighter.settings.string"), PestHighlighter.STRING),
 			AttributesDescriptor(PestBundle.message("pest.highlighter.settings.char"), PestHighlighter.CHAR),
@@ -133,11 +139,13 @@ class PestColorSettingsPage : ColorSettingsPage {
 	@Language("Pest")
 	override fun getDemoText() = """// Syntax Sample
 /* Block comment */
-compound_atomic_rule = { <Simple>simple</Simple> }
-simple_rule = _{ <Silent>silent</Silent> }
-silent_rule = @{ <Atomic>atomic</Atomic> }
-atomic_rule = ${'$'}{ <CompoundAtomic>compound_atomic_rule</CompoundAtomic> }
-non_atomic_rule = !{ <NonAtomic>non_atomic_rule</NonAtomic> }
-simple_rule = { PUSH ("string") ~ <Unresolved>unresolved_rule</Unresolved> ~ (!"PRE" ~ ) }
+<CompoundAtomic>compound_atomic_rule</CompoundAtomic> = @{ <Simple>simple_rule</Simple> ~ !"a"{2, 3} }
+<Silent>silent_rule</Silent> = _{ <Atomic>atomic_rule</Atomic> ~ '1'..'2' }
+<Atomic>atomic_rule</Atomic> = ${'$'}{ <NonAtomic>non_atomic_rule</NonAtomic> }
+<NonAtomic>non_atomic_rule</NonAtomic> = !{ <CompoundAtomic>compound_atomic_rule</CompoundAtomic> }
+<Simple>simple_rule</Simple> = { PUSH ("string") ~
+  <Unresolved>unresolved_rule</Unresolved> ~
+  <Silent>silent_rule</Silent> ~
+  (!"PRE" ~ ) }
 """
 }

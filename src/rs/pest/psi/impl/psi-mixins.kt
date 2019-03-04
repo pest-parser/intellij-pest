@@ -9,10 +9,6 @@ import com.intellij.util.IncorrectOperationException
 import icons.PestIcons
 import rs.pest.psi.*
 
-interface PestGrammarRuleInterface : PsiElement {
-	val type: PestRuleType
-}
-
 abstract class PestGrammarRuleMixin(node: ASTNode) : ASTWrapperPsiElement(node), PestGrammarRule {
 	private var refCache: Array<PsiReference>? = null
 	private fun refreshCache(myName: String) = collectFrom<PestIdentifier>(containingFile, myName, this).also { refCache = it }
@@ -39,8 +35,8 @@ abstract class PestGrammarRuleMixin(node: ASTNode) : ASTWrapperPsiElement(node),
 	}
 
 	private var typeCache: PestRuleType? = null
-	override val type: PestRuleType
-		get() = typeCache ?: when (modifier?.node?.elementType) {
+	val type: PestRuleType
+		get() = typeCache ?: when (modifier?.firstChild?.node?.elementType) {
 			PestTypes.SILENT_MODIFIER -> PestRuleType.Silent
 			PestTypes.ATOMIC_MODIFIER -> PestRuleType.Atomic
 			PestTypes.NON_ATOMIC_MODIFIER -> PestRuleType.NonAtomic
@@ -55,8 +51,16 @@ abstract class PestIdentifierMixin(node: ASTNode) : ASTWrapperPsiElement(node), 
 	override fun getName(): String? = text
 	override fun setName(newName: String): PsiElement = replace(PestTokenType.fromText(newName, project))
 
+	private var resolveCache = emptyList<ResolveResult>().toMutableList()
+	private fun updateCache(): List<ResolveResult> {
+		resolveCache.removeAll { it.element?.isValid ?: false }
+		if (resolveCache.isNotEmpty()) return resolveCache
+		else resolveCache.addAll(allGrammarRules().filter { it.name == text }.map(::PsiElementResolveResult))
+		return resolveCache
+	}
+
 	override fun resolve(): PsiElement? = multiResolve(false).firstOrNull()?.run { element }
-	override fun multiResolve(incomplete: Boolean): Array<ResolveResult> = allGrammarRules().filter { it.name == text }.map(::PsiElementResolveResult).toTypedArray()
+	override fun multiResolve(incomplete: Boolean): Array<ResolveResult> = updateCache().toTypedArray()
 	override fun getVariants() = allGrammarRules().toTypedArray()
 	override fun getReference() = this
 	override fun getReferences() = arrayOf(this)

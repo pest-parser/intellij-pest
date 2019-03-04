@@ -19,5 +19,6 @@
 		<lang.namesValidator language="Pest" implementationClass="rs.pest.editing.PestRuleNameValidator"/>
 		<lang.findUsagesProvider language="Pest" implementationClass="rs.pest.editing.PestFindUsagesProvider"/>
 		<backspaceHandlerDelegate implementation="rs.pest.editing.PestPairBackspaceHandler"/>
+		<annotator language="Pest" implementationClass="rs.pest.editing.PestAnnotator"/>
 	</extensions>
 </idea-plugin>
