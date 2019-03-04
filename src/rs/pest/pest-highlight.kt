@@ -52,6 +52,7 @@ object PestHighlighter : SyntaxHighlighter {
 		PestTypes.ASCII_TOKEN,
 		PestTypes.NEWLINE_TOKEN,
 		PestTypes.COMMENT_TOKEN,
+		PestTypes.WHITESPACE_TOKEN,
 		PestTypes.ASCII_DIGIT_TOKEN,
 		PestTypes.ASCII_ALPHA_TOKEN,
 		PestTypes.ASCII_ALPHANUMERIC_TOKEN,
