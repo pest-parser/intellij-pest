@@ -1,3 +1,5 @@
+import org.jetbrains.grammarkit.tasks.GenerateLexer
+import org.jetbrains.grammarkit.tasks.GenerateParser
 import org.gradle.language.base.internal.plugins.CleanRule
 import org.jetbrains.intellij.tasks.PatchPluginXmlTask
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
@@ -106,7 +108,31 @@ task("isCI") {
 	doFirst { println(if (isCI) "Yes, I'm on a CI." else "No, I'm not on CI.") }
 }
 
+fun path(more: Iterable<*>) = more.joinToString(File.separator)
+
+val genParser = task<GenerateParser>("genParser") {
+	group = tasks["init"].group!!
+	description = "Generate the Parser and PsiElement classes"
+	source = "grammar/pest.bnf"
+	targetRoot = "gen/"
+	val parserRoot = Paths.get("rs", "pest")!!
+	pathToParser = path(parserRoot + "PestParser.java")
+	pathToPsiRoot = path(parserRoot + "psi")
+	purgeOldFiles = true
+}
+
+val genLexer = task<GenerateLexer>("genLexer") {
+	group = genParser.group
+	description = "Generate the Lexer"
+	source = "grammar/pest.flex"
+	targetDir = path(Paths.get("gen", "rs", "pest", "psi"))
+	targetClass = "PestLexer"
+	purgeOldFiles = true
+	dependsOn(genParser)
+}
+
 tasks.withType<KotlinCompile> {
+	dependsOn(genParser, genLexer)
 	kotlinOptions {
 		jvmTarget = "1.8"
 		languageVersion = "1.2"
