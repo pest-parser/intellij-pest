@@ -1,3 +1,4 @@
+//noinspection BnfResolveForFile
 {
   generate=[java="8" names="long"]
 

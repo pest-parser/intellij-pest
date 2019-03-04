@@ -57,14 +57,10 @@ class PestTodoIndexer : LexerBasedTodoIndexer() {
 }
 
 class PestIdIndexer : LexerBasedIdIndexer() {
-	override fun createLexer(consumer: OccurrenceConsumer): Lexer {
-		return createIndexingLexer(consumer)
-	}
+	override fun createLexer(consumer: OccurrenceConsumer) = createIndexingLexer(consumer)
 
 	companion object {
-		fun createIndexingLexer(consumer: OccurrenceConsumer): Lexer {
-			return PestFilterLexer(lexer(), consumer)
-		}
+		fun createIndexingLexer(consumer: OccurrenceConsumer) = PestFilterLexer(lexer(), consumer)
 	}
 }
 
@@ -102,6 +98,7 @@ class PestRefactoringSupportProvider : RefactoringSupportProvider() {
 }
 
 class PestPairBackspaceHandler : BackspaceHandlerDelegate() {
+	override fun charDeleted(c: Char, file: PsiFile, editor: Editor) = false
 	override fun beforeCharDeleted(c: Char, file: PsiFile, editor: Editor) {
 		if (c !in "\"`'(" || file !is PestFile || !CodeInsightSettings.getInstance().AUTOINSERT_PAIR_BRACKET) return
 		val offset = editor.caretModel.offset
@@ -117,9 +114,5 @@ class PestPairBackspaceHandler : BackspaceHandlerDelegate() {
 
 		if (offset + 1 > file.textLength) editor.document.deleteString(offset, offset)
 		else editor.document.deleteString(offset, offset + 1)
-	}
-
-	override fun charDeleted(c: Char, file: PsiFile, editor: Editor): Boolean {
-		return false
 	}
 }
