@@ -5,6 +5,8 @@
 
 	<depends>com.intellij.modules.lang</depends>
 	<extensions defaultExtensionNs="com.intellij">
+		<additionalTextAttributes scheme="Default" file="/colorSchemes/Pest.xml"/>
+		<additionalTextAttributes scheme="Darcula" file="/colorSchemes/Pest_dark.xml"/>
 		<fileTypeFactory implementation="rs.pest.PestFileTypeFactory"/>
 		<errorHandler implementation="rs.pest.error.GitHubErrorReporter"/>
 		<liveTemplateContext implementation="rs.pest.PestContext"/>
