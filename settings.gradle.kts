@@ -1,2 +1,2 @@
-rootProject.name = "pest-intellij"
+rootProject.name = "intellij-pest"
 
