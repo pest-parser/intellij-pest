@@ -32,10 +32,18 @@ modifier ::=
 	NON_ATOMIC_MODIFIER
 
 expression ::= term (infix_operator term)*
-term       ::= prefix_operator* rule postfix_operator*
+term       ::= prefix_operator* rule postfix_operator* { extends=expression }
 // Can't name `node`, conflict with PsiElement's class
-rule       ::= OPENING_PAREN expression CLOSING_PAREN | terminal
-terminal   ::= push | peek_slice | identifier | string | range | builtin | commands
+rule       ::= OPENING_PAREN expression CLOSING_PAREN | atom { extends=expression }
+
+private atom ::=
+	push |
+	peek_slice |
+	identifier |
+	string |
+	range |
+	builtin |
+	commands
 
 prefix_operator  ::= POSITIVE_PREDICATE_OPERATOR | NON_ATOMIC_MODIFIER
 infix_operator   ::= SEQUENCE_OPERATOR | CHOICE_OPERATOR
@@ -57,12 +65,12 @@ integer    ::= MINUS? NUMBER
 identifier ::= IDENTIFIER_TOKEN {
 	mixin="rs.pest.psi.impl.PestIdentifierMixin"
 }
-push       ::= PUSH_TOKEN OPENING_PAREN expression CLOSING_PAREN
-peek_slice ::= PEEK_TOKEN OPENING_BRACK integer? RANGE_OPERATOR integer? CLOSING_BRACK
+push       ::= PUSH_TOKEN OPENING_PAREN expression CLOSING_PAREN { extends=expression }
+peek_slice ::= PEEK_TOKEN OPENING_BRACK integer? RANGE_OPERATOR integer? CLOSING_BRACK { extends=expression }
 commands   ::=
 	PEEK_ALL_TOKEN |
 	POP_TOKEN |
-	POP_ALL_TOKEN
+	POP_ALL_TOKEN { extends=expression }
 builtin    ::=
 	ANY_TOKEN |
 	EOI_TOKEN |
@@ -80,8 +88,8 @@ builtin    ::=
 	ASCII_OCT_DIGIT_TOKEN |
 	ASCII_HEX_DIGIT_TOKEN |
 	ASCII_ALPHA_UPPER_TOKEN |
-	ASCII_ALPHA_LOWER_TOKEN
+	ASCII_ALPHA_LOWER_TOKEN { extends=expression }
 
-character ::= CHAR_TOKEN
-string    ::= INSENSITIVE_OPERATOR? STRING_TOKEN
-range     ::= character RANGE_OPERATOR character
+character ::= CHAR_TOKEN { extends=expression }
+string    ::= INSENSITIVE_OPERATOR? STRING_TOKEN { extends=expression }
+range     ::= character RANGE_OPERATOR character { extends=expression }

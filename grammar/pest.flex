@@ -14,7 +14,8 @@ import static com.intellij.psi.TokenType.WHITE_SPACE;
 %{
   public PestLexer() { this((java.io.Reader)null); }
 
-  private int nestedLeftComment = 0;
+  private int commentStart = 0;
+  private int commentDepth = 0;
 %}
 
 %public
@@ -41,15 +42,19 @@ HEXDIGIT=[a-fA-F0-9]
 %%
 
 <INSIDE_COMMENT> {
-	"/*" { ++nestedLeftComment; }
-	"*/" { if (--nestedLeftComment <= 0) {yybegin(YYINITIAL); return BLOCK_COMMENT;} }
-	[^\*]+ { }
-	[^/]+ { }
+	"/*" { ++commentDepth; }
+	"*/" { if (--commentDepth <= 0) {yybegin(YYINITIAL); zzStartRead = commentStart; return BLOCK_COMMENT;} }
+	<<EOF>> {
+		yybegin(YYINITIAL);
+		zzStartRead = commentStart;
+		return BLOCK_COMMENT;
+	}
+	[^/\*]+ { }
 	\/[^\*]+ { }
 	\*[^\/]+ { }
 }
 
-"/*" { yybegin(INSIDE_COMMENT); nestedLeftComment = 0; }
+"/*" { yybegin(INSIDE_COMMENT); commentDepth = 1; commentStart = getTokenStart(); }
 -?{INTEGER} { return NUMBER; }
 - { return MINUS; }
 PUSH { return PUSH_TOKEN; }
