@@ -6,39 +6,53 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.*
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.IncorrectOperationException
-import rs.pest.psi.PestBuiltin
-import rs.pest.psi.PestGrammarRule
-import rs.pest.psi.PestIdentifier
-import rs.pest.psi.PestTokenType
+import icons.PestIcons
+import rs.pest.psi.*
+
+interface PestGrammarRuleInterface : PsiElement {
+	val type: PestRuleType
+}
 
 abstract class PestGrammarRuleMixin(node: ASTNode) : ASTWrapperPsiElement(node), PestGrammarRule {
-	var cache: Array<PsiReference>? = null
-	private fun refreshCache(myName: String) = collectFrom<PestIdentifier>(containingFile, myName, this).also { cache = it }
+	private var refCache: Array<PsiReference>? = null
+	private fun refreshCache(myName: String) = collectFrom<PestIdentifier>(containingFile, myName, this).also { refCache = it }
 	override fun getReference() = references.firstOrNull()
-	override fun getReferences() = cache ?: name?.let(::refreshCache) ?: emptyArray()
+	override fun getReferences() = refCache ?: name?.let(::refreshCache) ?: emptyArray()
 	override fun subtreeChanged() {
 		name?.let(::refreshCache)
+		typeCache = null
 	}
 
 	override fun getNameIdentifier() = firstChild as? PestIdentifier
+	override fun getIcon(flags: Int) = PestIcons.PEST
 	override fun getName() = nameIdentifier?.text
 	override fun setName(newName: String): PsiElement {
 		val nameIdentifier = firstChild
 		return when (nameIdentifier) {
 			is PestIdentifier -> {
-				cache = references.mapNotNull { it.handleElementRename(newName)?.reference }.toTypedArray()
+				refCache = references.mapNotNull { it.handleElementRename(newName)?.reference }.toTypedArray()
 				this@PestGrammarRuleMixin
 			}
 			is PestBuiltin -> throw IncorrectOperationException("Cannot rename a builtin rule!")
 			else -> this@PestGrammarRuleMixin
 		}
 	}
+
+	private var typeCache: PestRuleType? = null
+	override val type: PestRuleType
+		get() = typeCache ?: when (modifier?.node?.elementType) {
+			PestTypes.SILENT_MODIFIER -> PestRuleType.Silent
+			PestTypes.ATOMIC_MODIFIER -> PestRuleType.Atomic
+			PestTypes.NON_ATOMIC_MODIFIER -> PestRuleType.NonAtomic
+			PestTypes.COMPOUND_ATOMIC_MODIFIER -> PestRuleType.CompoundAtomic
+			else -> PestRuleType.Simple
+		}.also { typeCache = it }
 }
 
 abstract class PestIdentifierMixin(node: ASTNode) : ASTWrapperPsiElement(node), PsiPolyVariantReference, PsiNameIdentifierOwner {
 	private val range = TextRange(0, textLength)
 	override fun getNameIdentifier() = this
-	override fun getName() = text
+	override fun getName(): String? = text
 	override fun setName(newName: String): PsiElement = replace(PestTokenType.fromText(newName, project))
 
 	override fun resolve(): PsiElement? = multiResolve(false).firstOrNull()?.run { element }
@@ -51,7 +65,7 @@ abstract class PestIdentifierMixin(node: ASTNode) : ASTWrapperPsiElement(node), 
 	override fun getElement() = this
 	override fun bindToElement(element: PsiElement): PsiElement = throw IncorrectOperationException("Unsupported")
 	override fun isReferenceTo(reference: PsiElement) = reference == resolve()
-	override fun getCanonicalText() = text
+	override fun getCanonicalText(): String = text
 	override fun isSoft() = true
 	override fun getRangeInElement() = range
 }

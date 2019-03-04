@@ -11,5 +11,4 @@ inline fun <reified Element : PsiElement> collectFrom(startPoint: PsiElement, na
 	.psiTraverser(startPoint)
 	.filter { it is Element && it.text == name && it != self }
 	.mapNotNull(PsiElement::getReference)
-	.let { if (self != null) it.filter { it.isReferenceTo(self) } else it }
 	.toTypedArray()
