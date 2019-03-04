@@ -1,0 +1,59 @@
+{
+  generate=[java="8" names="long"]
+
+  parserClass="rs.pest.psi.PestParser"
+
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiClassPrefix="Pest"
+  psiImplClassSuffix="Impl"
+  psiPackage="rs.pest.psi"
+  psiImplPackage="rs.pest.psi.impl"
+
+  elementTypeHolderClass="rs.pest.psi.PestTypes"
+  elementTypePrefix="PEST_"
+  elementTypeClass="rs.pest.psi.PestTokenType"
+  tokenTypeClass="rs.pest.psi.PestTokenType"
+}
+
+grammar_rules ::=  grammar_rule+
+
+grammar_rule ::=
+	identifier ASSIGNMENT_OPERATOR modifier?
+	OPENING_BRACE expression CLOSING_BRACE
+
+modifier ::=
+	SILENT_MODIFIER |
+	ATOMIC_MODIFIER |
+	COMPOUND_ATOMIC_MODIFIER |
+	NON_ATOMIC_MODIFIER
+
+expression ::= term (infix_operator term)*
+term       ::= prefix_operator* node postfix_operator*
+node       ::= OPENING_PAREN expression CLOSING_PAREN | terminal
+terminal   ::= push | peek_slice | identifier | string | range
+
+prefix_operator  ::= POSITIVE_PREDICATE_OPERATOR | NON_ATOMIC_MODIFIER
+infix_operator   ::= SEQUENCE_OPERATOR | CHOICE_OPERATOR
+postfix_operator ::=
+	OPTIONAL_OPERATOR |
+	REPEAT_OPERATOR |
+	REPEAT_ONCE_OPERATOR |
+	repeat_exact |
+	repeat_min |
+	repeat_max |
+	repeat_min_max
+
+private repeat_exact   ::= OPENING_BRACE NUMBER CLOSING_BRACE
+private repeat_min     ::= OPENING_BRACE NUMBER COMMA CLOSING_BRACE
+private repeat_max     ::= OPENING_BRACE COMMA NUMBER CLOSING_BRACE
+private repeat_min_max ::= OPENING_BRACE NUMBER COMMA NUMBER CLOSING_BRACE
+
+integer    ::= MINUS? NUMBER
+identifier ::= IDENTIFIER_TOKEN
+push       ::= PUSH_TOKEN OPENING_PAREN expression CLOSING_PAREN
+peek_slice ::= PEEK_TOKEN OPENING_BRACK integer? RANGE_OPERATOR integer? CLOSING_BRACK
+
+character ::= CHAR_TOKEN
+string    ::= INSENSITIVE_OPERATOR? STRING_TOKEN
+range     ::= character RANGE_OPERATOR character
