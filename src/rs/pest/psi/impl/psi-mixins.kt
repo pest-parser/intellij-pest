@@ -87,7 +87,7 @@ abstract class PestIdentifierMixin(node: ASTNode) : PestElement(node), PsiPolyVa
 	}.toTypedArray()
 }
 
-abstract class PestStringMixin(node: ASTNode) : PestElement(node), PsiLanguageInjectionHost {
+abstract class PestStringMixin(node: ASTNode) : PestExpressionImpl(node), PsiLanguageInjectionHost {
 	override fun isValidHost() = true
 	override fun updateText(text: String) = replace(PestTokenType.fromText(text, project)) as? PestStringMixin
 	override fun createLiteralTextEscaper(): LiteralTextEscaper<PestStringMixin> = PestStringEscaper(this)

@@ -133,7 +133,7 @@ public class PestStringEscaper<T extends PsiLanguageInjectionHost> extends Liter
 					case 'u':
 						index = unicode(chars, outChars, index);
 						if (index == -1) return false;
-						break;
+						else break;
 
 					default:
 						outChars.append(c);
@@ -171,29 +171,24 @@ public class PestStringEscaper<T extends PsiLanguageInjectionHost> extends Liter
 		return index;
 	}
 
-	private static int unicode(@NotNull String chars, StringBuilder outChars, int index) {
-		char c;
-		if (index + 2 <= chars.length()) {
-			if (chars.charAt(index) != '{') return -1;
-			int range;
-			if (chars.charAt(index + 3) == '}') range = 2;
-			else if (chars.charAt(index + 4) == '}') range = 3;
-			else if (chars.charAt(index + 5) == '}') range = 4;
-			else if (chars.charAt(index + 6) == '}') range = 5;
-			else if (chars.charAt(index + 7) == '}') range = 6;
-			else return -1;
-			try {
-				int v = Integer.parseInt(chars.substring(index, index + range), 16);
-				c = chars.charAt(index + 1);
-				if (c == '+' || c == '-') return -1;
-				outChars.append((char) v);
-				index += range + 1;
-			} catch (Exception e) {
-				return -1;
-			}
-		} else {
+	public static int unicode(@NotNull String chars, StringBuilder outChars, int index) {
+		if (index + 4 > chars.length()) return -1;
+		if (chars.charAt(index) != '{') return -1;
+		int range;
+		if (chars.charAt(index + 3) == '}') range = 2;
+		else if (index + 4 < chars.length() && chars.charAt(index + 4) == '}') range = 3;
+		else if (index + 5 < chars.length() && chars.charAt(index + 5) == '}') range = 4;
+		else if (index + 6 < chars.length() && chars.charAt(index + 6) == '}') range = 5;
+		else if (index + 7 < chars.length() && chars.charAt(index + 7) == '}') range = 6;
+		else return -1;
+		try {
+			int v = Integer.parseInt(chars.substring(index + 1, index + 1 + range), 16);
+			char c = chars.charAt(index + 1);
+			if (c == '+' || c == '-') return -1;
+			outChars.append((char) v);
+			return index + range + 2;
+		} catch (Exception e) {
 			return -1;
 		}
-		return index;
 	}
 }
