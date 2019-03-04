@@ -28,12 +28,12 @@ class PestTokenType(debugName: String) : IElementType(debugName, PestLanguage.IN
 	}
 }
 
-enum class PestRuleType(val highlight: TextAttributesKey) {
-	Simple(PestHighlighter.SIMPLE),
-	Silent(PestHighlighter.SILENT),
-	Atomic(PestHighlighter.ATOMIC),
-	CompoundAtomic(PestHighlighter.COMPOUND_ATOMIC),
-	NonAtomic(PestHighlighter.NON_ATOMIC);
+enum class PestRuleType(val description: String, val highlight: TextAttributesKey) {
+	Simple("Simple", PestHighlighter.SIMPLE),
+	Silent("Silent", PestHighlighter.SILENT),
+	Atomic("Atomic", PestHighlighter.ATOMIC),
+	CompoundAtomic("Compound atomic", PestHighlighter.COMPOUND_ATOMIC),
+	NonAtomic("Non-atomic", PestHighlighter.NON_ATOMIC);
 
 	fun help() = when (this) {
 		Simple -> PestBundle.message("pest.rule.help.simple")

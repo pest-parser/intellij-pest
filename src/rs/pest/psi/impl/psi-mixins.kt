@@ -1,5 +1,7 @@
 package rs.pest.psi.impl
 
+import com.intellij.codeInsight.completion.CompletionResult
+import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.extapi.psi.ASTWrapperPsiElement
 import com.intellij.lang.ASTNode
 import com.intellij.openapi.util.TextRange
@@ -61,10 +63,10 @@ abstract class PestIdentifierMixin(node: ASTNode) : ASTWrapperPsiElement(node), 
 
 	override fun resolve(): PsiElement? = multiResolve(false).firstOrNull()?.run { element }
 	override fun multiResolve(incomplete: Boolean): Array<ResolveResult> = updateCache().toTypedArray()
-	override fun getVariants() = allGrammarRules().toTypedArray()
+	override fun getVariants() = allGrammarRules().map { LookupElementBuilder.create(it).withIcon(it.getIcon(0)).withTypeText(it.type.description) }.toTypedArray()
 	override fun getReference() = this
 	override fun getReferences() = arrayOf(this)
-	private fun allGrammarRules(): Collection<PestGrammarRule> = PsiTreeUtil.findChildrenOfType(containingFile, PestGrammarRule::class.java).filter { it.nameIdentifier != null }
+	private fun allGrammarRules(): Collection<PestGrammarRuleMixin> = PsiTreeUtil.findChildrenOfType(containingFile, PestGrammarRuleMixin::class.java).filter { it.nameIdentifier != null }
 	override fun handleElementRename(newName: String): PsiElement = setName(newName)
 	override fun getElement() = this
 	override fun bindToElement(element: PsiElement): PsiElement = throw IncorrectOperationException("Unsupported")
