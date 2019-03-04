@@ -14,6 +14,7 @@ class PestTokenType(debugName: String) : IElementType(debugName, PestLanguage.IN
 		@JvmField val BLOCK_COMMENT = PestTokenType("block comment")
 		@JvmField val COMMENTS = TokenSet.create(LINE_COMMENT, BLOCK_COMMENT)
 		@JvmField val STRINGS = TokenSet.create(PestTypes.STRING, PestTypes.STRING_TOKEN, PestTypes.CHARACTER, PestTypes.CHAR_TOKEN)
+		@JvmField val IDENTIFIERS = TokenSet.create(PestTypes.IDENTIFIER)
 		fun fromText(text: String, project: Project) = PsiFileFactory.getInstance(project).createFileFromText(PestLanguage.INSTANCE, text).firstChild
 	}
 }

@@ -17,5 +17,7 @@
 		<indexPatternBuilder implementation="rs.pest.editing.PestTodoIndexPatternBuilder"/>
 		<lang.refactoringSupport language="Pest" implementationClass="rs.pest.editing.PestRefactoringSupportProvider"/>
 		<lang.namesValidator language="Pest" implementationClass="rs.pest.editing.PestRuleNameValidator"/>
+		<lang.findUsagesProvider language="Pest" implementationClass="rs.pest.editing.PestFindUsagesProvider"/>
+		<backspaceHandlerDelegate implementation="rs.pest.editing.PestPairBackspaceHandler"/>
 	</extensions>
 </idea-plugin>
