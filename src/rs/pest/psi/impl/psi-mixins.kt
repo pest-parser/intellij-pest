@@ -75,7 +75,7 @@ abstract class PestIdentifierMixin(node: ASTNode) : ASTWrapperPsiElement(node), 
 	override fun getVariants() = allGrammarRules().map {
 		LookupElementBuilder
 			.create(it)
-			.withTailText(it.expressionList.lastOrNull()?.body(30), true)
+			.withTailText(it.expressionList.lastOrNull()?.body(50), true)
 			.withIcon(it.getIcon(0))
 			.withTypeText(it.type.description)
 	}.toTypedArray()

@@ -1,6 +1,7 @@
 package rs.pest.psi.impl
 
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.SyntaxTraverser
 
 
@@ -17,7 +18,8 @@ fun PsiElement.body(maxSizeExpected: Int) = buildString {
 	append(' ')
 	var child = firstChild
 	while (child != null) {
-		append(child.text)
+		if (child is PsiWhiteSpace) append(' ')
+		else append(child.text)
 		if (length >= maxSizeExpected) break
 		child = child.nextSibling
 	}

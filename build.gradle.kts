@@ -21,7 +21,7 @@ val commitHash = kotlin.run {
 	output.trim()
 }
 
-val pluginComingVersion = "0.0.1"
+val pluginComingVersion = "0.1.1"
 val pluginVersion = if (isCI) "$pluginComingVersion-$commitHash" else pluginComingVersion
 val packageName = "rs.pest"
 val kotlinVersion = "1.2.70"
