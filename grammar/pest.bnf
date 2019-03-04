@@ -23,6 +23,7 @@ grammar_rule ::=
 	OPENING_BRACE expression CLOSING_BRACE {
 	implements=["com.intellij.psi.PsiNameIdentifierOwner"]
 	mixin="rs.pest.psi.impl.PestGrammarRuleMixin"
+	pin=2
 }
 
 modifier ::=

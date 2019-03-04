@@ -12,3 +12,13 @@ inline fun <reified Element : PsiElement> collectFrom(startPoint: PsiElement, na
 	.filter { it is Element && it.text == name && it != self }
 	.mapNotNull(PsiElement::getReference)
 	.toTypedArray()
+
+fun PsiElement.body(maxSizeExpected: Int) = buildString {
+	append(' ')
+	var child = firstChild
+	while (child != null) {
+		append(child.text)
+		if (length >= maxSizeExpected) break
+		child = child.nextSibling
+	}
+}
