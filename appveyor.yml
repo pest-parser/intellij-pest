@@ -13,5 +13,5 @@ cache:
 
 artifacts:
   - path: 'build\distributions\*.zip'
-    name: pest-intellij
+    name: intellij-pest
 #
