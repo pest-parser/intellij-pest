@@ -13,5 +13,7 @@
 		<lang.braceMatcher language="Pest" implementationClass="rs.pest.editing.PestBraceMatcher"/>
 		<lang.syntaxHighlighterFactory language="Pest" implementationClass="rs.pest.PestHighlighterFactory"/>
 		<colorSettingsPage implementation="rs.pest.PestColorSettingsPage"/>
+		<todoIndexer filetype="Pest" implementationClass="rs.pest.editing.PestTodoIndexer"/>
+		<indexPatternBuilder implementation="rs.pest.editing.PestTodoIndexPatternBuilder"/>
 	</extensions>
 </idea-plugin>
