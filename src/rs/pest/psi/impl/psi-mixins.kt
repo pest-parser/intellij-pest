@@ -35,6 +35,7 @@ abstract class PestGrammarRuleMixin(node: ASTNode) : ASTWrapperPsiElement(node),
 		}
 	}
 
+	fun preview(maxSizeExpected: Int) = expressionList.lastOrNull()?.body(maxSizeExpected)
 	private var typeCache: PestRuleType? = null
 	val type: PestRuleType
 		get() = typeCache ?: when (modifier?.firstChild?.node?.elementType) {
@@ -75,7 +76,7 @@ abstract class PestIdentifierMixin(node: ASTNode) : ASTWrapperPsiElement(node), 
 	override fun getVariants() = allGrammarRules().map {
 		LookupElementBuilder
 			.create(it)
-			.withTailText(it.expressionList.lastOrNull()?.body(50), true)
+			.withTailText(it.preview(35), true)
 			.withIcon(it.getIcon(0))
 			.withTypeText(it.type.description)
 	}.toTypedArray()

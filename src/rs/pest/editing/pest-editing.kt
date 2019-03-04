@@ -2,17 +2,23 @@ package rs.pest.editing
 
 import com.intellij.codeInsight.CodeInsightSettings
 import com.intellij.codeInsight.editorActions.BackspaceHandlerDelegate
+import com.intellij.lang.ASTNode
 import com.intellij.lang.BracePair
 import com.intellij.lang.Commenter
 import com.intellij.lang.PairedBraceMatcher
 import com.intellij.lang.cacheBuilder.DefaultWordsScanner
 import com.intellij.lang.findUsages.FindUsagesProvider
+import com.intellij.lang.folding.CustomFoldingBuilder
+import com.intellij.lang.folding.FoldingDescriptor
+import com.intellij.lang.folding.NamedFoldingDescriptor
 import com.intellij.lang.refactoring.NamesValidator
 import com.intellij.lang.refactoring.RefactoringSupportProvider
 import com.intellij.lexer.Lexer
+import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiNameIdentifierOwner
@@ -25,17 +31,19 @@ import com.intellij.psi.impl.search.IndexPatternBuilder
 import com.intellij.psi.search.UsageSearchContext
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.TokenSet
+import com.intellij.psi.util.PsiTreeUtil
 import rs.pest.*
 import rs.pest.psi.PestGrammarRule
 import rs.pest.psi.PestTokenType
 import rs.pest.psi.PestTypes
+import rs.pest.psi.impl.PestGrammarRuleMixin
 
 class PestCommenter : Commenter {
 	override fun getCommentedBlockCommentPrefix() = blockCommentPrefix
 	override fun getCommentedBlockCommentSuffix() = blockCommentSuffix
 	override fun getBlockCommentPrefix() = PEST_BLOCK_COMMENT_BEGIN
 	override fun getBlockCommentSuffix() = PEST_BLOCK_COMMENT_END
-	override fun getLineCommentPrefix() = "// "
+	override fun getLineCommentPrefix() = PEST_LINE_COMMENT
 }
 
 class PestBraceMatcher : PairedBraceMatcher {
@@ -114,5 +122,17 @@ class PestPairBackspaceHandler : BackspaceHandlerDelegate() {
 
 		if (offset + 1 > file.textLength) editor.document.deleteString(offset, offset)
 		else editor.document.deleteString(offset, offset + 1)
+	}
+}
+
+class PestFoldingBuilder : CustomFoldingBuilder() {
+	override fun isRegionCollapsedByDefault(node: ASTNode) = node.textLength > 80
+	override fun getLanguagePlaceholderText(node: ASTNode, range: TextRange): String = "..."
+	private fun foldingDescriptor(elem: PsiElement, placeHolder: String?) = NamedFoldingDescriptor(elem.node, elem.textRange, null, placeHolder ?: "...")
+	override fun buildLanguageFoldRegions(descriptors: MutableList<FoldingDescriptor>, root: PsiElement, document: Document, quick: Boolean) {
+		if (root !is PestFile) return
+		PsiTreeUtil.findChildrenOfType(root, PestGrammarRuleMixin::class.java).mapNotNullTo(descriptors) {
+			it.expressionList.lastOrNull()?.let { elem -> foldingDescriptor(elem, PEST_FOLDING_PLACEHOLDER) }
+		}
 	}
 }

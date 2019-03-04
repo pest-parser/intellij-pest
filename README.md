@@ -1,8 +1,14 @@
 # intellij-pest
 
-![JetBrains IntelliJ plugins](https://img.shields.io/jetbrains/plugin/d/12046-pest.svg)
-![JetBrains IntelliJ Plugins](https://img.shields.io/jetbrains/plugin/v/12046-pest.svg)
-[![Build Status](https://travis-ci.org/pest-parser/intellij-pest.svg?branch=master)](https://travis-ci.org/pest-parser/intellij-pest)
+[![JB][d-svg]][jb]
+[![JB][v-svg]][jb]
+[![Build Status][tv-svg]][tv-url]
+
+ [d-svg]: https://img.shields.io/jetbrains/plugin/d/12046-pest.svg
+ [v-svg]: https://img.shields.io/jetbrains/plugin/v/12046-pest.svg
+ [jb]: https://plugins.jetbrains.com/plugin/12046-pest
+ [tv-url]: https://travis-ci.org/pest-parser/intellij-pest
+ [tv-svg]: https://travis-ci.org/pest-parser/intellij-pest.svg?branch=master
 
 The IntelliJ IDEA plugin for [Pest](https://pest.rs)
 

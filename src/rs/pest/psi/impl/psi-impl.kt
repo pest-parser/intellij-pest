@@ -17,10 +17,15 @@ inline fun <reified Element : PsiElement> collectFrom(startPoint: PsiElement, na
 fun PsiElement.body(maxSizeExpected: Int) = buildString {
 	append(' ')
 	var child = firstChild
-	while (child != null) {
+	while (child != null && child != this@body) {
 		if (child is PsiWhiteSpace) append(' ')
-		else append(child.text)
+		else {
+			while (child.firstChild != null && length + child.textLength > maxSizeExpected) child = child.firstChild
+			append(child.text)
+		}
 		if (length >= maxSizeExpected) break
-		child = child.nextSibling
+		do {
+			child = child.nextSibling ?: child.parent
+		} while (child == null)
 	}
 }

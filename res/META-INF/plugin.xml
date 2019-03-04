@@ -22,5 +22,6 @@
 		<lang.findUsagesProvider language="Pest" implementationClass="rs.pest.editing.PestFindUsagesProvider"/>
 		<backspaceHandlerDelegate implementation="rs.pest.editing.PestPairBackspaceHandler"/>
 		<annotator language="Pest" implementationClass="rs.pest.editing.PestAnnotator"/>
+		<lang.foldingBuilder language="Pest" implementationClass="rs.pest.editing.PestFoldingBuilder"/>
 	</extensions>
 </idea-plugin>
