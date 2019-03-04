@@ -24,5 +24,8 @@
 		<annotator language="Pest" implementationClass="rs.pest.editing.PestAnnotator"/>
 		<lang.foldingBuilder language="Pest" implementationClass="rs.pest.editing.PestFoldingBuilder"/>
 		<lang.psiStructureViewFactory language="Pest" implementationClass="rs.pest.editing.PestStructureViewFactory"/>
+		<lang.elementManipulator
+			forClass="rs.pest.psi.impl.PestStringMixin"
+			implementationClass="rs.pest.psi.PestStringManipulator"/>
 	</extensions>
 </idea-plugin>

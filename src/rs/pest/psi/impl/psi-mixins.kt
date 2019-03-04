@@ -5,6 +5,7 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement
 import com.intellij.lang.ASTNode
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.*
+import com.intellij.psi.impl.source.tree.injected.StringLiteralEscaper
 import com.intellij.util.IncorrectOperationException
 import icons.PestIcons
 import rs.pest.PestFile
@@ -84,4 +85,10 @@ abstract class PestIdentifierMixin(node: ASTNode) : PestElement(node), PsiPolyVa
 			.withIcon(it.getIcon(0))
 			.withTypeText(it.type.description)
 	}.toTypedArray()
+}
+
+abstract class PestStringMixin(node: ASTNode) : PestElement(node), PsiLanguageInjectionHost {
+	override fun isValidHost() = true
+	override fun updateText(text: String) = replace(PestTokenType.fromText(text, project)) as? PestStringMixin
+	override fun createLiteralTextEscaper(): LiteralTextEscaper<PestStringMixin> = PestStringEscaper(this)
 }

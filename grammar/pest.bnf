@@ -101,7 +101,12 @@ builtin    ::=
 	ASCII_ALPHA_LOWER_TOKEN { extends=expression }
 
 character ::= CHAR_TOKEN { extends=expression }
-string    ::= INSENSITIVE_OPERATOR? STRING_TOKEN { extends=expression }
+string    ::= INSENSITIVE_OPERATOR? STRING_TOKEN {
+	extends=expression
+	implements=["com.intellij.psi.PsiLanguageInjectionHost"]
+	mixin="rs.pest.psi.impl.PestStringMixin"
+}
+
 range     ::= character RANGE_OPERATOR character {
 	extends=expression
 	pin=2
