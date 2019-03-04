@@ -19,6 +19,12 @@ import rs.pest.psi.PestTypes
 object PestHighlighter : SyntaxHighlighter {
 	@JvmField val KEYWORD = TextAttributesKey.createTextAttributesKey("PEST_KEYWORD", DefaultLanguageHighlighterColors.KEYWORD)
 	@JvmField val IDENTIFIER = TextAttributesKey.createTextAttributesKey("PEST_IDENTIFIER", DefaultLanguageHighlighterColors.IDENTIFIER)
+	@JvmField val UNRESOLVED = TextAttributesKey.createTextAttributesKey("PEST_UNRESOLVED", DefaultLanguageHighlighterColors.IDENTIFIER)
+	@JvmField val SIMPLE = TextAttributesKey.createTextAttributesKey("PEST_SIMPLE", DefaultLanguageHighlighterColors.FUNCTION_DECLARATION)
+	@JvmField val SILENT = TextAttributesKey.createTextAttributesKey("PEST_SILENT", DefaultLanguageHighlighterColors.LOCAL_VARIABLE)
+	@JvmField val ATOMIC = TextAttributesKey.createTextAttributesKey("PEST_ATOMIC", DefaultLanguageHighlighterColors.CONSTANT)
+	@JvmField val COMPOUND_ATOMIC = TextAttributesKey.createTextAttributesKey("PEST_COMPOUND_ATOMIC", DefaultLanguageHighlighterColors.CONSTANT)
+	@JvmField val NON_ATOMIC = TextAttributesKey.createTextAttributesKey("PEST_NON_ATOMIC", DefaultLanguageHighlighterColors.REASSIGNED_LOCAL_VARIABLE)
 	@JvmField val NUMBER = TextAttributesKey.createTextAttributesKey("PEST_NUMBER", DefaultLanguageHighlighterColors.NUMBER)
 	@JvmField val STRING = TextAttributesKey.createTextAttributesKey("PEST_STRING", DefaultLanguageHighlighterColors.STRING)
 	@JvmField val CHAR = TextAttributesKey.createTextAttributesKey("PEST_CHAR", DefaultLanguageHighlighterColors.STRING)
@@ -108,7 +114,14 @@ class PestColorSettingsPage : ColorSettingsPage {
 			AttributesDescriptor(PestBundle.message("pest.highlighter.settings.comment"), PestHighlighter.COMMENT),
 			AttributesDescriptor(PestBundle.message("pest.highlighter.settings.block-comment"), PestHighlighter.BLOCK_COMMENT))
 
-		private val ADDITIONAL_DESCRIPTORS = mapOf<String,TextAttributesKey>()
+		private val ADDITIONAL_DESCRIPTORS = mapOf(
+			"Unresolved" to PestHighlighter.UNRESOLVED,
+			"Simple" to PestHighlighter.SIMPLE,
+			"Silent" to PestHighlighter.SILENT,
+			"Atomic" to PestHighlighter.ATOMIC,
+			"CompoundAtomic" to PestHighlighter.COMPOUND_ATOMIC,
+			"NonAtomic" to PestHighlighter.NON_ATOMIC
+		)
 	}
 
 	override fun getHighlighter(): SyntaxHighlighter = PestHighlighter
@@ -120,6 +133,11 @@ class PestColorSettingsPage : ColorSettingsPage {
 	@Language("Pest")
 	override fun getDemoText() = """// Syntax Sample
 /* Block comment */
-rule = { PUSH ("string") ~ other_rule ~ (!"PRE" ~ ) }
+compound_atomic_rule = { <Simple>simple</Simple> }
+simple_rule = _{ <Silent>silent</Silent> }
+silent_rule = @{ <Atomic>atomic</Atomic> }
+atomic_rule = ${'$'}{ <CompoundAtomic>compound_atomic_rule</CompoundAtomic> }
+non_atomic_rule = !{ <NonAtomic>non_atomic_rule</NonAtomic> }
+simple_rule = { PUSH ("string") ~ <Unresolved>unresolved_rule</Unresolved> ~ (!"PRE" ~ ) }
 """
 }
