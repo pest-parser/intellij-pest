@@ -32,7 +32,7 @@ modifier ::=
 	COMPOUND_ATOMIC_MODIFIER |
 	NON_ATOMIC_MODIFIER
 
-expression ::= term (infix_operator term)*
+expression ::= term (infix_operator term)* { pin=2 }
 term       ::= prefix_operator* rule postfix_operator* { extends=expression }
 // Can't name `node`, conflict with PsiElement's class
 rule       ::= OPENING_PAREN expression CLOSING_PAREN | atom { extends=expression }
@@ -66,8 +66,17 @@ integer    ::= MINUS? NUMBER
 identifier ::= IDENTIFIER_TOKEN {
 	mixin="rs.pest.psi.impl.PestIdentifierMixin"
 }
-push       ::= PUSH_TOKEN OPENING_PAREN expression CLOSING_PAREN { extends=expression }
-peek_slice ::= PEEK_TOKEN OPENING_BRACK integer? RANGE_OPERATOR integer? CLOSING_BRACK { extends=expression }
+
+push       ::= PUSH_TOKEN OPENING_PAREN expression CLOSING_PAREN {
+	extends=expression
+	pin=1
+}
+
+peek_slice ::= PEEK_TOKEN OPENING_BRACK integer? RANGE_OPERATOR integer? CLOSING_BRACK {
+	extends=expression
+	pin=1
+}
+
 commands   ::=
 	PEEK_ALL_TOKEN |
 	POP_TOKEN |
@@ -93,4 +102,8 @@ builtin    ::=
 
 character ::= CHAR_TOKEN { extends=expression }
 string    ::= INSENSITIVE_OPERATOR? STRING_TOKEN { extends=expression }
-range     ::= character RANGE_OPERATOR character { extends=expression }
+range     ::= character RANGE_OPERATOR character {
+	extends=expression
+	pin=2
+}
+
