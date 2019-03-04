@@ -11,7 +11,6 @@
   psiImplPackage="rs.pest.psi.impl"
 
   elementTypeHolderClass="rs.pest.psi.PestTypes"
-  elementTypePrefix="PEST_"
   elementTypeClass="rs.pest.psi.PestTokenType"
   tokenTypeClass="rs.pest.psi.PestTokenType"
 }
@@ -29,8 +28,9 @@ modifier ::=
 	NON_ATOMIC_MODIFIER
 
 expression ::= term (infix_operator term)*
-term       ::= prefix_operator* node postfix_operator*
-node       ::= OPENING_PAREN expression CLOSING_PAREN | terminal
+term       ::= prefix_operator* rule postfix_operator*
+// Can't name `node`, conflict with PsiElement's class
+rule       ::= OPENING_PAREN expression CLOSING_PAREN | terminal
 terminal   ::= push | peek_slice | identifier | string | range
 
 prefix_operator  ::= POSITIVE_PREDICATE_OPERATOR | NON_ATOMIC_MODIFIER

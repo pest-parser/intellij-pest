@@ -8,8 +8,8 @@
 		<fileTypeFactory implementation="rs.pest.PestFileTypeFactory"/>
 		<errorHandler implementation="rs.pest.error.GitHubErrorReporter"/>
 		<liveTemplateContext implementation="rs.pest.PestContext"/>
-		<lang.commenter
-			language="Pest"
-			implementationClass="rs.pest.editing.PestCommenter"/>
+		<lang.parserDefinition language="Pest" implementationClass="rs.pest.psi.PestParserDefinition"/>
+		<lang.commenter language="Pest" implementationClass="rs.pest.editing.PestCommenter"/>
+		<lang.braceMatcher language="Pest" implementationClass="rs.pest.editing.PestBraceMatcher"/>
 	</extensions>
 </idea-plugin>
