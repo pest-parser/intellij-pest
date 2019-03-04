@@ -31,7 +31,7 @@ expression ::= term (infix_operator term)*
 term       ::= prefix_operator* rule postfix_operator*
 // Can't name `node`, conflict with PsiElement's class
 rule       ::= OPENING_PAREN expression CLOSING_PAREN | terminal
-terminal   ::= push | peek_slice | identifier | string | range
+terminal   ::= push | peek_slice | identifier | string | range | builtin
 
 prefix_operator  ::= POSITIVE_PREDICATE_OPERATOR | NON_ATOMIC_MODIFIER
 infix_operator   ::= SEQUENCE_OPERATOR | CHOICE_OPERATOR
@@ -53,6 +53,26 @@ integer    ::= MINUS? NUMBER
 identifier ::= IDENTIFIER_TOKEN
 push       ::= PUSH_TOKEN OPENING_PAREN expression CLOSING_PAREN
 peek_slice ::= PEEK_TOKEN OPENING_BRACK integer? RANGE_OPERATOR integer? CLOSING_BRACK
+builtin    ::=
+	PEEK_ALL_TOKEN |
+	POP_TOKEN |
+	POP_ALL_TOKEN |
+	ANY_TOKEN |
+	EOI_TOKEN |
+	SOI_TOKEN |
+	DROP_TOKEN |
+	ASCII_TOKEN |
+	NEWLINE_TOKEN |
+	COMMENT_TOKEN |
+	ASCII_DIGIT_TOKEN |
+	ASCII_ALPHA_TOKEN |
+	ASCII_ALPHANUMERIC_TOKEN |
+	ASCII_NONZERO_DIGIT_TOKEN |
+	ASCII_BIN_DIGIT_TOKEN |
+	ASCII_OCT_DIGIT_TOKEN |
+	ASCII_HEX_DIGIT_TOKEN |
+	ASCII_ALPHA_UPPER_TOKEN |
+	ASCII_ALPHA_LOWER_TOKEN
 
 character ::= CHAR_TOKEN
 string    ::= INSENSITIVE_OPERATOR? STRING_TOKEN

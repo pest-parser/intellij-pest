@@ -2,8 +2,8 @@ package rs.pest.psi;
 
 import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.tree.IElementType;
-import static rs.pest.psi.PestTokenType.Static.LINE_COMMENT;
-import static rs.pest.psi.PestTokenType.Static.BLOCK_COMMENT;
+import static rs.pest.psi.PestTokenType.LINE_COMMENT;
+import static rs.pest.psi.PestTokenType.BLOCK_COMMENT;
 import static rs.pest.psi.PestTypes.*;
 
 import static com.intellij.psi.TokenType.BAD_CHARACTER;
@@ -54,6 +54,25 @@ HEXDIGIT=[a-fA-F0-9]
 - { return MINUS; }
 PUSH { return PUSH_TOKEN; }
 PEEK { return PEEK_TOKEN; }
+PEEK_ALL { return PEEK_ALL_TOKEN; }
+POP { return POP_TOKEN; }
+POP_ALL { return POP_ALL_TOKEN; }
+ANY { return ANY_TOKEN; }
+EOI { return EOI_TOKEN; }
+SOI { return SOI_TOKEN; }
+DROP { return DROP_TOKEN; }
+ASCII { return ASCII_TOKEN; }
+NEWLINE { return NEWLINE_TOKEN; }
+COMMENT { return COMMENT_TOKEN; }
+ASCII_DIGIT { return ASCII_DIGIT_TOKEN; }
+ASCII_ALPHA { return ASCII_ALPHA_TOKEN; }
+ASCII_ALPHANUMERIC { return ASCII_ALPHANUMERIC_TOKEN; }
+ASCII_NONZERO_DIGIT { return ASCII_NONZERO_DIGIT_TOKEN; }
+ASCII_BIN_DIGIT { return ASCII_BIN_DIGIT_TOKEN; }
+ASCII_OCT_DIGIT { return ASCII_OCT_DIGIT_TOKEN; }
+ASCII_HEX_DIGIT { return ASCII_HEX_DIGIT_TOKEN; }
+ASCII_ALPHA_UPPER { return ASCII_ALPHA_UPPER_TOKEN; }
+ASCII_ALPHA_LOWER { return ASCII_ALPHA_LOWER_TOKEN; }
 "_" { return SILENT_MODIFIER; }
 {IDENTIFIER} { return IDENTIFIER_TOKEN; }
 "//"[^\r\n]* { return LINE_COMMENT; }

@@ -42,6 +42,25 @@ object PestHighlighter : SyntaxHighlighter {
 	@JvmField val BLOCK_COMMENT_KEY = arrayOf(BLOCK_COMMENT)
 
 	private val KEYWORDS_LIST = listOf(
+		PestTypes.PEEK_ALL_TOKEN,
+		PestTypes.POP_TOKEN,
+		PestTypes.POP_ALL_TOKEN,
+		PestTypes.ANY_TOKEN,
+		PestTypes.EOI_TOKEN,
+		PestTypes.SOI_TOKEN,
+		PestTypes.DROP_TOKEN,
+		PestTypes.ASCII_TOKEN,
+		PestTypes.NEWLINE_TOKEN,
+		PestTypes.COMMENT_TOKEN,
+		PestTypes.ASCII_DIGIT_TOKEN,
+		PestTypes.ASCII_ALPHA_TOKEN,
+		PestTypes.ASCII_ALPHANUMERIC_TOKEN,
+		PestTypes.ASCII_NONZERO_DIGIT_TOKEN,
+		PestTypes.ASCII_BIN_DIGIT_TOKEN,
+		PestTypes.ASCII_OCT_DIGIT_TOKEN,
+		PestTypes.ASCII_HEX_DIGIT_TOKEN,
+		PestTypes.ASCII_ALPHA_UPPER_TOKEN,
+		PestTypes.ASCII_ALPHA_LOWER_TOKEN,
 		PestTypes.PUSH_TOKEN,
 		PestTypes.PEEK_TOKEN)
 
@@ -100,6 +119,6 @@ class PestColorSettingsPage : ColorSettingsPage {
 	@Language("Pest")
 	override fun getDemoText() = """// Syntax Sample
 /* Block comment */
-rule = { PUSH ("string") ~ other_rule }
+rule = { PUSH ("string") ~ other_rule ~ (!"PRE" ~ ) }
 """
 }
