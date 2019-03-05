@@ -9,11 +9,14 @@
 	<extensions defaultExtensionNs="com.intellij">
 		<additionalTextAttributes scheme="Default" file="/colorSchemes/Pest.xml"/>
 		<additionalTextAttributes scheme="Darcula" file="/colorSchemes/Pest_dark.xml"/>
+
 		<fileTypeFactory implementation="rs.pest.PestFileTypeFactory"/>
 		<errorHandler implementation="rs.pest.error.GitHubErrorReporter"/>
 		<liveTemplateContext implementation="rs.pest.editing.PestDefaultContext"/>
 		<liveTemplateContext implementation="rs.pest.editing.PestLocalContext"/>
 		<defaultLiveTemplatesProvider implementation="rs.pest.editing.PestLiveTemplateProvider"/>
+		<inlineActionHandler implementation="rs.pest.action.PestInlineRuleActionHandler"/>
+
 		<lang.parserDefinition language="Pest" implementationClass="rs.pest.PestParserDefinition"/>
 		<lang.commenter language="Pest" implementationClass="rs.pest.editing.PestCommenter"/>
 		<lang.braceMatcher language="Pest" implementationClass="rs.pest.editing.PestBraceMatcher"/>
@@ -28,8 +31,9 @@
 		<annotator language="Pest" implementationClass="rs.pest.editing.PestAnnotator"/>
 		<lang.foldingBuilder language="Pest" implementationClass="rs.pest.editing.PestFoldingBuilder"/>
 		<lang.psiStructureViewFactory language="Pest" implementationClass="rs.pest.editing.PestStructureViewFactory"/>
-		<quoteHandler fileType="Pest" className="rs.pest.editing.PestQuoteHandler"/>
 		<spellchecker.support language="Pest" implementationClass="rs.pest.editing.PestSpellCheckingStrategy"/>
+		<quoteHandler fileType="Pest" className="rs.pest.editing.PestQuoteHandler"/>
+
 		<localInspection
 			language="Pest"
 			level="ERROR"

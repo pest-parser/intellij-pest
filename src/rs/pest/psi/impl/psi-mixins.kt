@@ -18,6 +18,16 @@ abstract class PestElement(node: ASTNode) : ASTWrapperPsiElement(node) {
 fun renameBuiltin(): Nothing = throw IncorrectOperationException("Cannot rename a builtin rule!")
 
 abstract class PestGrammarRuleMixin(node: ASTNode) : PestElement(node), PestGrammarRule {
+	private var recCache: Boolean? = null
+	val isRecursive get() = recCache ?: run {
+		val grammarBody = grammarBody?.expression ?: return@run false
+		val name = name
+		SyntaxTraverser
+			.psiTraverser(grammarBody)
+			.filterTypes { it == PestTypes.IDENTIFIER }
+			.any { it.text == name }
+	}.also { recCache = it }
+
 	private var refCache: Array<PsiReference>? = null
 	private fun refreshCache(myName: String) = collectFrom<PestIdentifier>(containingFile, myName, this).also { refCache = it }
 	override fun getReference() = references.firstOrNull()
@@ -25,6 +35,7 @@ abstract class PestGrammarRuleMixin(node: ASTNode) : PestElement(node), PestGram
 	override fun subtreeChanged() {
 		refreshCache(name)
 		typeCache = null
+		recCache = null
 	}
 
 	override fun getNameIdentifier(): PsiElement = firstChild

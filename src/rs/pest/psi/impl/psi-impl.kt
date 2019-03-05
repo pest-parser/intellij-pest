@@ -14,6 +14,9 @@ inline fun <reified Element : PsiElement> collectFrom(startPoint: PsiElement, na
 	.mapNotNull(PsiElement::getReference)
 	.toTypedArray()
 
+/**
+ * @param maxSizeExpected if less than zero, don't limit text size.
+ */
 fun PsiElement.bodyText(maxSizeExpected: Int) = buildString {
 	append(' ')
 	var child = firstChild
@@ -23,7 +26,7 @@ fun PsiElement.bodyText(maxSizeExpected: Int) = buildString {
 			while (child.firstChild != null && length + child.textLength > maxSizeExpected) child = child.firstChild
 			append(child.text)
 		}
-		if (length >= maxSizeExpected) break
+		if (maxSizeExpected < 0 || length >= maxSizeExpected) break
 		do {
 			child = child.nextSibling ?: child.parent
 		} while (child == null)
