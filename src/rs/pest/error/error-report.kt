@@ -57,8 +57,8 @@ import javax.crypto.spec.SecretKeySpec
 
 private object AnonymousFeedback {
 	private const val tokenFile = "rs/pest/error/token.bin"
-	private const val gitRepoUser = "ice1000"
-	private const val gitRepo = "pest-intellij"
+	private const val gitRepoUser = "pest-parser"
+	private const val gitRepo = "intellij-pest"
 	private const val issueLabel = "pending"
 
 	/**
@@ -170,7 +170,7 @@ class GitHubErrorReporter : ErrorReportSubmitter() {
 		val dataContext = DataManager.getInstance().getDataContext(parent)
 		val bean = GitHubErrorBean(
 			event.throwable,
-			IdeaLogger.ourLastActionId,
+			IdeaLogger.ourLastActionId.orEmpty(),
 			description ?: "<No description>",
 			event.message ?: event.throwable.message.toString())
 		IdeErrorsDialog.findPluginId(event.throwable)?.let { pluginId ->

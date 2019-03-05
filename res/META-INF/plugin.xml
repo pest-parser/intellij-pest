@@ -25,6 +25,7 @@
 		<lang.foldingBuilder language="Pest" implementationClass="rs.pest.editing.PestFoldingBuilder"/>
 		<lang.psiStructureViewFactory language="Pest" implementationClass="rs.pest.editing.PestStructureViewFactory"/>
 		<quoteHandler fileType="Pest" className="rs.pest.editing.PestQuoteHandler"/>
+		<spellchecker.support language="Pest" implementationClass="rs.pest.editing.PestSpellCheckingStrategy"/>
 		<lang.elementManipulator
 			forClass="rs.pest.psi.impl.PestStringMixin"
 			implementationClass="rs.pest.psi.PestStringManipulator"/>

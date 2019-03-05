@@ -33,10 +33,11 @@ import com.intellij.psi.impl.search.IndexPatternBuilder
 import com.intellij.psi.search.UsageSearchContext
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.TokenSet
+import com.intellij.spellchecker.tokenizer.PsiIdentifierOwnerTokenizer
+import com.intellij.spellchecker.tokenizer.SpellcheckingStrategy
+import com.intellij.spellchecker.tokenizer.Tokenizer
 import rs.pest.*
-import rs.pest.psi.PestGrammarRule
-import rs.pest.psi.PestTokenType
-import rs.pest.psi.PestTypes
+import rs.pest.psi.*
 
 class PestCommenter : Commenter {
 	override fun getCommentedBlockCommentPrefix() = blockCommentPrefix
@@ -137,4 +138,16 @@ class PestFoldingBuilder : CustomFoldingBuilder() {
 
 class PestQuoteHandler : SimpleTokenSetQuoteHandler(PestTokenType.ANY_STRINGS) {
 	override fun hasNonClosedLiteral(editor: Editor, iterator: HighlighterIterator, offset: Int) = iterator.tokenType in PestTokenType.ANY_STRINGS
+}
+
+class PestSpellCheckingStrategy : SpellcheckingStrategy() {
+	override fun getTokenizer(element: PsiElement): Tokenizer<*> = when (element) {
+		is PestIdentifier -> {
+			val parent = element.parent
+			if (parent is PestGrammarRule && parent.firstChild === element) PsiIdentifierOwnerTokenizer.INSTANCE
+			else EMPTY_TOKENIZER
+		}
+		is PestString, is PestCharacter -> EMPTY_TOKENIZER
+		else -> super.getTokenizer(element)
+	}
 }

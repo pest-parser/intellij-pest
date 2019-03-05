@@ -24,7 +24,7 @@
 	<option name="PEST_UNRESOLVED">
 		<value>
 			<option name="ERROR_STRIPE_COLOR" value="ff0000"/>
-			<option name="EFFECT_TYPE" value="2"/>
+			<option name="FOREGROUND" value="BC3F3C"/>
 		</value>
 	</option>
 </list>
