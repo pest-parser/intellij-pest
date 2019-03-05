@@ -5,14 +5,13 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement
 import com.intellij.lang.ASTNode
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.*
-import com.intellij.psi.impl.source.tree.injected.StringLiteralEscaper
 import com.intellij.util.IncorrectOperationException
 import icons.PestIcons
 import rs.pest.PestFile
 import rs.pest.psi.*
 
 abstract class PestElement(node: ASTNode) : ASTWrapperPsiElement(node) {
-	val containingPestFile get() = containingFile as PestFile
+	val containingPestFile get() = containingFile as? PestFile
 }
 
 abstract class PestGrammarRuleMixin(node: ASTNode) : PestElement(node), PestGrammarRule {
@@ -40,7 +39,7 @@ abstract class PestGrammarRuleMixin(node: ASTNode) : PestElement(node), PestGram
 		}
 	}
 
-	fun preview(maxSizeExpected: Int) = expressionList.lastOrNull()?.body(maxSizeExpected)
+	fun preview(maxSizeExpected: Int) = grammarBody?.bodyText(maxSizeExpected)
 	private var typeCache: PestRuleType? = null
 	val type: PestRuleType
 		get() = typeCache ?: when (modifier?.firstChild?.node?.elementType) {
@@ -58,6 +57,12 @@ abstract class PestIdentifierMixin(node: ASTNode) : PestElement(node), PsiPolyVa
 	override fun getName(): String? = text
 	override fun setName(newName: String): PsiElement = replace(PestTokenType.fromText(newName, project))
 
+	private fun allGrammarRules(): Collection<PestGrammarRuleMixin> = containingPestFile
+		?.rules()
+		?.values
+		?.filter { it.nameIdentifier != null }
+		.orEmpty()
+
 	private var resolveCache = emptyList<ResolveResult>().toMutableList()
 	private fun updateCache(): List<ResolveResult> {
 		resolveCache.removeAll { it.element?.isValid ?: false }
@@ -70,7 +75,6 @@ abstract class PestIdentifierMixin(node: ASTNode) : PestElement(node), PsiPolyVa
 	override fun multiResolve(incomplete: Boolean): Array<ResolveResult> = updateCache().toTypedArray()
 	override fun getReference() = this
 	override fun getReferences() = arrayOf(this)
-	private fun allGrammarRules(): Collection<PestGrammarRuleMixin> = containingPestFile.rules().values.filter { it.nameIdentifier != null }
 	override fun handleElementRename(newName: String): PsiElement = setName(newName)
 	override fun getElement() = this
 	override fun bindToElement(element: PsiElement): PsiElement = throw IncorrectOperationException("Unsupported")

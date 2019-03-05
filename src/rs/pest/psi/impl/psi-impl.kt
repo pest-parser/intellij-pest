@@ -14,10 +14,10 @@ inline fun <reified Element : PsiElement> collectFrom(startPoint: PsiElement, na
 	.mapNotNull(PsiElement::getReference)
 	.toTypedArray()
 
-fun PsiElement.body(maxSizeExpected: Int) = buildString {
+fun PsiElement.bodyText(maxSizeExpected: Int) = buildString {
 	append(' ')
 	var child = firstChild
-	while (child != null && child != this@body) {
+	while (child != null && child != this@bodyText) {
 		if (child is PsiWhiteSpace) append(' ')
 		else {
 			while (child.firstChild != null && length + child.textLength > maxSizeExpected) child = child.firstChild

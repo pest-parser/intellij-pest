@@ -132,7 +132,7 @@ class PestFoldingBuilder : CustomFoldingBuilder() {
 	private fun foldingDescriptor(elem: PsiElement) = NamedFoldingDescriptor(elem.node, elem.textRange, null, PEST_FOLDING_PLACEHOLDER)
 	override fun buildLanguageFoldRegions(descriptors: MutableList<FoldingDescriptor>, root: PsiElement, document: Document, quick: Boolean) {
 		if (root !is PestFile) return
-		root.rules().values.mapNotNullTo(descriptors) { it.expressionList.lastOrNull()?.let(::foldingDescriptor) }
+		root.rules().values.mapNotNullTo(descriptors) { it.grammarBody?.let(::foldingDescriptor) }
 	}
 }
 

@@ -19,8 +19,11 @@ class InlineGrammarInjector : LanguageInjector {
 
 	/// Do we need to check the existence of `#[derive(Parser)]` as well?
 	private fun isInlineGrammar(host: RsLitExpr): Boolean {
+		// Should be inside of a #[]
 		val parent = host.parent as? RsMetaItem ?: return false
+		// Should have a #[derive(Parser)] before
 		if (parent.parent !is RsOuterAttr) return false
+		// Should be grammar_inline = "bla"
 		val peers = parent.childrenWithLeaves.filter { it !is PsiWhiteSpace }.toList()
 		if (peers.size != 3) return false
 		if (peers[0].text != "grammar_inline") return false
