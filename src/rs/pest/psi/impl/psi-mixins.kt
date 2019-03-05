@@ -30,11 +30,12 @@ abstract class PestGrammarRuleMixin(node: ASTNode) : PestElement(node), PestGram
 	}.also { recCache = it }
 
 	private var refCache: Array<PsiReference>? = null
-	private fun refreshCache(myName: String, self: PsiElement) = collectFrom<PestIdentifier>(containingFile, myName, self).also { refCache = it }
+	fun refreshReferenceCache() = refreshReferenceCache(name, nameIdentifier)
+	private fun refreshReferenceCache(myName: String, self: PsiElement) = collectFrom<PestIdentifier>(containingFile, myName, self).also { refCache = it }
 	override fun getReference() = references.firstOrNull()
-	override fun getReferences() = refCache ?: refreshCache(name, nameIdentifier) ?: emptyArray()
+	override fun getReferences() = refCache ?: refreshReferenceCache(name, nameIdentifier) ?: emptyArray()
 	override fun subtreeChanged() {
-		refreshCache(name, nameIdentifier)
+		refreshReferenceCache()
 		typeCache = null
 		recCache = null
 	}
@@ -73,7 +74,7 @@ abstract class PestResolvableMixin(node: ASTNode) : PestExpressionImpl(node), Ps
 
 	private var resolveCache = emptyList<ResolveResult>().toMutableList()
 	private fun updateCache(): List<ResolveResult> {
-		resolveCache.removeAll { it.element?.isValid ?: false }
+		resolveCache.removeAll { !(it.element?.isValid ?: false) }
 		if (resolveCache.isNotEmpty()) return resolveCache
 		else resolveCache.addAll(allGrammarRules().filter { it.name == text }.map(::PsiElementResolveResult))
 		return resolveCache

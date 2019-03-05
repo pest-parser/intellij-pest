@@ -77,7 +77,7 @@ class PestInlineProcessor(
 	override fun getCommandName() = PestBundle.message("pest.actions.inline.command.name", name)
 	override fun createUsageViewDescriptor(usages: Array<UsageInfo>) = PestInlineViewDescriptor(rule)
 	override fun findUsages() = rule
-		.references
+		.refreshReferenceCache()
 		.asSequence()
 		.map(PsiReference::getElement)
 		.filter(PsiElement::isValid)
