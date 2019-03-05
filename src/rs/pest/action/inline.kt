@@ -6,7 +6,6 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.ElementDescriptionUtil
-import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
 import com.intellij.psi.util.PsiTreeUtil
@@ -38,34 +37,41 @@ class PestInlineRuleActionHandler : InlineActionHandler() {
 			return
 		}
 		if (!CommonRefactoringUtil.checkReadOnlyStatus(project, rule)) return
-		PestInlineDialog(project, element).show()
+		val reference = editor?.let { rule.containingFile.findElementAt(it.caretModel.offset) }
+		PestInlineDialog(project, element, reference).show()
 	}
 }
 
 class PestInlineViewDescriptor(private val element: PestGrammarRuleMixin) : UsageViewDescriptor {
 	override fun getElements() = arrayOf(element)
 	override fun getProcessedElementsHeader() = PestBundle.message("pest.actions.inline.view.title")
-	override fun getCodeReferencesText(usagesCount: Int, filesCount: Int) =
+	override fun getCodeReferencesText(usagesCount: Int, filesCount: Int): String =
 		RefactoringBundle.message("invocations.to.be.inlined", UsageViewBundle.getReferencesString(usagesCount, filesCount))
 
-	override fun getCommentReferencesText(usagesCount: Int, filesCount: Int) =
+	override fun getCommentReferencesText(usagesCount: Int, filesCount: Int): String =
 		RefactoringBundle.message("comments.elements.header", UsageViewBundle.getOccurencesString(usagesCount, filesCount))
 }
 
-class PestInlineDialog(project: Project, element: PsiElement) : InlineOptionsDialog(project, true, element) {
+class PestInlineDialog(project: Project, val element: PestGrammarRuleMixin, private val reference: PsiElement?)
+	: InlineOptionsDialog(project, true, element) {
 	init {
 		init()
 	}
 
 	override fun isInlineThis() = false
-	override fun getNameLabelText() = ElementDescriptionUtil.getElementDescription(myElement, UsageViewNodeTextLocation.INSTANCE)
+	override fun getNameLabelText() = ElementDescriptionUtil.getElementDescription(element, UsageViewNodeTextLocation.INSTANCE)
 	override fun getInlineThisText() = PestBundle.message("pest.actions.inline.dialog.this")
 	override fun getInlineAllText() = PestBundle.message("pest.actions.inline.dialog.all")
 	override fun getBorderTitle() = PestBundle.message("pest.actions.inline.dialog.title")
-	override fun doAction() = invokeRefactoring(PestInlineProcessor(project, myElement as PestGrammarRuleMixin, isInlineThisOnly))
+	override fun doAction() = invokeRefactoring(PestInlineProcessor(project, element, reference, isInlineThisOnly))
 }
 
-class PestInlineProcessor(project: Project, val rule: PestGrammarRuleMixin, val thisOnly: Boolean) : BaseRefactoringProcessor(project) {
+class PestInlineProcessor(
+	project: Project,
+	val rule: PestGrammarRuleMixin,
+	private val reference: PsiElement?,
+	private val thisOnly: Boolean
+) : BaseRefactoringProcessor(project) {
 	private val name = rule.name
 	override fun getCommandName() = PestBundle.message("pest.actions.inline.command.name", name)
 	override fun createUsageViewDescriptor(usages: Array<UsageInfo>) = PestInlineViewDescriptor(rule)
@@ -89,12 +95,16 @@ class PestInlineProcessor(project: Project, val rule: PestGrammarRuleMixin, val 
 			is PestTerm -> expression.text
 			is PestRange -> expression.text
 			is PestBuiltin -> expression.text
-			else -> "(${expression.bodyText(expression.textLength).trim()})"
+			else -> "(${expression.bodyText(grammarBody.textLength).trim()})"
 		}
 		ApplicationManager.getApplication().runWriteAction {
-			if (!thisOnly) rule.delete()
 			val newElement = PestTokenType.createExpression(newText, myProject)
-			usages.forEach { it.element?.replace(newElement) }
+			if (thisOnly) {
+				reference?.replace(newElement)
+			} else {
+				usages.forEach { it.element?.replace(newElement) }
+				rule.delete()
+			}
 		}
 	}
 }
