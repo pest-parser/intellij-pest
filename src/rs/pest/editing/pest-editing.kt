@@ -2,6 +2,7 @@ package rs.pest.editing
 
 import com.intellij.codeInsight.CodeInsightSettings
 import com.intellij.codeInsight.editorActions.BackspaceHandlerDelegate
+import com.intellij.codeInsight.editorActions.SimpleTokenSetQuoteHandler
 import com.intellij.lang.ASTNode
 import com.intellij.lang.BracePair
 import com.intellij.lang.Commenter
@@ -17,6 +18,7 @@ import com.intellij.lexer.Lexer
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ex.EditorEx
+import com.intellij.openapi.editor.highlighter.HighlighterIterator
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
@@ -31,12 +33,10 @@ import com.intellij.psi.impl.search.IndexPatternBuilder
 import com.intellij.psi.search.UsageSearchContext
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.TokenSet
-import com.intellij.psi.util.PsiTreeUtil
 import rs.pest.*
 import rs.pest.psi.PestGrammarRule
 import rs.pest.psi.PestTokenType
 import rs.pest.psi.PestTypes
-import rs.pest.psi.impl.PestGrammarRuleMixin
 
 class PestCommenter : Commenter {
 	override fun getCommentedBlockCommentPrefix() = blockCommentPrefix
@@ -128,11 +128,13 @@ class PestPairBackspaceHandler : BackspaceHandlerDelegate() {
 class PestFoldingBuilder : CustomFoldingBuilder() {
 	override fun isRegionCollapsedByDefault(node: ASTNode) = node.textLength > 80
 	override fun getLanguagePlaceholderText(node: ASTNode, range: TextRange): String = "..."
-	private fun foldingDescriptor(elem: PsiElement, placeHolder: String?) = NamedFoldingDescriptor(elem.node, elem.textRange, null, placeHolder ?: "...")
+	private fun foldingDescriptor(elem: PsiElement) = NamedFoldingDescriptor(elem.node, elem.textRange, null, PEST_FOLDING_PLACEHOLDER)
 	override fun buildLanguageFoldRegions(descriptors: MutableList<FoldingDescriptor>, root: PsiElement, document: Document, quick: Boolean) {
 		if (root !is PestFile) return
-		root.rules().values.mapNotNullTo(descriptors) {
-			it.expressionList.lastOrNull()?.let { elem -> foldingDescriptor(elem, PEST_FOLDING_PLACEHOLDER) }
-		}
+		root.rules().values.mapNotNullTo(descriptors) { it.expressionList.lastOrNull()?.let(::foldingDescriptor) }
 	}
+}
+
+class PestQuoteHandler : SimpleTokenSetQuoteHandler(PestTokenType.ANY_STRINGS) {
+	override fun hasNonClosedLiteral(editor: Editor, iterator: HighlighterIterator, offset: Int) = iterator.tokenType in PestTokenType.ANY_STRINGS
 }

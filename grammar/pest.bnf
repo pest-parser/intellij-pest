@@ -70,11 +70,13 @@ identifier ::= IDENTIFIER_TOKEN {
 push       ::= PUSH_TOKEN OPENING_PAREN expression CLOSING_PAREN {
 	extends=expression
 	pin=1
+	name="PUSH command"
 }
 
 peek_slice ::= PEEK_TOKEN OPENING_BRACK integer? RANGE_OPERATOR integer? CLOSING_BRACK {
 	extends=expression
 	pin=1
+	name="PEEK slice command"
 }
 
 commands   ::=

@@ -2,8 +2,7 @@ package rs.pest.psi;
 
 import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.tree.IElementType;
-import static rs.pest.psi.PestTokenType.LINE_COMMENT;
-import static rs.pest.psi.PestTokenType.BLOCK_COMMENT;
+import static rs.pest.psi.PestTokenType.*;
 import static rs.pest.psi.PestTypes.*;
 
 import static com.intellij.psi.TokenType.BAD_CHARACTER;
@@ -34,9 +33,11 @@ WHITE_SPACE=[\ \t\f\r\n]
 IDENTIFIER_CHAR=[a-zA-Z_0-9]
 INTEGER=[0-9]+
 IDENTIFIER={IDENTIFIER_CHAR}+
-STRING_LITERAL=\"([^\"\\]|(\\[^])|{STRING_UNICODE})*\"
 STRING_UNICODE=\\((u\{{HEXDIGIT}{2,6}\})|(x{HEXDIGIT}{2}))
-CHAR_LITERAL='([^\\\'\x00-\x1F\x7F]|\\[^\x00-\x1F\x7F]+|{STRING_UNICODE})'
+STRING_INCOMPLETE=\"([^\"\\]|(\\[^])|{STRING_UNICODE})*
+CHAR_INCOMPLETE='([^\\\'\x00-\x1F\x7F]|\\[^\x00-\x1F\x7F]+|{STRING_UNICODE})?
+STRING_LITERAL={STRING_INCOMPLETE}\"
+CHAR_LITERAL={CHAR_INCOMPLETE}'
 HEXDIGIT=[a-fA-F0-9]
 
 %%
@@ -102,5 +103,7 @@ ASCII_ALPHA_LOWER { return ASCII_ALPHA_LOWER_TOKEN; }
 ".." { return RANGE_OPERATOR; }
 {STRING_LITERAL} { return STRING_TOKEN; }
 {CHAR_LITERAL} { return CHAR_TOKEN; }
+{STRING_INCOMPLETE} { return STRING_INCOMPLETE; }
+{CHAR_INCOMPLETE} { return CHAR_INCOMPLETE; }
 {WHITE_SPACE}+ { return WHITE_SPACE; }
 [^] { return BAD_CHARACTER; }

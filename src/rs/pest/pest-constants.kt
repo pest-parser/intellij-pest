@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NonNls
 @NonNls const val PEST_PLUGIN_ID = "rs.pest"
 
 @NonNls const val PEST_WEBSITE = "https://pest.rs/"
-@NonNls const val PEST_FOLDING_PLACEHOLDER = "{...}"
+@NonNls const val PEST_FOLDING_PLACEHOLDER = "..."
 
 @JvmField val BUILTIN_RULES = listOf(
 	"PUSH",

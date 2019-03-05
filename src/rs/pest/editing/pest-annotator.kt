@@ -6,6 +6,7 @@ import com.intellij.lang.annotation.Annotator
 import com.intellij.psi.PsiElement
 import rs.pest.PestBundle
 import rs.pest.PestHighlighter
+import rs.pest.psi.PestCharacter
 import rs.pest.psi.impl.PestGrammarRuleMixin
 import rs.pest.psi.impl.PestIdentifierMixin
 
@@ -14,6 +15,14 @@ class PestAnnotator : Annotator {
 		when (element) {
 			is PestGrammarRuleMixin -> grammarRule(element, holder)
 			is PestIdentifierMixin -> identifier(element, holder)
+			is PestCharacter -> char(element, holder)
+		}
+	}
+
+	private fun char(element: PestCharacter, holder: AnnotationHolder) {
+		if (element.textLength <= 2) holder.createErrorAnnotation(element, PestBundle.message("pest.annotator.empty-char")).apply {
+			textAttributes = PestHighlighter.UNRESOLVED
+			highlightType = ProblemHighlightType.ERROR
 		}
 	}
 
