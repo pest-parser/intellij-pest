@@ -33,7 +33,7 @@ class PestFile(viewProvider: FileViewProvider) : PsiFileBase(viewProvider, PestL
 	fun rule(name: String) = rules()[name]
 	private fun calcRules() = children.filterIsInstance<PestGrammarRuleMixin>().run {
 		val map = hashMapOf<String, PestGrammarRuleMixin>()
-		forEach { map[it.firstChild.text] = it }
+		forEach { rule -> rule.name?.let {  map[it] = rule } }
 		map
 	}
 }

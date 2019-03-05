@@ -66,6 +66,7 @@ private repeat_min_max ::= OPENING_BRACE NUMBER COMMA NUMBER CLOSING_BRACE
 integer    ::= MINUS? NUMBER
 identifier ::= IDENTIFIER_TOKEN {
 	mixin="rs.pest.psi.impl.PestIdentifierMixin"
+	extends=expression
 }
 
 push       ::= PUSH_TOKEN OPENING_PAREN expression CLOSING_PAREN {
@@ -101,7 +102,10 @@ builtin    ::=
 	ASCII_OCT_DIGIT_TOKEN |
 	ASCII_HEX_DIGIT_TOKEN |
 	ASCII_ALPHA_UPPER_TOKEN |
-	ASCII_ALPHA_LOWER_TOKEN { extends=expression }
+	ASCII_ALPHA_LOWER_TOKEN {
+	extends=expression
+	mixin="rs.pest.psi.impl.PestBuiltinMixin"
+}
 
 character ::= CHAR_TOKEN { extends=expression }
 string    ::= INSENSITIVE_OPERATOR? STRING_TOKEN {

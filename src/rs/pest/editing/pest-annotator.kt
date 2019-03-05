@@ -38,9 +38,10 @@ class PestAnnotator : Annotator {
 	}
 
 	private fun grammarRule(element: PestGrammarRuleMixin, holder: AnnotationHolder) {
-		element.nameIdentifier?.let {
+		val nameIdentifier = element.nameIdentifier
+		if (nameIdentifier is PestIdentifierMixin) {
 			val type = element.type
-			holder.createInfoAnnotation(it, type.help()).textAttributes = type.highlight
-		} ?: holder.createInfoAnnotation(element, PestBundle.message("pest.annotator.overwrite"))
+			holder.createInfoAnnotation(nameIdentifier, type.help()).textAttributes = type.highlight
+		} else holder.createInfoAnnotation(nameIdentifier, PestBundle.message("pest.annotator.overwrite"))
 	}
 }

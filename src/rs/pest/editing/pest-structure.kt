@@ -34,7 +34,7 @@ class PestStructureViewElement(private val root: NavigatablePsiElement) :
 	override fun getLocationString() = ""
 	override fun getIcon(open: Boolean) = root.getIcon(0)
 	override fun getPresentableText() = when (root) {
-		is PestGrammarRuleMixin -> root.firstChild.text.orEmpty()
+		is PestGrammarRuleMixin -> root.name.orEmpty()
 		is PestFile -> cutText(root.name, 18)
 		else -> "Unknown"
 	}

@@ -12,7 +12,13 @@ import rs.pest.psi.*
 
 abstract class PestElement(node: ASTNode) : ASTWrapperPsiElement(node) {
 	val containingPestFile get() = containingFile as? PestFile
+	protected fun allGrammarRules(): Collection<PestGrammarRuleMixin> = containingPestFile
+		?.rules()
+		?.values
+		.orEmpty()
 }
+
+fun renameBuiltin(): Nothing = throw IncorrectOperationException("Cannot rename a builtin rule!")
 
 abstract class PestGrammarRuleMixin(node: ASTNode) : PestElement(node), PestGrammarRule {
 	private var refCache: Array<PsiReference>? = null
@@ -24,20 +30,18 @@ abstract class PestGrammarRuleMixin(node: ASTNode) : PestElement(node), PestGram
 		typeCache = null
 	}
 
-	override fun getNameIdentifier() = firstChild as? PestIdentifier
+	override fun getNameIdentifier(): PsiElement = firstChild
 	override fun getIcon(flags: Int) = PestIcons.PEST
-	override fun getName() = nameIdentifier?.text
-	override fun setName(newName: String): PsiElement {
-		val nameIdentifier = firstChild
-		return when (nameIdentifier) {
-			is PestIdentifier -> {
-				refCache = references.mapNotNull { it.handleElementRename(newName)?.reference }.toTypedArray()
-				this@PestGrammarRuleMixin
-			}
-			is PestBuiltin -> throw IncorrectOperationException("Cannot rename a builtin rule!")
-			else -> this@PestGrammarRuleMixin
+	override fun getName() = nameIdentifier.text
+	override fun setName(newName: String) = when (nameIdentifier) {
+		is PestIdentifier -> {
+			refCache = references.mapNotNull { it.handleElementRename(newName)?.reference }.toTypedArray()
+			this@PestGrammarRuleMixin
 		}
+		is PestBuiltin -> renameBuiltin()
+		else -> this@PestGrammarRuleMixin
 	}
+
 
 	fun preview(maxSizeExpected: Int) = grammarBody?.bodyText(maxSizeExpected)
 	private var typeCache: PestRuleType? = null
@@ -51,17 +55,10 @@ abstract class PestGrammarRuleMixin(node: ASTNode) : PestElement(node), PestGram
 		}.also { typeCache = it }
 }
 
-abstract class PestIdentifierMixin(node: ASTNode) : PestElement(node), PsiPolyVariantReference, PsiNameIdentifierOwner {
+abstract class PestResolvableMixin(node: ASTNode) : PestExpressionImpl(node), PsiPolyVariantReference {
 	private val range = TextRange(0, textLength)
-	override fun getNameIdentifier() = this
-	override fun getName(): String? = text
-	override fun setName(newName: String): PsiElement = replace(PestTokenType.fromText(newName, project))
-
-	private fun allGrammarRules(): Collection<PestGrammarRuleMixin> = containingPestFile
-		?.rules()
-		?.values
-		?.filter { it.nameIdentifier != null }
-		.orEmpty()
+	override fun isSoft() = true
+	override fun getRangeInElement() = range
 
 	private var resolveCache = emptyList<ResolveResult>().toMutableList()
 	private fun updateCache(): List<ResolveResult> {
@@ -71,17 +68,14 @@ abstract class PestIdentifierMixin(node: ASTNode) : PestElement(node), PsiPolyVa
 		return resolveCache
 	}
 
-	override fun resolve(): PsiElement? = multiResolve(false).firstOrNull()?.run { element }
-	override fun multiResolve(incomplete: Boolean): Array<ResolveResult> = updateCache().toTypedArray()
 	override fun getReference() = this
-	override fun getReferences() = arrayOf(this)
-	override fun handleElementRename(newName: String): PsiElement = setName(newName)
-	override fun getElement() = this
-	override fun bindToElement(element: PsiElement): PsiElement = throw IncorrectOperationException("Unsupported")
+	override fun getReferences() = arrayOf(reference)
 	override fun isReferenceTo(reference: PsiElement) = reference == resolve()
 	override fun getCanonicalText(): String = text
-	override fun isSoft() = true
-	override fun getRangeInElement() = range
+	override fun resolve(): PsiElement? = multiResolve(false).firstOrNull()?.run { element }
+	override fun multiResolve(incomplete: Boolean): Array<ResolveResult> = updateCache().toTypedArray()
+	override fun getElement() = this
+	override fun bindToElement(element: PsiElement): PsiElement = throw IncorrectOperationException("Unsupported")
 	override fun getVariants() = allGrammarRules().map {
 		LookupElementBuilder
 			.create(it)
@@ -89,6 +83,18 @@ abstract class PestIdentifierMixin(node: ASTNode) : PestElement(node), PsiPolyVa
 			.withIcon(it.getIcon(0))
 			.withTypeText(it.type.description)
 	}.toTypedArray()
+}
+
+abstract class PestIdentifierMixin(node: ASTNode) : PestResolvableMixin(node), PsiNameIdentifierOwner {
+	override fun getNameIdentifier() = this
+	override fun getName(): String? = text
+	override fun setName(newName: String): PsiElement = replace(PestTokenType.fromText(newName, project))
+
+	override fun handleElementRename(newName: String): PsiElement = setName(newName)
+}
+
+abstract class PestBuiltinMixin(node: ASTNode) : PestResolvableMixin(node) {
+	override fun handleElementRename(newName: String): PsiElement = renameBuiltin()
 }
 
 abstract class PestStringMixin(node: ASTNode) : PestExpressionImpl(node), PsiLanguageInjectionHost {
