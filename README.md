@@ -22,6 +22,9 @@ See [JetBrains Plugin Marketplace][jb] page.
 
 ## Screenshots
 
+### Rust code injection
+![rust-injected](https://user-images.githubusercontent.com/16398479/53776511-44c84b00-3ec4-11e9-9771-83106b6ccd57.png)
+
 ### Completion
 ![screen](https://user-images.githubusercontent.com/16398479/53726936-0dfb2200-3e3d-11e9-9ea3-d1bf5511e8cb.gif)
 
