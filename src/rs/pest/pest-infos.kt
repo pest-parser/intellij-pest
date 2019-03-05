@@ -2,6 +2,7 @@ package rs.pest
 
 import com.intellij.CommonBundle
 import com.intellij.codeInsight.template.TemplateContextType
+import com.intellij.codeInsight.template.impl.DefaultLiveTemplatesProvider
 import com.intellij.extapi.psi.PsiFileBase
 import com.intellij.openapi.fileTypes.FileTypeConsumer
 import com.intellij.openapi.fileTypes.FileTypeFactory
@@ -37,10 +38,6 @@ class PestFileTypeFactory : FileTypeFactory() {
 	override fun createFileTypes(consumer: FileTypeConsumer) {
 		consumer.consume(PestFileType, PEST_EXTENSION)
 	}
-}
-
-class PestContext : TemplateContextType(PEST_CONTEXT_ID, PEST_LANGUAGE_NAME) {
-	override fun isInContext(file: PsiFile, offset: Int) = file.fileType == PestFileType
 }
 
 object PestBundle {

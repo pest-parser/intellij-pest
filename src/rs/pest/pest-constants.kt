@@ -1,8 +1,11 @@
 package rs.pest
 
+import org.jetbrains.annotations.Nls
 import org.jetbrains.annotations.NonNls
 
-@NonNls const val PEST_CONTEXT_ID = "PEST_CONTEXT"
+@NonNls const val PEST_DEFAULT_CONTEXT_ID = "PEST_DEFAULT_CONTEXT"
+@NonNls const val PEST_LOCAL_CONTEXT_ID = "PEST_LOCAL_CONTEXT"
+@Nls const val PEST_LOCAL_CONTEXT_NAME = "Expression"
 @NonNls const val PEST_LANGUAGE_NAME = "Pest"
 @NonNls const val PEST_EXTENSION = "pest"
 @NonNls const val PEST_BLOCK_COMMENT_BEGIN = "/*"
@@ -12,7 +15,7 @@ import org.jetbrains.annotations.NonNls
 @NonNls const val PEST_PLUGIN_ID = "rs.pest"
 
 @NonNls const val PEST_WEBSITE = "https://pest.rs/"
-@NonNls const val PEST_FOLDING_PLACEHOLDER = "..."
+@NonNls const val PEST_FOLDING_PLACEHOLDER = "{...}"
 
 @JvmField val BUILTIN_RULES = listOf(
 	"PUSH",

@@ -1,0 +1,24 @@
+<templateSet group="Pest">
+	<template
+		name="whitespace"
+		value="WHITESPACE = _{ $END$ }"
+		description="WHITESPACE = _{ ... }"
+		toReformat="true"
+		toShortenFQNames="true">
+		<context>
+			<option name="PEST_DEFAULT_CONTEXT" value="true"/>
+			<option name="PEST_LOCAL_CONTEXT" value="false"/>
+		</context>
+	</template>
+	<template
+		name="comment"
+		value="COMMENT = _{ $END$ }"
+		description="COMMENT = _{ ... }"
+		toReformat="false"
+		toShortenFQNames="true">
+		<context>
+			<option name="PEST_DEFAULT_CONTEXT" value="true"/>
+			<option name="PEST_LOCAL_CONTEXT" value="false"/>
+		</context>
+	</template>
+</templateSet>
