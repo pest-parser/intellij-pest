@@ -4,6 +4,8 @@
 	<idea-version since-build="162.0"/>
 
 	<depends>com.intellij.modules.lang</depends>
+	<depends optional="true" config-file="plugin-rust.xml">org.rust.lang</depends>
+
 	<extensions defaultExtensionNs="com.intellij">
 		<additionalTextAttributes scheme="Default" file="/colorSchemes/Pest.xml"/>
 		<additionalTextAttributes scheme="Darcula" file="/colorSchemes/Pest_dark.xml"/>

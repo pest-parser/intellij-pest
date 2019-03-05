@@ -49,6 +49,8 @@ allprojects {
 				alternativeIdePath = "$root/PyCharm-C/ch-0/191.5849.23"
 			}
 		}
+
+		setPlugins("org.rust.lang:0.2.93.2117-191")
 	}
 }
 
