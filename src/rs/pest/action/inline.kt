@@ -24,7 +24,6 @@ import rs.pest.psi.*
 import rs.pest.psi.impl.PestGrammarRuleMixin
 import rs.pest.psi.impl.bodyText
 
-
 class PestInlineRuleActionHandler : InlineActionHandler() {
 	override fun isEnabledForLanguage(l: Language?) = l == PestLanguage.INSTANCE
 	override fun canInlineElement(element: PsiElement?) = element is PestGrammarRuleMixin && !element.isRecursive

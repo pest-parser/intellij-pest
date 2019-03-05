@@ -3,12 +3,15 @@
 [![JB][d-svg]][jb]
 [![JB][v-svg]][jb]
 [![Build Status][tv-svg]][tv-url]
+[![Build status][av-svg]][av-url]
 
  [d-svg]: https://img.shields.io/jetbrains/plugin/d/12046-pest.svg
  [v-svg]: https://img.shields.io/jetbrains/plugin/v/12046-pest.svg
  [jb]: https://plugins.jetbrains.com/plugin/12046-pest
  [tv-url]: https://travis-ci.org/pest-parser/intellij-pest
  [tv-svg]: https://travis-ci.org/pest-parser/intellij-pest.svg?branch=master
+ [av-url]: https://ci.appveyor.com/project/ice1000/intellij-pest/branch/master
+ [av-svg]: https://ci.appveyor.com/api/projects/status/yj5hya5hcdtvt9m0/branch/master?svg=true
 
 The IntelliJ IDEA plugin for [Pest](https://pest.rs).
 
