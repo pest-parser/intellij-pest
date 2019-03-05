@@ -32,6 +32,8 @@
 		<lang.foldingBuilder language="Pest" implementationClass="rs.pest.editing.PestFoldingBuilder"/>
 		<lang.psiStructureViewFactory language="Pest" implementationClass="rs.pest.editing.PestStructureViewFactory"/>
 		<spellchecker.support language="Pest" implementationClass="rs.pest.editing.PestSpellCheckingStrategy"/>
+		<completion.contributor language="Pest" implementationClass="rs.pest.editing.PestBuiltinCompletionContributor"/>
+
 		<quoteHandler fileType="Pest" className="rs.pest.editing.PestQuoteHandler"/>
 
 		<localInspection
