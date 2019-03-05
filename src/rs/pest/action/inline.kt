@@ -55,6 +55,7 @@ class PestInlineViewDescriptor(private val element: PestGrammarRuleMixin) : Usag
 class PestInlineDialog(project: Project, val element: PestGrammarRuleMixin, private val reference: PsiElement?)
 	: InlineOptionsDialog(project, true, element) {
 	init {
+		myInvokedOnReference = reference != null
 		init()
 	}
 
