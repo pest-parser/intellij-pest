@@ -1,5 +1,5 @@
 #[derive(Parser)]
 #[grammar_inline = "\
-my_rule = { "" }
+my_rule = { \"\" }
 "]
 struct MyParser;
