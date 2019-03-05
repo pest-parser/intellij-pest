@@ -20,8 +20,8 @@ class PestRecursionLineMarkerProvider : LineMarkerProvider {
 			.filterIsInstance<PestGrammarRuleMixin>()
 			.filter { root ->
 				ProgressManager.checkCanceled()
-				val grammarBody = root.grammarBody ?: return@filter false
-				val name = root.name ?: return@filter false
+				val grammarBody = root.grammarBody?.expression ?: return@filter false
+				val name = root.name
 				SyntaxTraverser
 					.psiTraverser(grammarBody)
 					.filterTypes { it == PestTypes.IDENTIFIER }

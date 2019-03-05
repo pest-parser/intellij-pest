@@ -40,7 +40,7 @@ abstract class PestGrammarRuleMixin(node: ASTNode) : PestElement(node), PestGram
 	}
 
 
-	fun preview(maxSizeExpected: Int) = grammarBody?.bodyText(maxSizeExpected)
+	fun preview(maxSizeExpected: Int) = grammarBody?.expression?.bodyText(maxSizeExpected)
 	private var typeCache: PestRuleType? = null
 	val type: PestRuleType
 		get() = typeCache ?: when (modifier?.firstChild?.node?.elementType) {
