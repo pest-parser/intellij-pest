@@ -12,6 +12,7 @@
  [tv-svg]: https://travis-ci.org/pest-parser/intellij-pest.svg?branch=master
  [av-url]: https://ci.appveyor.com/project/ice1000/intellij-pest/branch/master
  [av-svg]: https://ci.appveyor.com/api/projects/status/yj5hya5hcdtvt9m0/branch/master?svg=true
+ [av-zip]: https://ci.appveyor.com/project/ice1000/intellij-pest/branch/master/artifacts
 
 The IntelliJ IDEA plugin for [Pest](https://pest.rs).
 
@@ -40,3 +41,4 @@ See [JetBrains Plugin Marketplace][jb] page.
 ### Completion under white theme
 ![completion](https://user-images.githubusercontent.com/16398479/53726938-0dfb2200-3e3d-11e9-9c50-8f3139b30c0d.jpg)
 
+Unstable per-commit build can be downloaded from [AppVeyor page][av-zip]

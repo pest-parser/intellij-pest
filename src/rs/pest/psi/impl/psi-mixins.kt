@@ -72,8 +72,8 @@ abstract class PestResolvableMixin(node: ASTNode) : PestExpressionImpl(node), Ps
 	override fun isSoft() = true
 	override fun getRangeInElement() = range
 
-	private var resolveCache = emptyList<ResolveResult>().toMutableList()
-	private fun updateCache(): List<ResolveResult> {
+	private var resolveCache = emptySet<ResolveResult>().toMutableSet()
+	private fun updateCache(): Set<ResolveResult> {
 		resolveCache.removeAll { !(it.element?.isValid ?: false) }
 		if (resolveCache.isNotEmpty()) return resolveCache
 		else resolveCache.addAll(allGrammarRules().filter { it.name == text }.map(::PsiElementResolveResult))
