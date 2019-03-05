@@ -28,6 +28,13 @@
 		<lang.psiStructureViewFactory language="Pest" implementationClass="rs.pest.editing.PestStructureViewFactory"/>
 		<quoteHandler fileType="Pest" className="rs.pest.editing.PestQuoteHandler"/>
 		<spellchecker.support language="Pest" implementationClass="rs.pest.editing.PestSpellCheckingStrategy"/>
+		<localInspection
+			language="Pest"
+			level="ERROR"
+			displayName="Duplicate rules"
+			groupName="Pest Grammar"
+			enabledByDefault="true"
+			implementationClass="rs.pest.editing.DuplicateRuleInspection"/>
 		<codeInsight.lineMarkerProvider
 			language="Pest"
 			implementationClass="rs.pest.editing.PestRecursionLineMarkerProvider"/>

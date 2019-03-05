@@ -28,14 +28,9 @@ class PestFile(viewProvider: FileViewProvider) : PsiFileBase(viewProvider, PestL
 		rulesCache = null
 	}
 
-	private var rulesCache: MutableMap<String, PestGrammarRuleMixin>? = null
+	private var rulesCache: List<PestGrammarRuleMixin>? = null
 	fun rules() = rulesCache ?: calcRules().also { rulesCache = it }
-	fun rule(name: String) = rules()[name]
-	private fun calcRules() = children.filterIsInstance<PestGrammarRuleMixin>().run {
-		val map = hashMapOf<String, PestGrammarRuleMixin>()
-		forEach { rule -> rule.name?.let {  map[it] = rule } }
-		map
-	}
+	private fun calcRules() = children.filterIsInstance<PestGrammarRuleMixin>()
 }
 
 class PestFileTypeFactory : FileTypeFactory() {

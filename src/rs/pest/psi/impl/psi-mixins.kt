@@ -12,10 +12,7 @@ import rs.pest.psi.*
 
 abstract class PestElement(node: ASTNode) : ASTWrapperPsiElement(node) {
 	val containingPestFile get() = containingFile as? PestFile
-	protected fun allGrammarRules(): Collection<PestGrammarRuleMixin> = containingPestFile
-		?.rules()
-		?.values
-		.orEmpty()
+	protected fun allGrammarRules(): Collection<PestGrammarRuleMixin> = containingPestFile?.rules().orEmpty()
 }
 
 fun renameBuiltin(): Nothing = throw IncorrectOperationException("Cannot rename a builtin rule!")
@@ -24,15 +21,15 @@ abstract class PestGrammarRuleMixin(node: ASTNode) : PestElement(node), PestGram
 	private var refCache: Array<PsiReference>? = null
 	private fun refreshCache(myName: String) = collectFrom<PestIdentifier>(containingFile, myName, this).also { refCache = it }
 	override fun getReference() = references.firstOrNull()
-	override fun getReferences() = refCache ?: name?.let(::refreshCache) ?: emptyArray()
+	override fun getReferences() = refCache ?: refreshCache(name) ?: emptyArray()
 	override fun subtreeChanged() {
-		name?.let(::refreshCache)
+		refreshCache(name)
 		typeCache = null
 	}
 
 	override fun getNameIdentifier(): PsiElement = firstChild
 	override fun getIcon(flags: Int) = PestIcons.PEST
-	override fun getName() = nameIdentifier.text
+	override fun getName(): String = nameIdentifier.text
 	override fun setName(newName: String) = when (nameIdentifier) {
 		is PestIdentifier -> {
 			refCache = references.mapNotNull { it.handleElementRename(newName)?.reference }.toTypedArray()
