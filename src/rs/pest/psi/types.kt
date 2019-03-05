@@ -8,6 +8,7 @@ import com.intellij.psi.tree.TokenSet
 import rs.pest.PestBundle
 import rs.pest.PestHighlighter
 import rs.pest.PestLanguage
+import rs.pest.psi.impl.PestGrammarRuleMixin
 
 class PestElementType(debugName: String) : IElementType(debugName, PestLanguage.INSTANCE)
 
@@ -24,6 +25,9 @@ class PestTokenType(debugName: String) : IElementType(debugName, PestLanguage.IN
 		@JvmField val IDENTIFIERS = TokenSet.create(PestTypes.IDENTIFIER)
 
 		fun fromText(text: String, project: Project) = PsiFileFactory.getInstance(project).createFileFromText(PestLanguage.INSTANCE, text).firstChild
+		fun createRule(text: String, project: Project) = fromText(text, project) as PestGrammarRuleMixin
+		fun createBody(text: String, project: Project) = createRule("r=$text", project).grammarBody as PestGrammarBody
+		fun createExpression(text: String, project: Project) = createBody("{$text}", project).expression
 	}
 }
 

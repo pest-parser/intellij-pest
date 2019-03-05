@@ -3,6 +3,7 @@ package rs.pest.psi.impl
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.extapi.psi.ASTWrapperPsiElement
 import com.intellij.lang.ASTNode
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.*
 import com.intellij.util.IncorrectOperationException
@@ -29,11 +30,11 @@ abstract class PestGrammarRuleMixin(node: ASTNode) : PestElement(node), PestGram
 	}.also { recCache = it }
 
 	private var refCache: Array<PsiReference>? = null
-	private fun refreshCache(myName: String) = collectFrom<PestIdentifier>(containingFile, myName, this).also { refCache = it }
+	private fun refreshCache(myName: String, self: PsiElement) = collectFrom<PestIdentifier>(containingFile, myName, self).also { refCache = it }
 	override fun getReference() = references.firstOrNull()
-	override fun getReferences() = refCache ?: refreshCache(name) ?: emptyArray()
+	override fun getReferences() = refCache ?: refreshCache(name, nameIdentifier) ?: emptyArray()
 	override fun subtreeChanged() {
-		refreshCache(name)
+		refreshCache(name, nameIdentifier)
 		typeCache = null
 		recCache = null
 	}
@@ -43,7 +44,9 @@ abstract class PestGrammarRuleMixin(node: ASTNode) : PestElement(node), PestGram
 	override fun getName(): String = nameIdentifier.text
 	override fun setName(newName: String) = when (nameIdentifier) {
 		is PestIdentifier -> {
-			refCache = references.mapNotNull { it.handleElementRename(newName)?.reference }.toTypedArray()
+			refCache = ApplicationManager.getApplication().runWriteAction<Array<PsiReference>> {
+				references.mapNotNull { it.handleElementRename(newName)?.reference }.toTypedArray()
+			}
 			this@PestGrammarRuleMixin
 		}
 		is PestBuiltin -> renameBuiltin()
@@ -96,8 +99,7 @@ abstract class PestResolvableMixin(node: ASTNode) : PestExpressionImpl(node), Ps
 abstract class PestIdentifierMixin(node: ASTNode) : PestResolvableMixin(node), PsiNameIdentifierOwner {
 	override fun getNameIdentifier() = this
 	override fun getName(): String? = text
-	override fun setName(newName: String): PsiElement = replace(PestTokenType.fromText(newName, project))
-
+	override fun setName(newName: String): PsiElement = replace(PestTokenType.createExpression(newName, project))
 	override fun handleElementRename(newName: String): PsiElement = setName(newName)
 }
 
@@ -107,6 +109,6 @@ abstract class PestBuiltinMixin(node: ASTNode) : PestResolvableMixin(node) {
 
 abstract class PestStringMixin(node: ASTNode) : PestExpressionImpl(node), PsiLanguageInjectionHost {
 	override fun isValidHost() = true
-	override fun updateText(text: String) = replace(PestTokenType.fromText(text, project)) as? PestStringMixin
+	override fun updateText(text: String) = replace(PestTokenType.createExpression(text, project)) as? PestStringMixin
 	override fun createLiteralTextEscaper(): LiteralTextEscaper<PestStringMixin> = PestStringEscaper(this)
 }

@@ -10,13 +10,11 @@ import com.intellij.psi.SyntaxTraverser
  */
 inline fun <reified Element : PsiElement> collectFrom(startPoint: PsiElement, name: String, self: PsiElement? = null) = SyntaxTraverser
 	.psiTraverser(startPoint)
-	.filter { it is Element && it.text == name && it != self }
+	.filterIsInstance<Element>()
+	.filter { it.text == name && it != self }
 	.mapNotNull(PsiElement::getReference)
 	.toTypedArray()
 
-/**
- * @param maxSizeExpected if less than zero, don't limit text size.
- */
 fun PsiElement.bodyText(maxSizeExpected: Int) = buildString {
 	append(' ')
 	var child = firstChild

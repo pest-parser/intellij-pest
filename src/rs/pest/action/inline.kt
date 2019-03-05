@@ -2,10 +2,13 @@ package rs.pest.action
 
 import com.intellij.lang.Language
 import com.intellij.lang.refactoring.InlineActionHandler
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.ElementDescriptionUtil
+import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiReference
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.refactoring.BaseRefactoringProcessor
 import com.intellij.refactoring.RefactoringBundle
@@ -66,10 +69,20 @@ class PestInlineDialog(project: Project, element: PsiElement) : InlineOptionsDia
 class PestInlineProcessor(project: Project, val rule: PestGrammarRuleMixin, val thisOnly: Boolean) : BaseRefactoringProcessor(project) {
 	private val name = rule.name
 	override fun getCommandName() = PestBundle.message("pest.actions.inline.command.name", name)
-	override fun findUsages() = rule.containingPestFile?.rules().orEmpty().map(::UsageInfo).toTypedArray()
 	override fun createUsageViewDescriptor(usages: Array<UsageInfo>) = PestInlineViewDescriptor(rule)
+	override fun findUsages() = rule
+		.references
+		.asSequence()
+		.map(PsiReference::getElement)
+		.filter(PsiElement::isValid)
+		.filterNot { PsiTreeUtil.isAncestor(rule, it, false) }
+		.map(::UsageInfo)
+		.toList()
+		.toTypedArray()
+
 	override fun performRefactoring(usages: Array<UsageInfo>) {
-		val expression = rule.grammarBody?.expression ?: return
+		val grammarBody = rule.grammarBody
+		val expression = grammarBody?.expression ?: return
 		val newText = when (expression) {
 			is PestString -> expression.text
 			is PestCharacter -> expression.text
@@ -77,9 +90,12 @@ class PestInlineProcessor(project: Project, val rule: PestGrammarRuleMixin, val 
 			is PestTerm -> expression.text
 			is PestRange -> expression.text
 			is PestBuiltin -> expression.text
-			else -> "(${expression.bodyText(-1)})"
+			else -> "(${expression.bodyText(expression.textLength).trim()})"
 		}
-		val newElement = PestTokenType.fromText(newText, myProject)
-		usages.forEach { it.element?.replace(newElement) }
+		ApplicationManager.getApplication().runWriteAction {
+			if (!thisOnly) rule.delete()
+			val newElement = PestTokenType.createExpression(newText, myProject)
+			usages.forEach { it.element?.replace(newElement) }
+		}
 	}
 }
