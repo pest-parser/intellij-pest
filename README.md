@@ -33,12 +33,18 @@ See [JetBrains Plugin Marketplace][jb] page.
 ![screen](https://user-images.githubusercontent.com/16398479/53726936-0dfb2200-3e3d-11e9-9ea3-d1bf5511e8cb.gif)
 
 ### Rename
-![rename](https://user-images.githubusercontent.com/16398479/53726939-0dfb2200-3e3d-11e9-9982-c9c7ed6f7145.gif)
+![rename](https://user-images.githubusercontent.com/16398479/53851472-d00d1380-3f8c-11e9-9b50-03c813125e5d.gif)
 
-### Unresolved reference
-![unresolved](https://user-images.githubusercontent.com/16398479/53726937-0dfb2200-3e3d-11e9-97e7-9072a5fd1a29.jpg)
+### Inline
+![inline](https://user-images.githubusercontent.com/16398479/53846719-fc6c6400-3f7b-11e9-9506-9a3d0c50e319.gif)
+
+### Goto definition
 
 ### Completion under white theme
 ![completion](https://user-images.githubusercontent.com/16398479/53726938-0dfb2200-3e3d-11e9-9c50-8f3139b30c0d.jpg)
+
+### Miscellaneous highlighting
+![unresolved.png](https://user-images.githubusercontent.com/16398479/53846891-a9df7780-3f7c-11e9-9823-bbc4a8655ef7.png)
+![recursion.png](https://user-images.githubusercontent.com/16398479/53846994-0fcbff00-3f7d-11e9-933c-d7fc0fb0f007.png)
 
 Unstable per-commit build can be downloaded from [AppVeyor page][av-zip]
