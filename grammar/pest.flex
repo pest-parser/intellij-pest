@@ -30,9 +30,8 @@ import static com.intellij.psi.TokenType.WHITE_SPACE;
 %state INSIDE_COMMENT
 
 WHITE_SPACE=[\ \t\f\r\n]
-IDENTIFIER_CHAR=[a-zA-Z_0-9]
 INTEGER=[0-9]+
-IDENTIFIER={IDENTIFIER_CHAR}+
+IDENTIFIER=[a-zA-Z][a-zA-Z_0-9]*
 STRING_UNICODE=\\((u\{{HEXDIGIT}{2,6}\})|(x{HEXDIGIT}{2}))
 STRING_INCOMPLETE=\"([^\"\\]|(\\[^])|{STRING_UNICODE})*
 CHAR_INCOMPLETE='([^\\\'\x00-\x1F\x7F]|\\[^\x00-\x1F\x7F]+|{STRING_UNICODE})?
@@ -101,6 +100,7 @@ ASCII_ALPHA_LOWER { return ASCII_ALPHA_LOWER_TOKEN; }
 "+" { return REPEAT_ONCE_OPERATOR; }
 "^" { return INSENSITIVE_OPERATOR; }
 ".." { return RANGE_OPERATOR; }
+"," { return COMMA; }
 {STRING_LITERAL} { return STRING_TOKEN; }
 {CHAR_LITERAL} { return CHAR_TOKEN; }
 {STRING_INCOMPLETE} { return STRING_INCOMPLETE; }
