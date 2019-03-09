@@ -18,7 +18,7 @@
 
 grammar_rules ::=  grammar_rule+
 
-grammar_body  ::= OPENING_BRACE expression CLOSING_BRACE
+grammar_body  ::= OPENING_BRACE expression CLOSING_BRACE { pin=1 }
 grammar_rule  ::=
 	(identifier | builtin) ASSIGNMENT_OPERATOR modifier? grammar_body {
 	implements=["com.intellij.psi.PsiNameIdentifierOwner"]
@@ -32,10 +32,13 @@ modifier ::=
 	COMPOUND_ATOMIC_MODIFIER |
 	NON_ATOMIC_MODIFIER
 
-expression ::= term (infix_operator term)* { pin=2 }
-term       ::= prefix_operator* rule postfix_operator* { extends=expression }
+expression ::= term infix_part*
+term       ::= prefix_operator* rule postfix_operator* { pin=1 extends=expression }
 // Can't name `node`, conflict with PsiElement's class
-rule       ::= OPENING_PAREN expression CLOSING_PAREN | atom { extends=expression }
+rule       ::= paren_part | atom { extends=expression }
+
+private paren_part ::= OPENING_PAREN expression CLOSING_PAREN { pin=1 }
+private infix_part ::= infix_operator term { pin=1 }
 
 private atom ::=
 	push |
@@ -114,6 +117,7 @@ string    ::= INSENSITIVE_OPERATOR? STRING_TOKEN {
 }
 
 range     ::= character RANGE_OPERATOR character {
+	name=".."
 	extends=expression
 	pin=2
 }
