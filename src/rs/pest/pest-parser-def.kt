@@ -8,6 +8,7 @@ import com.intellij.psi.FileViewProvider
 import com.intellij.psi.PsiElement
 import com.intellij.psi.stubs.PsiFileStubImpl
 import com.intellij.psi.tree.IStubFileElementType
+import com.intellij.psi.tree.TokenSet
 import rs.pest.psi.PestLexer
 import rs.pest.psi.PestParser
 import rs.pest.psi.PestTokenType
@@ -25,6 +26,7 @@ class PestParserDefinition : ParserDefinition {
 	override fun createElement(node: ASTNode?): PsiElement = PestTypes.Factory.createElement(node)
 	override fun createFile(viewProvider: FileViewProvider) = PestFile(viewProvider)
 	override fun getStringLiteralElements() = PestTokenType.STRINGS
+	override fun getWhitespaceTokens() = PestTokenType.WHITE_SPACE
 	override fun getCommentTokens() = PestTokenType.COMMENTS
 	override fun getFileNodeType() = FILE
 	// TODO: replace after dropping support for 183

@@ -3,6 +3,7 @@ package rs.pest.psi
 import com.intellij.openapi.editor.colors.TextAttributesKey
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFileFactory
+import com.intellij.psi.TokenType
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.TokenSet
 import rs.pest.PestBundle
@@ -20,6 +21,7 @@ class PestTokenType(debugName: String) : IElementType(debugName, PestLanguage.IN
 		@JvmField val CHAR_INCOMPLETE = PestTokenType("incomplete char")
 		@JvmField val COMMENTS = TokenSet.create(LINE_COMMENT, BLOCK_COMMENT)
 		@JvmField val STRINGS = TokenSet.create(PestTypes.STRING_TOKEN, PestTypes.CHAR_TOKEN)
+		@JvmField val WHITE_SPACE = TokenSet.create(TokenType.WHITE_SPACE)
 		@JvmField val INCOMPLETE_STRINGS = TokenSet.create(STRING_INCOMPLETE, CHAR_INCOMPLETE)
 		@JvmField val ANY_STRINGS = TokenSet.orSet(STRINGS, INCOMPLETE_STRINGS)
 		@JvmField val IDENTIFIERS = TokenSet.create(PestTypes.IDENTIFIER)
@@ -27,7 +29,7 @@ class PestTokenType(debugName: String) : IElementType(debugName, PestLanguage.IN
 		fun fromText(text: String, project: Project) = PsiFileFactory.getInstance(project).createFileFromText(PestLanguage.INSTANCE, text).firstChild
 		fun createRule(text: String, project: Project) = fromText(text, project) as PestGrammarRuleMixin
 		fun createBody(text: String, project: Project) = createRule("r=$text", project).grammarBody as PestGrammarBody
-		fun createExpression(text: String, project: Project) = createBody("{$text}", project).expression
+		fun createExpression(text: String, project: Project) = createBody("{$text}", project).expression!!
 	}
 }
 

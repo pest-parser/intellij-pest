@@ -57,5 +57,13 @@
 			class="rs.pest.action.NewPestFile">
 			<add-to-group group-id="NewGroup" anchor="after" relative-to-action="NewFile"/>
 		</action>
+		<action
+			id="Pest.Introduce.Rule"
+			class="rs.pest.action.PestIntroduceRuleAction"
+			text="_Rule..."
+			use-shortcut-of="ExtractMethod"
+			description="Introduce rule">
+			<add-to-group group-id="IntroduceActionsGroup" anchor="first"/>
+		</action>
 	</actions>
 </idea-plugin>

@@ -1,8 +1,10 @@
 package rs.pest.psi.impl
 
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.SyntaxTraverser
+import com.intellij.psi.util.PsiTreeUtil
 
 
 /**
@@ -29,4 +31,14 @@ fun PsiElement.bodyText(maxSizeExpected: Int) = buildString {
 			child = child.nextSibling ?: child.parent
 		} while (child == null)
 	}
+}
+
+inline fun <reified T : PsiElement> findParentExpression(file: PsiFile, startOffset: Int, endOffset: Int): T? {
+	var endOffset = endOffset
+	if (endOffset > startOffset) endOffset--
+	val startElement = file.findElementAt(startOffset)
+	val endElement = file.findElementAt(endOffset)
+	if (startElement == null || endElement == null) return null
+	val commonParent = PsiTreeUtil.findCommonParent(startElement, endElement)
+	return PsiTreeUtil.getParentOfType(commonParent, T::class.java, false)
 }
