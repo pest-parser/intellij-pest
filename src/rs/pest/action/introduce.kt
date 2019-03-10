@@ -52,8 +52,8 @@ class PestIntroduceRuleActionHandler : RefactoringActionHandler {
 		val ends = selectionModel.blockSelectionEnds
 		if (starts.isEmpty() || ends.isEmpty()) return
 
-		val startOffset = starts[0]
-		val endOffset = ends[ends.size - 1]
+		val startOffset = starts.first()
+		val endOffset = ends.last()
 		val currentRule = PsiTreeUtil.getParentOfType(file.findElementAt(startOffset), PestGrammarRuleMixin::class.java)
 		var parentExpression = if (currentRule != null) findParentExpression<PestExpression>(file, startOffset, endOffset) else null
 		if (currentRule == null || parentExpression == null) {
@@ -123,7 +123,7 @@ class PestIntroduceRuleActionHandler : RefactoringActionHandler {
 			else break
 		}
 		val range = TextRange(first.startOffset, last.endOffset)
-		val rule = PestTokenType.createRule("$name = { ${range.shiftLeft(currentRule.startOffset).substring(currentRule.bodyText(currentRule.textLength)).trim()} }", project)
+		val rule = PestTokenType.createRule("$name = { ${range.shiftLeft(currentRule.startOffset).substring(currentRule.text).trim()} }", project)
 		WriteCommandAction.runWriteCommandAction(project) {
 			val document = editor.document
 			file.add(rule)
