@@ -29,11 +29,12 @@ abstract class PestGrammarRuleMixin(node: ASTNode) : PestElement(node), PestGram
 			.any { it.text == name }
 	}.also { recCache = it }
 
-	private var refCache: Array<PsiReference>? = null
+	private var refCache: MutableList<PsiReference>? = null
+	private fun checkedRefCache() = refCache?.apply { removeAll { !it.element.isValid } }?.toTypedArray()
 	fun refreshReferenceCache() = refreshReferenceCache(name, nameIdentifier)
 	private fun refreshReferenceCache(myName: String, self: PsiElement) = collectFrom<PestIdentifier>(containingFile, myName, self).also { refCache = it }
 	override fun getReference() = references.firstOrNull()
-	override fun getReferences() = refCache ?: refreshReferenceCache(name, nameIdentifier) ?: emptyArray()
+	override fun getReferences() = checkedRefCache() ?: refreshReferenceCache(name, nameIdentifier).toTypedArray() ?: emptyArray()
 	override fun subtreeChanged() {
 		refreshReferenceCache()
 		typeCache = null
@@ -45,8 +46,8 @@ abstract class PestGrammarRuleMixin(node: ASTNode) : PestElement(node), PestGram
 	override fun getName(): String = nameIdentifier.text
 	override fun setName(newName: String) = when (nameIdentifier) {
 		is PestIdentifier -> {
-			refCache = ApplicationManager.getApplication().runWriteAction<Array<PsiReference>> {
-				references.mapNotNull { it.handleElementRename(newName)?.reference }.toTypedArray()
+			refCache = ApplicationManager.getApplication().runWriteAction<MutableList<PsiReference>> {
+				references.mapNotNull { it.handleElementRename(newName)?.reference }.toMutableList()
 			}
 			this@PestGrammarRuleMixin
 		}

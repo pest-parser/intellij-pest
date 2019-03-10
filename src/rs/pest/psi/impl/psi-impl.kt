@@ -15,7 +15,7 @@ inline fun <reified Element : PsiElement> collectFrom(startPoint: PsiElement, na
 	.filterIsInstance<Element>()
 	.filter { it.text == name && it != self }
 	.mapNotNull(PsiElement::getReference)
-	.toTypedArray()
+	.toMutableList()
 
 fun PsiElement.bodyText(maxSizeExpected: Int) = buildString {
 	append(' ')
