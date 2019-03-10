@@ -38,6 +38,9 @@ See [JetBrains Plugin Marketplace][jb] page.
 ### Inline
 ![inline](https://user-images.githubusercontent.com/16398479/53846719-fc6c6400-3f7b-11e9-9506-9a3d0c50e319.gif)
 
+### Extract rule
+![extract](https://user-images.githubusercontent.com/16398479/54079464-d7912d00-42aa-11e9-83f0-232d06b22b49.gif)
+
 ### Completion under white theme
 ![completion](https://user-images.githubusercontent.com/16398479/53726938-0dfb2200-3e3d-11e9-9c50-8f3139b30c0d.jpg)
 
