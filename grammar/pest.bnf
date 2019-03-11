@@ -42,7 +42,7 @@ private infix_part ::= infix_operator term { pin=1 }
 
 private atom ::=
 	push |
-	peek_slice |
+	peek |
 	identifier |
 	string |
 	range |
@@ -65,22 +65,27 @@ private repeat_min     ::= OPENING_BRACE NUMBER COMMA CLOSING_BRACE
 private repeat_max     ::= OPENING_BRACE COMMA NUMBER CLOSING_BRACE
 private repeat_min_max ::= OPENING_BRACE NUMBER COMMA NUMBER CLOSING_BRACE
 
-integer    ::= MINUS? NUMBER
+integer    ::= MINUS? NUMBER { pin=1 }
 identifier ::= IDENTIFIER_TOKEN {
 	mixin="rs.pest.psi.impl.PestIdentifierMixin"
 	extends=expression
 }
 
-push       ::= PUSH_TOKEN OPENING_PAREN expression CLOSING_PAREN {
+push ::= PUSH_TOKEN OPENING_PAREN expression CLOSING_PAREN {
 	extends=expression
 	pin=1
-	name="PUSH command"
+	name="PUSH"
 }
 
-peek_slice ::= PEEK_TOKEN OPENING_BRACK integer? RANGE_OPERATOR integer? CLOSING_BRACK {
+peek ::= PEEK_TOKEN peek_slice? {
 	extends=expression
 	pin=1
-	name="PEEK slice command"
+	name="PEEK"
+}
+
+peek_slice ::= OPENING_BRACK integer? RANGE_OPERATOR integer? CLOSING_BRACK {
+	pin=1
+	name="PEEK.."
 }
 
 commands   ::=
