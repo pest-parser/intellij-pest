@@ -42,7 +42,7 @@ private infix_part ::= infix_operator term { pin=1 }
 
 private atom ::=
 	push |
-	peek_slice |
+	peek |
 	identifier |
 	string |
 	range |
@@ -77,10 +77,16 @@ push       ::= PUSH_TOKEN OPENING_PAREN expression CLOSING_PAREN {
 	name="PUSH command"
 }
 
-peek_slice ::= PEEK_TOKEN OPENING_BRACK integer? RANGE_OPERATOR integer? CLOSING_BRACK {
+peek ::= PEEK_TOKEN peek_slice?{
 	extends=expression
 	pin=1
-	name="PEEK slice command"
+	name="PEEK command"
+}
+
+peek_slice ::= OPENING_BRACK integer? RANGE_OPERATOR integer? CLOSING_BRACK {
+	extends=expression
+	pin=1
+	name="PEEK slice"
 }
 
 commands   ::=
