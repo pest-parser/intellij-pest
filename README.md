@@ -10,9 +10,9 @@
  [jb]: https://plugins.jetbrains.com/plugin/12046-pest
  [tv-url]: https://travis-ci.org/pest-parser/intellij-pest
  [tv-svg]: https://travis-ci.org/pest-parser/intellij-pest.svg?branch=master
- [av-url]: https://ci.appveyor.com/project/ice1000/intellij-pest/branch/master
+ [av-url]: https://ci.appveyor.com/project/dragostis/intellij-pest-3fx8c/branch/master
  [av-svg]: https://ci.appveyor.com/api/projects/status/yj5hya5hcdtvt9m0/branch/master?svg=true
- [av-zip]: https://ci.appveyor.com/project/ice1000/intellij-pest/branch/master/artifacts
+ [av-zip]: https://ci.appveyor.com/project/dragostis/intellij-pest-3fx8c/branch/master/artifacts
 
 The IntelliJ IDEA plugin for [Pest](https://pest.rs).
 
