@@ -65,5 +65,18 @@
 			description="Introduce rule">
 			<add-to-group group-id="IntroduceActionsGroup" anchor="first"/>
 		</action>
+		<group
+			id="Pest.ToolsMenu"
+			text="Pest"
+			description="Pest Tools"
+			icon="PestIcons.PEST"
+			popup="true">
+			<action
+				id="Pest.Tools.ViewSite"
+				class="rs.pest.action.PestViewSiteAction"
+				text="View Pest website"
+				icon="PestIcons.PEST"/>
+			<add-to-group group-id="ToolsMenu" anchor="last"/>
+		</group>
 	</actions>
 </idea-plugin>
