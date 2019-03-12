@@ -1,5 +1,6 @@
 package rs.pest.editing
 
+import com.intellij.codeHighlighting.Pass
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.codeInsight.daemon.LineMarkerProvider
 import com.intellij.icons.AllIcons
@@ -20,8 +21,12 @@ class PestRecursionLineMarkerProvider : LineMarkerProvider {
 	}
 }
 
+/// This constructor is deprecated but #6
+@Suppress("DEPRECATION")
 private class RecMarkerInfo internal constructor(id: PsiElement) : LineMarkerInfo<PsiElement>(
-	id, id.textRange, AllIcons.Gutter.RecursiveMethod, FunctionUtil.constant("Recursive rule"), null, GutterIconRenderer.Alignment.RIGHT) {
+	id, id.textRange, AllIcons.Gutter.RecursiveMethod, Pass.LINE_MARKERS,
+	FunctionUtil.constant("Recursive rule"), null,
+	GutterIconRenderer.Alignment.RIGHT) {
 	override fun createGutterRenderer(): LineMarkerGutterIconRenderer<PsiElement>? =
 		if (myIcon == null) null else object : LineMarkerGutterIconRenderer<PsiElement>(this) {
 			override fun getClickAction(): AnAction? = null
