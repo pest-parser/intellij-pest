@@ -81,6 +81,11 @@ abstract class PestResolvableMixin(node: ASTNode) : PestExpressionImpl(node), Ps
 		return resolveCache
 	}
 
+	override fun subtreeChanged() {
+		super.subtreeChanged()
+		resolveCache = emptySet<ResolveResult>().toMutableSet()
+	}
+
 	override fun getReference() = this
 	override fun getReferences() = arrayOf(reference)
 	override fun isReferenceTo(reference: PsiElement) = reference == resolve()
