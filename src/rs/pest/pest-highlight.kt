@@ -92,6 +92,7 @@ object PestHighlighter : SyntaxHighlighter {
 		PestTokenType.BLOCK_COMMENT -> BLOCK_COMMENT_KEY
 		PestTypes.NUMBER,
 		PestTypes.MINUS -> NUMBER_KEY
+		PestTypes.VALID_RULE_NAME -> IDENTIFIER_KEY
 		in PARENS-> PAREN_KEY
 		in BRACKS -> BRACK_KEY
 		in BRACES -> BRACE_KEY

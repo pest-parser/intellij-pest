@@ -29,8 +29,9 @@ import org.jetbrains.annotations.NonNls
 	"DROP",
 	"ASCII",
 	"NEWLINE",
-	"COMMENT",
-	"WHITESPACE",
+// COMMENT and WHITESPACE can be overwritten.
+//	"COMMENT",
+//	"WHITESPACE",
 	"ASCII_DIGIT",
 	"ASCII_ALPHA",
 	"ASCII_ALPHANUMERIC",

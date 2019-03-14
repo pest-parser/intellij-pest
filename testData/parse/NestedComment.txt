@@ -2,7 +2,7 @@ FILE
   PsiComment(block comment)('/*Joesph Joestar/*/**/*/ Oh My God*/')
   PsiWhiteSpace('\n')
   PestGrammarRuleImpl(GRAMMAR_RULE)
-    PestIdentifierImpl(IDENTIFIER)
+    PestValidRuleNameImpl(VALID_RULE_NAME)
       PsiElement(IDENTIFIER_TOKEN)('rule')
     PsiElement(ASSIGNMENT_OPERATOR)('=')
     PestGrammarBodyImpl(GRAMMAR_BODY)
