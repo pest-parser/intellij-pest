@@ -24,7 +24,7 @@ val commitHash = kotlin.run {
 val pluginComingVersion = "0.1.3"
 val pluginVersion = if (isCI) "$pluginComingVersion-$commitHash" else pluginComingVersion
 val packageName = "rs.pest"
-val kotlinVersion = "1.2.70"
+val kotlinVersion = "1.3.21"
 
 group = packageName
 version = pluginVersion
@@ -33,7 +33,7 @@ plugins {
 	java
 	id("org.jetbrains.intellij") version "0.4.4"
 	id("org.jetbrains.grammarkit") version "2018.3.1"
-	kotlin("jvm") version "1.2.70"
+	kotlin("jvm") version "1.3.21"
 }
 
 allprojects {
@@ -47,6 +47,9 @@ allprojects {
 				val root = "/home/ice1000/.local/share/JetBrains/Toolbox/apps"
 				localPath = "$root/IDEA-C/ch-0/191.5849.21"
 				alternativeIdePath = "$root/PyCharm-C/ch-0/191.5849.23"
+			}
+			"schle" -> {
+				version = "191.5849.21"
 			}
 		}
 
