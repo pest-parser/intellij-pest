@@ -16,15 +16,60 @@
   tokenTypeClass="rs.pest.psi.PestTokenType"
 }
 
-grammar_rules ::=  grammar_rule+
+grammar_rules ::=  grammar_rule+ { recoverWhile=grammar_rules_recover }
 
-grammar_body  ::= OPENING_BRACE expression CLOSING_BRACE { pin=1 }
-grammar_rule  ::=
-	(identifier | builtin) ASSIGNMENT_OPERATOR modifier? grammar_body {
+grammar_body  ::= OPENING_BRACE expression CLOSING_BRACE {
+	pin=1
+	recoverWhile=grammar_body_recover
+}
+
+private grammar_body_recover ::= !rule_name
+
+grammar_rule  ::=	rule_name ASSIGNMENT_OPERATOR modifier? grammar_body {
 	implements=["com.intellij.psi.PsiNameIdentifierOwner"]
 	mixin="rs.pest.psi.impl.PestGrammarRuleMixin"
-	pin=2
+	pin=1
+	recoverWhile=grammar_rule_recover
 }
+
+private rule_name ::=
+    valid_rule_name
+  | overwritable_rule_name
+  | fixed_builtin_rule_name
+  {	pin=1 }
+
+fixed_builtin_rule_name ::=
+    commands
+  | PUSH_TOKEN
+  | PEEK_TOKEN
+  |	ANY_TOKEN
+  | EOI_TOKEN
+  |	SOI_TOKEN
+  |	DROP_TOKEN
+  |	ASCII_TOKEN
+  |	NEWLINE_TOKEN
+  |	ASCII_DIGIT_TOKEN
+  |	ASCII_ALPHA_TOKEN
+  |	ASCII_ALPHANUMERIC_TOKEN
+  |	ASCII_NONZERO_DIGIT_TOKEN
+  |	ASCII_BIN_DIGIT_TOKEN
+  |	ASCII_OCT_DIGIT_TOKEN
+  |	ASCII_HEX_DIGIT_TOKEN
+  |	ASCII_ALPHA_UPPER_TOKEN
+  |	ASCII_ALPHA_LOWER_TOKEN {
+	mixin="rs.pest.psi.impl.PestFixedBuiltinRuleNameMixin"
+}
+
+overwritable_rule_name ::= WHITESPACE_TOKEN | COMMENT_TOKEN {
+	mixin="rs.pest.psi.impl.PestOverwritableRuleNameMixin"
+}
+
+valid_rule_name ::= IDENTIFIER_TOKEN {
+	mixin="rs.pest.psi.impl.PestRuleNameMixin"
+}
+
+private grammar_rule_recover ::= !(rule_name )
+private grammar_rules_recover ::= !(rule_name  ASSIGNMENT_OPERATOR)
 
 modifier ::=
 	SILENT_MODIFIER |

@@ -1,6 +1,6 @@
 FILE
   PestGrammarRuleImpl(GRAMMAR_RULE)
-    PestIdentifierImpl(IDENTIFIER)
+    PestValidRuleNameImpl(VALID_RULE_NAME)
       PsiElement(IDENTIFIER_TOKEN)('rule')
     PsiWhiteSpace(' ')
     PsiElement(ASSIGNMENT_OPERATOR)('=')

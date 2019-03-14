@@ -31,7 +31,7 @@ import static com.intellij.psi.TokenType.WHITE_SPACE;
 
 WHITE_SPACE=[\ \t\f\r\n]
 INTEGER=[0-9]+
-IDENTIFIER=[a-zA-Z][a-zA-Z_0-9]*
+IDENTIFIER=[a-zA-Z_][a-zA-Z_0-9]*
 STRING_UNICODE=\\((u\{{HEXDIGIT}{2,6}\})|(x{HEXDIGIT}{2}))
 STRING_INCOMPLETE=\"([^\"\\]|(\\[^])|{STRING_UNICODE})*
 CHAR_INCOMPLETE='([^\\\'\x00-\x1F\x7F]|\\[^\x00-\x1F\x7F]+|{STRING_UNICODE})?

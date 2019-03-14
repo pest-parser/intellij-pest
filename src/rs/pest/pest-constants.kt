@@ -29,8 +29,6 @@ import org.jetbrains.annotations.NonNls
 	"DROP",
 	"ASCII",
 	"NEWLINE",
-	"COMMENT",
-	"WHITESPACE",
 	"ASCII_DIGIT",
 	"ASCII_ALPHA",
 	"ASCII_ALPHANUMERIC",
@@ -40,3 +38,5 @@ import org.jetbrains.annotations.NonNls
 	"ASCII_HEX_DIGIT",
 	"ASCII_ALPHA_UPPER",
 	"ASCII_ALPHA_LOWER")
+
+@JvmField val BUILTIN_RULE_FOR_COMPLETION = BUILTIN_RULES + listOf("COMMENT", "WHITESPACE")

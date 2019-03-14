@@ -72,9 +72,8 @@ object PestHighlighter : SyntaxHighlighter {
 		PestTypes.PUSH_TOKEN,
 		PestTypes.PEEK_TOKEN)
 
-	private val OPERATORS_LIST = listOf(
-		PestTypes.PUSH_TOKEN,
-		PestTypes.PEEK_TOKEN)
+	private val OPERATORS_LIST = listOf(PestTypes.PUSH_TOKEN, PestTypes.PEEK_TOKEN)
+	private val IDENTIFIER_LIST = listOf(PestTypes.IDENTIFIER_TOKEN, PestTypes.VALID_RULE_NAME)
 
 	/** brackets */
 	private val BRACKS = listOf(PestTypes.OPENING_BRACK, PestTypes.CLOSING_BRACK)
@@ -85,13 +84,13 @@ object PestHighlighter : SyntaxHighlighter {
 
 	override fun getHighlightingLexer() = lexer()
 	override fun getTokenHighlights(type: IElementType?): Array<TextAttributesKey> = when (type) {
-		PestTypes.IDENTIFIER_TOKEN -> IDENTIFIER_KEY
 		PestTypes.STRING_TOKEN -> STRING_KEY
 		PestTypes.CHAR_TOKEN -> CHAR_KEY
 		PestTokenType.LINE_COMMENT -> COMMENT_KEY
 		PestTokenType.BLOCK_COMMENT -> BLOCK_COMMENT_KEY
 		PestTypes.NUMBER,
 		PestTypes.MINUS -> NUMBER_KEY
+		in IDENTIFIER_LIST -> IDENTIFIER_KEY
 		in PARENS-> PAREN_KEY
 		in BRACKS -> BRACK_KEY
 		in BRACES -> BRACE_KEY
