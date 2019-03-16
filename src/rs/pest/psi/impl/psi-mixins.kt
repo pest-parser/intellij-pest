@@ -55,9 +55,8 @@ abstract class PestGrammarRuleMixin(node: ASTNode) : PestElement(node), PsiNameI
 }
 
 abstract class PestResolvableMixin(node: ASTNode) : PestExpressionImpl(node), PsiPolyVariantReference {
-	private val range = TextRange(0, textLength)
 	override fun isSoft() = true
-	override fun getRangeInElement() = range
+	override fun getRangeInElement() = TextRange(0, textLength)
 
 	override fun getReference() = this
 	override fun getReferences() = arrayOf(reference)
