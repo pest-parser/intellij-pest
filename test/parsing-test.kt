@@ -7,6 +7,7 @@ class ParsingTest : ParsingTestCase("parse", "pest", PestParserDefinition()) {
 	override fun getTestDataPath() = "testData"
 	fun testNestedComment() = doTest(true)
 	fun testSimpleRule() = doTest(true)
+	fun testChar() = doTest(true)
 	fun testParen() = doTest(true)
 }
 
