@@ -9,7 +9,7 @@ import rs.pest.BUILTIN_RULE_FOR_COMPLETION
 import rs.pest.psi.PestGrammarBody
 
 class PestBuiltinCompletionContributor : CompletionContributor() {
-	private val builtin = BUILTIN_RULE_FOR_COMPLETION.map {
+	private val builtin = BUILTIN_RULS.map {
 		LookupElementBuilder
 			.create(it)
 			.withTypeText("Builtin")
