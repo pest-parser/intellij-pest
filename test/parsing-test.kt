@@ -8,6 +8,7 @@ class ParsingTest : ParsingTestCase("parse", "pest", PestParserDefinition()) {
 	fun testNestedComment() = doTest(true)
 	fun testSimpleRule() = doTest(true)
 	fun testChar() = doTest(true)
+	fun testBuiltins() = doTest(true)
 	fun testParen() = doTest(true)
 }
 

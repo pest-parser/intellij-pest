@@ -1,0 +1,9 @@
+//
+// Created by intellij-pest on 2019-03-22
+// Builtins
+// Author: ice1000
+//
+
+builtins = { "Hello World!" }
+COMMENT = { ID_CONTINUE }
+WHITESPACE = { WHITE_SPACE }
