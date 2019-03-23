@@ -15,10 +15,12 @@ import icons.PestIcons
 import org.intellij.lang.annotations.Language
 import rs.pest.psi.PestTokenType
 import rs.pest.psi.PestTypes
+import java.util.*
 
 
 object PestHighlighter : SyntaxHighlighter {
 	@JvmField val KEYWORD = TextAttributesKey.createTextAttributesKey("PEST_KEYWORD", DefaultLanguageHighlighterColors.KEYWORD)
+	@JvmField val BUILTIN = TextAttributesKey.createTextAttributesKey("PEST_BUILTIN", DefaultLanguageHighlighterColors.KEYWORD)
 	@JvmField val IDENTIFIER = TextAttributesKey.createTextAttributesKey("PEST_IDENTIFIER", DefaultLanguageHighlighterColors.IDENTIFIER)
 	@JvmField val UNRESOLVED = TextAttributesKey.createTextAttributesKey("PEST_UNRESOLVED", HighlighterColors.BAD_CHARACTER)
 	@JvmField val SIMPLE = TextAttributesKey.createTextAttributesKey("PEST_SIMPLE", DefaultLanguageHighlighterColors.FUNCTION_DECLARATION)
@@ -37,6 +39,7 @@ object PestHighlighter : SyntaxHighlighter {
 	@JvmField val BLOCK_COMMENT = TextAttributesKey.createTextAttributesKey("PEST_BLOCK_COMMENT", DefaultLanguageHighlighterColors.BLOCK_COMMENT)
 
 	@JvmField val KEYWORD_KEY = arrayOf(KEYWORD)
+	@JvmField val BUILTIN_KEY = arrayOf(BUILTIN)
 	@JvmField val IDENTIFIER_KEY = arrayOf(IDENTIFIER)
 	@JvmField val OPERATOR_KEY = arrayOf(OPERATOR)
 	@JvmField val STRING_KEY = arrayOf(STRING)
@@ -48,18 +51,101 @@ object PestHighlighter : SyntaxHighlighter {
 	@JvmField val COMMENT_KEY = arrayOf(COMMENT)
 	@JvmField val BLOCK_COMMENT_KEY = arrayOf(BLOCK_COMMENT)
 
-	private val KEYWORDS_LIST = listOf(
-		PestTypes.PEEK_ALL_TOKEN,
-		PestTypes.POP_TOKEN,
-		PestTypes.POP_ALL_TOKEN,
+	private val BUILTINS_LIST = listOf(PestTypes.LETTER_TOKEN,
+		PestTypes.CASED_LETTER_TOKEN,
+		PestTypes.UPPERCASE_LETTER_TOKEN,
+		PestTypes.LOWERCASE_LETTER_TOKEN,
+		PestTypes.TITLECASE_LETTER_TOKEN,
+		PestTypes.MODIFIER_LETTER_TOKEN,
+		PestTypes.OTHER_LETTER_TOKEN,
+		PestTypes.MARK_TOKEN,
+		PestTypes.NONSPACING_MARK_TOKEN,
+		PestTypes.SPACING_MARK_TOKEN,
+		PestTypes.ENCLOSING_MARK_TOKEN,
+		PestTypes.NUMBER_TOKEN,
+		PestTypes.DECIMAL_NUMBER_TOKEN,
+		PestTypes.LETTER_NUMBER_TOKEN,
+		PestTypes.OTHER_NUMBER_TOKEN,
+		PestTypes.PUNCTUATION_TOKEN,
+		PestTypes.CONNECTOR_PUNCTUATION_TOKEN,
+		PestTypes.DASH_PUNCTUATION_TOKEN,
+		PestTypes.OPEN_PUNCTUATION_TOKEN,
+		PestTypes.CLOSE_PUNCTUATION_TOKEN,
+		PestTypes.INITIAL_PUNCTUATION_TOKEN,
+		PestTypes.FINAL_PUNCTUATION_TOKEN,
+		PestTypes.OTHER_PUNCTUATION_TOKEN,
+		PestTypes.SYMBOL_TOKEN,
+		PestTypes.MATH_SYMBOL_TOKEN,
+		PestTypes.CURRENCY_SYMBOL_TOKEN,
+		PestTypes.MODIFIER_SYMBOL_TOKEN,
+		PestTypes.OTHER_SYMBOL_TOKEN,
+		PestTypes.SEPARATOR_TOKEN,
+		PestTypes.SPACE_SEPARATOR_TOKEN,
+		PestTypes.LINE_SEPARATOR_TOKEN,
+		PestTypes.PARAGRAPH_SEPARATOR_TOKEN,
+		PestTypes.OTHER_TOKEN,
+		PestTypes.CONTROL_TOKEN,
+		PestTypes.FORMAT_TOKEN,
+		PestTypes.SURROGATE_TOKEN,
+		PestTypes.PRIVATE_USE_TOKEN,
+		PestTypes.UNASSIGNED_TOKEN,
+		PestTypes.ALPHABETIC_TOKEN,
+		PestTypes.BIDI_CONTROL_TOKEN,
+		PestTypes.CASE_IGNORABLE_TOKEN,
+		PestTypes.CASED_TOKEN,
+		PestTypes.CHANGES_WHEN_CASEFOLDED_TOKEN,
+		PestTypes.CHANGES_WHEN_CASEMAPPED_TOKEN,
+		PestTypes.CHANGES_WHEN_LOWERCASED_TOKEN,
+		PestTypes.CHANGES_WHEN_TITLECASED_TOKEN,
+		PestTypes.CHANGES_WHEN_UPPERCASED_TOKEN,
+		PestTypes.DASH_TOKEN,
+		PestTypes.DEFAULT_IGNORABLE_CODE_POINT_TOKEN,
+		PestTypes.DEPRECATED_TOKEN,
+		PestTypes.DIACRITIC_TOKEN,
+		PestTypes.EXTENDER_TOKEN,
+		PestTypes.GRAPHEME_BASE_TOKEN,
+		PestTypes.GRAPHEME_EXTEND_TOKEN,
+		PestTypes.GRAPHEME_LINK_TOKEN,
+		PestTypes.HEX_DIGIT_TOKEN,
+		PestTypes.HYPHEN_TOKEN,
+		PestTypes.IDS_BINARY_OPERATOR_TOKEN,
+		PestTypes.IDS_TRINARY_OPERATOR_TOKEN,
+		PestTypes.ID_CONTINUE_TOKEN,
+		PestTypes.ID_START_TOKEN,
+		PestTypes.IDEOGRAPHIC_TOKEN,
+		PestTypes.JOIN_CONTROL_TOKEN,
+		PestTypes.LOGICAL_ORDER_EXCEPTION_TOKEN,
+		PestTypes.LOWERCASE_TOKEN,
+		PestTypes.MATH_TOKEN,
+		PestTypes.NONCHARACTER_CODE_POINT_TOKEN,
+		PestTypes.OTHER_ALPHABETIC_TOKEN,
+		PestTypes.OTHER_DEFAULT_IGNORABLE_CODE_POINT_TOKEN,
+		PestTypes.OTHER_GRAPHEME_EXTEND_TOKEN,
+		PestTypes.OTHER_ID_CONTINUE_TOKEN,
+		PestTypes.OTHER_ID_START_TOKEN,
+		PestTypes.OTHER_LOWERCASE_TOKEN,
+		PestTypes.OTHER_MATH_TOKEN,
+		PestTypes.OTHER_UPPERCASE_TOKEN,
+		PestTypes.PATTERN_SYNTAX_TOKEN,
+		PestTypes.PATTERN_WHITE_SPACE_TOKEN,
+		PestTypes.PREPENDED_CONCATENATION_MARK_TOKEN,
+		PestTypes.QUOTATION_MARK_TOKEN,
+		PestTypes.RADICAL_TOKEN,
+		PestTypes.REGIONAL_INDICATOR_TOKEN,
+		PestTypes.SENTENCE_TERMINAL_TOKEN,
+		PestTypes.SOFT_DOTTED_TOKEN,
+		PestTypes.TERMINAL_PUNCTUATION_TOKEN,
+		PestTypes.UNIFIED_IDEOGRAPH_TOKEN,
+		PestTypes.UPPERCASE_TOKEN,
+		PestTypes.VARIATION_SELECTOR_TOKEN,
+		PestTypes.WHITE_SPACE_TOKEN,
+		PestTypes.XID_CONTINUE_TOKEN,
+		PestTypes.XID_START_TOKEN,
 		PestTypes.ANY_TOKEN,
 		PestTypes.EOI_TOKEN,
 		PestTypes.SOI_TOKEN,
-		PestTypes.DROP_TOKEN,
 		PestTypes.ASCII_TOKEN,
 		PestTypes.NEWLINE_TOKEN,
-		PestTypes.COMMENT_TOKEN,
-		PestTypes.WHITESPACE_TOKEN,
 		PestTypes.ASCII_DIGIT_TOKEN,
 		PestTypes.ASCII_ALPHA_TOKEN,
 		PestTypes.ASCII_ALPHANUMERIC_TOKEN,
@@ -68,7 +154,15 @@ object PestHighlighter : SyntaxHighlighter {
 		PestTypes.ASCII_OCT_DIGIT_TOKEN,
 		PestTypes.ASCII_HEX_DIGIT_TOKEN,
 		PestTypes.ASCII_ALPHA_UPPER_TOKEN,
-		PestTypes.ASCII_ALPHA_LOWER_TOKEN,
+		PestTypes.ASCII_ALPHA_LOWER_TOKEN)
+
+	private val KEYWORDS_LIST = Arrays.asList(
+		PestTypes.PEEK_ALL_TOKEN,
+		PestTypes.POP_TOKEN,
+		PestTypes.POP_ALL_TOKEN,
+		PestTypes.DROP_TOKEN,
+		PestTypes.COMMENT_TOKEN,
+		PestTypes.WHITESPACE_TOKEN,
 		PestTypes.PUSH_TOKEN,
 		PestTypes.PEEK_TOKEN)
 
@@ -95,6 +189,7 @@ object PestHighlighter : SyntaxHighlighter {
 		in BRACKS -> BRACK_KEY
 		in BRACES -> BRACE_KEY
 		in KEYWORDS_LIST -> KEYWORD_KEY
+		in BUILTINS_LIST -> BUILTIN_KEY
 		in OPERATORS_LIST -> OPERATOR_KEY
 		else -> emptyArray()
 	}
@@ -108,6 +203,7 @@ class PestColorSettingsPage : ColorSettingsPage {
 	private companion object DescriptorHolder {
 		private val DESCRIPTORS = arrayOf(
 			AttributesDescriptor(PestBundle.message("pest.highlighter.settings.unresolved"), PestHighlighter.UNRESOLVED),
+			AttributesDescriptor(PestBundle.message("pest.highlighter.settings.builtin"), PestHighlighter.BUILTIN),
 			AttributesDescriptor(PestBundle.message("pest.highlighter.settings.simple"), PestHighlighter.SIMPLE),
 			AttributesDescriptor(PestBundle.message("pest.highlighter.settings.silent"), PestHighlighter.SILENT),
 			AttributesDescriptor(PestBundle.message("pest.highlighter.settings.atomic"), PestHighlighter.ATOMIC),
@@ -145,6 +241,6 @@ class PestColorSettingsPage : ColorSettingsPage {
 <Simple>simple_rule</Simple> = { PUSH ("string") ~
   <Unresolved>unresolved_rule</Unresolved> ~
   <Silent>silent_rule</Silent> ~
-  (!"PRE" ~ ) }
+  (!"PRE" ~ ID_CONTINUE) }
 """
 }

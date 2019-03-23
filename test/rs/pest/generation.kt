@@ -16,4 +16,11 @@ class CodeGeneration {
 			println(" | ${it}_TOKEN")
 		}
 	}
+
+	@Test
+	fun generateHighlighter() {
+		BUILTIN_RULES.forEach {
+			println("PestTypes.${it}_TOKEN,")
+		}
+	}
 }
