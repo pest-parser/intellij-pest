@@ -36,8 +36,10 @@ abstract class PestGrammarRuleMixin(node: ASTNode) : PestElement(node), PsiNameI
 	override fun getNameIdentifier(): PsiElement = firstChild
 	override fun getIcon(flags: Int) = PestIcons.PEST
 	override fun getName(): String = nameIdentifier.text
+	@Throws(IncorrectOperationException::class)
 	override fun setName(newName: String): PsiElement {
-		firstChild.replace(PestTokenType.createRuleName(newName, project))
+		firstChild.replace(PestTokenType.createRuleName(newName, project)
+			?: throw IncorrectOperationException("Invalid name $newName"))
 		return this
 	}
 
@@ -77,19 +79,28 @@ abstract class PestResolvableMixin(node: ASTNode) : PestExpressionImpl(node), Ps
 
 
 abstract class PestIdentifierMixin(node: ASTNode) : PestResolvableMixin(node) {
-	override fun handleElementRename(newName: String): PsiElement = replace(PestTokenType.createExpression(newName, project))
+	@Throws(IncorrectOperationException::class)
+	override fun handleElementRename(newName: String): PsiElement = replace(
+		PestTokenType.createExpression(newName, project)
+			?: throw IncorrectOperationException("Invalid name: $newName"))
 }
 
 abstract class PestBuiltinMixin(node: ASTNode) : PestResolvableMixin(node) {
-	override fun handleElementRename(newName: String): PsiElement = replace(PestTokenType.createExpression(newName, project))
+	@Throws(IncorrectOperationException::class)
+	override fun handleElementRename(newName: String): PsiElement = replace(
+		PestTokenType.createExpression(newName, project)
+			?: throw IncorrectOperationException("Invalid name: $newName"))
 }
 
 abstract class PestStringMixin(node: ASTNode) : PestExpressionImpl(node), PsiLanguageInjectionHost {
 	override fun isValidHost() = true
-	override fun updateText(text: String) = replace(PestTokenType.createExpression(text, project)) as? PestStringMixin
+	override fun updateText(text: String) = PestTokenType.createExpression(text, project)?.let(::replace) as? PestStringMixin
 	override fun createLiteralTextEscaper(): LiteralTextEscaper<PestStringMixin> = PestStringEscaper(this)
 }
 
-abstract class PestFixedBuiltinRuleNameMixin(node: ASTNode) : PestElement(node)
-abstract class PestOverwritableRuleNameMixin(node: ASTNode) : PestElement(node)
-abstract class PestRuleNameMixin(node: ASTNode) : PestElement(node)
+abstract class PestFixedBuiltinRuleNameMixin(node: ASTNode) : PestElement(node), PestFixedBuiltinRuleName
+abstract class PestCustomizableRuleNameMixin(node: ASTNode) : PestResolvableMixin(node), PestCustomizableRuleName {
+	@Throws(IncorrectOperationException::class)
+	override fun handleElementRename(newName: String): PsiElement = throw IncorrectOperationException("Cannot rename")
+}
+abstract class PestRuleNameMixin(node: ASTNode) : PestElement(node), PestValidRuleName

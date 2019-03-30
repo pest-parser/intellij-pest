@@ -2,6 +2,7 @@ package rs.pest.psi
 
 import com.intellij.openapi.editor.colors.TextAttributesKey
 import com.intellij.openapi.project.Project
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFileFactory
 import com.intellij.psi.TokenType
 import com.intellij.psi.tree.IElementType
@@ -26,11 +27,11 @@ class PestTokenType(debugName: String) : IElementType(debugName, PestLanguage.IN
 		@JvmField val ANY_STRINGS = TokenSet.orSet(STRINGS, INCOMPLETE_STRINGS)
 		@JvmField val IDENTIFIERS = TokenSet.create(PestTypes.IDENTIFIER)
 
-		fun fromText(text: String, project: Project) = PsiFileFactory.getInstance(project).createFileFromText(PestLanguage.INSTANCE, text).firstChild
-		fun createRule(text: String, project: Project) = fromText(text, project) as PestGrammarRuleMixin
-		fun createBody(text: String, project: Project) = createRule("r=$text", project).grammarBody as PestGrammarBody
-		fun createExpression(text: String, project: Project) = createBody("{$text}", project).expression!!
-		fun createRuleName(text: String, project: Project) = createRule("$text = {\"d\"}", project).nameIdentifier
+		fun fromText(text: String, project: Project): PsiElement? = PsiFileFactory.getInstance(project).createFileFromText(PestLanguage.INSTANCE, text).firstChild
+		fun createRule(text: String, project: Project) = fromText(text, project) as? PestGrammarRuleMixin
+		fun createBody(text: String, project: Project) = createRule("r=$text", project)?.grammarBody as? PestGrammarBody
+		fun createExpression(text: String, project: Project) = createBody("{$text}", project)?.expression
+		fun createRuleName(text: String, project: Project) = createRule("$text = {\"d\"}", project)?.nameIdentifier
 	}
 }
 

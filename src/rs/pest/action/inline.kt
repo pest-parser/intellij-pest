@@ -99,7 +99,7 @@ class PestInlineProcessor(
 			else -> "(${expression.bodyText(grammarBody.textLength).trim()})"
 		}
 		ApplicationManager.getApplication().runWriteAction {
-			val newElement = PestTokenType.createExpression(newText, myProject)
+			val newElement = PestTokenType.createExpression(newText, myProject)!!
 			if (thisOnly) {
 				reference?.replace(newElement)
 			} else {

@@ -34,7 +34,7 @@ grammar_rule  ::= rule_name ASSIGNMENT_OPERATOR modifier? grammar_body {
 
 private rule_name ::=
     valid_rule_name
-  | overwritable_rule_name
+  | customizable_rule_name
   | fixed_builtin_rule_name
   { pin=1 }
 
@@ -42,8 +42,8 @@ fixed_builtin_rule_name ::= commands | builtin {
 	mixin="rs.pest.psi.impl.PestFixedBuiltinRuleNameMixin"
 }
 
-overwritable_rule_name ::= WHITESPACE_TOKEN | COMMENT_TOKEN {
-	mixin="rs.pest.psi.impl.PestOverwritableRuleNameMixin"
+customizable_rule_name ::= WHITESPACE_TOKEN | COMMENT_TOKEN {
+	mixin="rs.pest.psi.impl.PestCustomizableRuleNameMixin"
 }
 
 valid_rule_name ::= IDENTIFIER_TOKEN {
@@ -71,6 +71,7 @@ private atom ::=
 	push |
 	peek |
 	identifier |
+	customizable_rule_name |
 	string |
 	range |
 	builtin |

@@ -123,13 +123,13 @@ class PestIntroduceRuleActionHandler : RefactoringActionHandler {
 			else break
 		}
 		val range = TextRange(first.startOffset, last.endOffset)
-		val rule = PestTokenType.createRule("$name = { ${range.shiftLeft(currentRule.startOffset).substring(currentRule.text).trim()} }", project)
+		val rule = PestTokenType.createRule("$name = { ${range.shiftLeft(currentRule.startOffset).substring(currentRule.text).trim()} }", project)!!
 		WriteCommandAction.runWriteCommandAction(project) {
 			val document = editor.document
 			file.add(rule)
 			PsiDocumentManager.getInstance(project).doPostponedOperationsAndUnblockDocument(document)
 			if (expressions.size == 1) {
-				expressions.first().replace(PestTokenType.createExpression(name, project))
+				expressions.first().replace(PestTokenType.createExpression(name, project)!!)
 			} else {
 				document.deleteString(range.startOffset, range.endOffset)
 				document.insertString(range.startOffset, name)
