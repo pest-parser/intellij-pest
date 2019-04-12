@@ -17,6 +17,7 @@ import com.intellij.refactoring.IntroduceTargetChooser
 import com.intellij.refactoring.RefactoringActionHandler
 import com.intellij.refactoring.RefactoringBundle
 import com.intellij.refactoring.actions.BasePlatformRefactoringAction
+import com.intellij.refactoring.introduce.inplace.OccurrencesChooser
 import com.intellij.refactoring.util.CommonRefactoringUtil
 import com.intellij.util.containers.ContainerUtil
 import rs.pest.PestBundle
@@ -123,25 +124,36 @@ class PestIntroduceRuleActionHandler : RefactoringActionHandler {
 			if (file.rules().any { it.name == name }) i++
 			else break
 		}
-		val range = TextRange(first.startOffset, last.endOffset)
-		val rule = PestTokenType.createRule("$name = { ${range.shiftLeft(currentRule.startOffset).substring(currentRule.text).trim()} }", project)!!
-		WriteCommandAction.runWriteCommandAction(project) {
-			file.addAfter(rule, currentRule.nextSibling)
-			val document = editor.document
-			PsiDocumentManager.getInstance(project).doPostponedOperationsAndUnblockDocument(document)
-			if (expressions.size == 1) {
-				expressions.first().replace(PestTokenType.createExpression(name, project)!!)
-			} else {
-				document.deleteString(range.startOffset, range.endOffset)
-				document.insertString(range.startOffset, name)
+		val occurrence = mutableMapOf<OccurrencesChooser.ReplaceChoice, MutableList<Array<PestExpression>>>()
+		occurrence[OccurrencesChooser.ReplaceChoice.NO] = mutableListOf(expressions.toTypedArray())
+		occurrence[OccurrencesChooser.ReplaceChoice.ALL] = mutableListOf()
+		// TODO: find occurrences
+		if (occurrence[OccurrencesChooser.ReplaceChoice.ALL]!!.size <= 1)
+			occurrence.remove(OccurrencesChooser.ReplaceChoice.ALL)
+		object : OccurrencesChooser<Array<PestExpression>>(editor) {
+			override fun getOccurrenceRange(occurrence: Array<PestExpression>) =
+				TextRange(occurrence.first().startOffset, occurrence.last().endOffset)
+		}.showChooser(object : Pass<OccurrencesChooser.ReplaceChoice>() {
+			override fun pass(t: OccurrencesChooser.ReplaceChoice?) = WriteCommandAction.runWriteCommandAction(project) {
+				val range = TextRange(first.startOffset, last.endOffset)
+				val rule = PestTokenType.createRule("$name = { ${range.shiftLeft(currentRule.startOffset).substring(currentRule.text).trim()} }", project)!!
+				file.addAfter(rule, currentRule.nextSibling)
+				val document = editor.document
+				PsiDocumentManager.getInstance(project).doPostponedOperationsAndUnblockDocument(document)
+				if (expressions.size == 1) {
+					expressions.first().replace(PestTokenType.createExpression(name, project)!!)
+				} else {
+					document.deleteString(range.startOffset, range.endOffset)
+					document.insertString(range.startOffset, name)
+				}
+				val popup = PestIntroduceRulePopupImpl(rule, editor, project, rule.grammarBody!!.expression!!)
+				val newRuleStartOffset = currentRule.endOffset + 1
+				editor.caretModel.moveToOffset(newRuleStartOffset)
+				PsiDocumentManager.getInstance(project).doPostponedOperationsAndUnblockDocument(document)
+				document.insertString(newRuleStartOffset + rule.textLength, "\n")
+				popup.performInplaceRefactoring(null)
 			}
-			val popup = PestIntroduceRulePopupImpl(rule, editor, project, rule.grammarBody!!.expression!!)
-			val newRuleStartOffset = currentRule.endOffset + 1
-			editor.caretModel.moveToOffset(newRuleStartOffset)
-			PsiDocumentManager.getInstance(project).doPostponedOperationsAndUnblockDocument(document)
-			document.insertString(newRuleStartOffset + rule.textLength, "\n")
-			popup.performInplaceRefactoring(null)
-		}
+		}, occurrence)
 	}
 
 	// Unsupported
