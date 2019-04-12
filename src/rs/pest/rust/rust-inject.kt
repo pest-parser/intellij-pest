@@ -8,8 +8,8 @@ import com.intellij.psi.PsiWhiteSpace
 import org.rust.lang.core.psi.RsLitExpr
 import org.rust.lang.core.psi.RsMetaItem
 import org.rust.lang.core.psi.RsOuterAttr
-import org.rust.lang.core.psi.ext.childrenWithLeaves
 import rs.pest.PestLanguage
+import rs.pest.psi.childrenWithLeaves
 
 class InlineGrammarInjector : LanguageInjector {
 	override fun getLanguagesToInject(host: PsiLanguageInjectionHost, places: InjectedLanguagePlaces) {
