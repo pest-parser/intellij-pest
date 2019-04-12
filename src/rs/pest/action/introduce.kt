@@ -19,16 +19,17 @@ import com.intellij.refactoring.RefactoringBundle
 import com.intellij.refactoring.actions.BasePlatformRefactoringAction
 import com.intellij.refactoring.util.CommonRefactoringUtil
 import com.intellij.util.containers.ContainerUtil
-import org.rust.lang.core.psi.ext.endOffset
-import org.rust.lang.core.psi.ext.startOffset
 import rs.pest.PestBundle
 import rs.pest.PestFile
 import rs.pest.PestLanguage
+import rs.pest.action.ui.PestIntroduceRulePopupImpl
 import rs.pest.psi.PestExpression
 import rs.pest.psi.PestTokenType
+import rs.pest.psi.endOffset
 import rs.pest.psi.impl.PestGrammarRuleMixin
 import rs.pest.psi.impl.bodyText
 import rs.pest.psi.impl.findParentExpression
+import rs.pest.psi.startOffset
 import java.util.*
 
 
@@ -93,7 +94,7 @@ class PestIntroduceRuleActionHandler : RefactoringActionHandler {
 	}
 
 	private fun findSelectedExpressionsInRange(parentExpression: PestExpression, range: TextRange): List<PestExpression> {
-		if (parentExpression.textRange == range) return parentExpression.expressionList
+		if (parentExpression.textRange == range) return listOf(parentExpression)
 		val list = ContainerUtil.newArrayList<PestExpression>()
 		var c: PsiElement? = parentExpression.firstChild
 		while (c != null) {
@@ -118,15 +119,15 @@ class PestIntroduceRuleActionHandler : RefactoringActionHandler {
 		var i = 0
 		var name: String
 		while (true) {
-			name = "${currentRuleName}_$i"
+			name = "$currentRuleName$i"
 			if (file.rules().any { it.name == name }) i++
 			else break
 		}
 		val range = TextRange(first.startOffset, last.endOffset)
 		val rule = PestTokenType.createRule("$name = { ${range.shiftLeft(currentRule.startOffset).substring(currentRule.text).trim()} }", project)!!
 		WriteCommandAction.runWriteCommandAction(project) {
+			file.addAfter(rule, currentRule.nextSibling)
 			val document = editor.document
-			file.add(rule)
 			PsiDocumentManager.getInstance(project).doPostponedOperationsAndUnblockDocument(document)
 			if (expressions.size == 1) {
 				expressions.first().replace(PestTokenType.createExpression(name, project)!!)
@@ -134,8 +135,12 @@ class PestIntroduceRuleActionHandler : RefactoringActionHandler {
 				document.deleteString(range.startOffset, range.endOffset)
 				document.insertString(range.startOffset, name)
 			}
-			editor.caretModel.moveToOffset(file.lastChild.startOffset)
+			val popup = PestIntroduceRulePopupImpl(rule, editor, project, rule.grammarBody!!.expression!!)
+			val newRuleStartOffset = currentRule.endOffset + 1
+			editor.caretModel.moveToOffset(newRuleStartOffset)
 			PsiDocumentManager.getInstance(project).doPostponedOperationsAndUnblockDocument(document)
+			document.insertString(newRuleStartOffset + rule.textLength, "\n")
+			popup.performInplaceRefactoring(null)
 		}
 	}
 
