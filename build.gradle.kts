@@ -21,10 +21,9 @@ val commitHash = kotlin.run {
 	output.trim()
 }
 
-val pluginComingVersion = "0.1.7"
+val pluginComingVersion = "0.2.0"
 val pluginVersion = if (isCI) "$pluginComingVersion-$commitHash" else pluginComingVersion
 val packageName = "rs.pest"
-val kotlinVersion = "1.2.70"
 
 group = packageName
 version = pluginVersion
@@ -33,7 +32,7 @@ plugins {
 	java
 	id("org.jetbrains.intellij") version "0.4.6"
 	id("org.jetbrains.grammarkit") version "2018.3.1"
-	kotlin("jvm") version "1.2.70"
+	kotlin("jvm") version "1.3.30"
 }
 
 fun fromToolbox(path: String) = file(path).listFiles().orEmpty().filter { it.isDirectory }.maxBy {
@@ -62,7 +61,7 @@ allprojects {
 			}
 		}
 
-		setPlugins("org.rust.lang:0.2.93.2117-191")
+		setPlugins("org.rust.lang:0.2.96.2122-191")
 	}
 }
 
@@ -78,15 +77,15 @@ tasks.withType<PatchPluginXmlTask> {
 	pluginId(packageName)
 }
 
-java.sourceSets {
-	"main" {
+sourceSets {
+	main {
 		withConvention(KotlinSourceSet::class) {
 			listOf(java, kotlin).forEach { it.srcDirs("src", "gen") }
 		}
 		resources.srcDirs("res")
 	}
 
-	"test" {
+	test {
 		withConvention(KotlinSourceSet::class) {
 			listOf(java, kotlin).forEach { it.srcDirs("test") }
 		}
@@ -97,16 +96,11 @@ java.sourceSets {
 repositories { mavenCentral() }
 
 dependencies {
-	compileOnly(kotlin("stdlib", kotlinVersion))
-	compile(kotlin("stdlib-jdk8", kotlinVersion).toString()) {
-		exclude(module = "kotlin-runtime")
-		exclude(module = "kotlin-reflect")
-		exclude(module = "kotlin-stdlib")
-	}
+	compile(kotlin("stdlib-jdk8"))
 	compile("org.eclipse.mylyn.github", "org.eclipse.egit.github.core", "2.1.5") {
 		exclude(module = "gson")
 	}
-	testCompile(kotlin("test-junit", kotlinVersion))
+	testCompile(kotlin("test-junit"))
 	testCompile("junit", "junit", "4.12")
 }
 
@@ -149,8 +143,8 @@ tasks.withType<KotlinCompile> {
 	dependsOn(genParser, genLexer)
 	kotlinOptions {
 		jvmTarget = "1.8"
-		languageVersion = "1.2"
-		apiVersion = "1.2"
+		languageVersion = "1.3"
+		apiVersion = "1.3"
 		freeCompilerArgs = listOf("-Xjvm-default=enable")
 	}
 }
