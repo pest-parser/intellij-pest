@@ -8,10 +8,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Pass
 import com.intellij.openapi.util.TextRange
-import com.intellij.psi.PsiDocumentManager
-import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiFile
-import com.intellij.psi.PsiWhiteSpace
+import com.intellij.psi.*
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.refactoring.IntroduceTargetChooser
 import com.intellij.refactoring.RefactoringActionHandler
@@ -24,13 +21,11 @@ import rs.pest.PestBundle
 import rs.pest.PestFile
 import rs.pest.PestLanguage
 import rs.pest.action.ui.PestIntroduceRulePopupImpl
-import rs.pest.psi.PestExpression
-import rs.pest.psi.PestTokenType
-import rs.pest.psi.endOffset
+import rs.pest.psi.*
 import rs.pest.psi.impl.PestGrammarRuleMixin
 import rs.pest.psi.impl.bodyText
+import rs.pest.psi.impl.compareExpr
 import rs.pest.psi.impl.findParentExpression
-import rs.pest.psi.startOffset
 import java.util.*
 
 
@@ -124,34 +119,45 @@ class PestIntroduceRuleActionHandler : RefactoringActionHandler {
 			if (file.rules().any { it.name == name }) i++
 			else break
 		}
+		val range = TextRange(first.startOffset, last.endOffset)
+		val rule = PestTokenType.createRule("$name = { ${range.shiftLeft(currentRule.startOffset).substring(currentRule.text).trim()} }", project)!!
+		val expr = rule.grammarBody!!.expression!!
 		val occurrence = mutableMapOf<OccurrencesChooser.ReplaceChoice, MutableList<Array<PestExpression>>>()
 		occurrence[OccurrencesChooser.ReplaceChoice.NO] = mutableListOf(expressions.toTypedArray())
-		occurrence[OccurrencesChooser.ReplaceChoice.ALL] = mutableListOf()
-		// TODO: find occurrences
-		if (occurrence[OccurrencesChooser.ReplaceChoice.ALL]!!.size <= 1)
-			occurrence.remove(OccurrencesChooser.ReplaceChoice.ALL)
+		val allList = mutableListOf<Array<PestExpression>>()
+		file.acceptChildren(object: PestVisitor() {
+			override fun visitExpression(o: PestExpression) {
+				if (compareExpr(expr, o)) allList.add(arrayOf(o))
+				super.visitExpression(o)
+			}
+		})
+		if (allList.size > 1)
+			occurrence[OccurrencesChooser.ReplaceChoice.ALL] = allList
 		object : OccurrencesChooser<Array<PestExpression>>(editor) {
 			override fun getOccurrenceRange(occurrence: Array<PestExpression>) =
 				TextRange(occurrence.first().startOffset, occurrence.last().endOffset)
 		}.showChooser(object : Pass<OccurrencesChooser.ReplaceChoice>() {
-			override fun pass(t: OccurrencesChooser.ReplaceChoice?) = WriteCommandAction.runWriteCommandAction(project) {
-				val range = TextRange(first.startOffset, last.endOffset)
-				val rule = PestTokenType.createRule("$name = { ${range.shiftLeft(currentRule.startOffset).substring(currentRule.text).trim()} }", project)!!
-				file.addAfter(rule, currentRule.nextSibling)
-				val document = editor.document
-				PsiDocumentManager.getInstance(project).doPostponedOperationsAndUnblockDocument(document)
-				if (expressions.size == 1) {
-					expressions.first().replace(PestTokenType.createExpression(name, project)!!)
-				} else {
-					document.deleteString(range.startOffset, range.endOffset)
-					document.insertString(range.startOffset, name)
+			override fun pass(t: OccurrencesChooser.ReplaceChoice?) {
+				WriteCommandAction.runWriteCommandAction(project) {
+					file.addAfter(rule, currentRule.nextSibling)
+					val document = editor.document
+					PsiDocumentManager.getInstance(project).doPostponedOperationsAndUnblockDocument(document)
+					if (expressions.size == 1) {
+						expressions.first().replace(PestTokenType.createExpression(name, project)!!)
+					} else {
+						document.deleteString(range.startOffset, range.endOffset)
+						document.insertString(range.startOffset, name)
+					}
+					val popup = PestIntroduceRulePopupImpl(rule, editor, project, expr)
+					val newRuleStartOffset = currentRule.endOffset + 1
+					editor.caretModel.moveToOffset(newRuleStartOffset)
+					PsiDocumentManager.getInstance(project).doPostponedOperationsAndUnblockDocument(document)
+					var lastOffset = newRuleStartOffset + rule.textLength
+					val fullLength = document.textLength
+					if (lastOffset > fullLength) lastOffset = fullLength
+					document.insertString(lastOffset, "\n")
+					popup.performInplaceRefactoring(null)
 				}
-				val popup = PestIntroduceRulePopupImpl(rule, editor, project, rule.grammarBody!!.expression!!)
-				val newRuleStartOffset = currentRule.endOffset + 1
-				editor.caretModel.moveToOffset(newRuleStartOffset)
-				PsiDocumentManager.getInstance(project).doPostponedOperationsAndUnblockDocument(document)
-				document.insertString(newRuleStartOffset + rule.textLength, "\n")
-				popup.performInplaceRefactoring(null)
 			}
 		}, occurrence)
 	}

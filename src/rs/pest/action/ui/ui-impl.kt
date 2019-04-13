@@ -28,8 +28,10 @@ class PestIntroduceRulePopupImpl(
 					val document = myEditor.document
 					val grammarBody = expr.parentOfType<PestGrammarBody>() ?: return@act
 					val offset = grammarBody.startOffset - 1
+					if (document.immutableCharSequence[offset] in "@!_$")
+						document.deleteString(offset, offset + 1)
 					when (button) {
-						normal -> document.deleteString(offset, offset + 1)
+						normal -> Unit
 						atomic -> document.insertString(offset, "@")
 						nonAtomic -> document.insertString(offset, "!")
 						compoundAtomic -> document.insertString(offset, "$")

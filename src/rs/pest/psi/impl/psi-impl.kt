@@ -5,6 +5,7 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.SyntaxTraverser
 import com.intellij.psi.util.PsiTreeUtil
+import rs.pest.psi.*
 
 
 /**
@@ -41,4 +42,31 @@ inline fun <reified T : PsiElement> findParentExpression(file: PsiFile, startOff
 	if (startElement == null || endElement == null) return null
 	val commonParent = PsiTreeUtil.findCommonParent(startElement, endElement)
 	return PsiTreeUtil.getParentOfType(commonParent, T::class.java, false)
+}
+
+fun compareExpr(l: PsiElement, r: PsiElement): Boolean {
+	if (l === r) return true
+	if (!l.isValid || !r.isValid) return false
+	return when {
+		l is PestCustomizableRuleName && r is PestCustomizableRuleName
+			|| l is PestBuiltin && r is PestBuiltin
+			|| l is PestString && r is PestString
+			|| l is PestInfixOperator && r is PestInfixOperator
+			|| l is PestPrefixOperator && r is PestPrefixOperator
+			|| l is PestIdentifier && r is PestIdentifier
+			|| l is PestPush && r is PestPush
+			|| l is PestPeek && r is PestPeek
+			|| l is PestRange && r is PestRange
+			|| l is PestPeekSlice && r is PestPeekSlice
+			|| l is PestCharacter && r is PestCharacter -> l.textMatches(r)
+		l is PestPostfixOperator && r is PestPostfixOperator
+			|| l is PestExpressionImpl && r is PestExpressionImpl
+			|| l is PestTerm && r is PestTerm -> {
+			val lc = l.children
+			val rc = r.children
+			if (lc.size != rc.size) return false
+			(lc zip rc).all { (x, y) -> compareExpr(x, y) }
+		}
+		else -> false
+	}
 }
