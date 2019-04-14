@@ -35,6 +35,7 @@ fun PsiElement.bodyText(maxSizeExpected: Int) = buildString {
 }
 
 inline fun <reified T : PsiElement> findParentExpression(file: PsiFile, startOffset: Int, endOffset: Int): T? {
+	@Suppress("NAME_SHADOWING")
 	var endOffset = endOffset
 	if (endOffset > startOffset) endOffset--
 	val startElement = file.findElementAt(startOffset)
@@ -59,13 +60,13 @@ fun compareExpr(l: PsiElement, r: PsiElement): Boolean {
 			|| l is PestRange && r is PestRange
 			|| l is PestPeekSlice && r is PestPeekSlice
 			|| l is PestCharacter && r is PestCharacter -> l.textMatches(r)
-		l is PestPostfixOperator && r is PestPostfixOperator
-			|| l is PestExpressionImpl && r is PestExpressionImpl
-			|| l is PestTerm && r is PestTerm -> {
+		l.javaClass == r.javaClass && r.javaClass == PestExpressionImpl::class.java
+			|| l is PestPostfixOperator && r is PestPostfixOperator -> {
 			val lc = l.children
 			val rc = r.children
-			if (lc.size != rc.size) return false
-			(lc zip rc).all { (x, y) -> compareExpr(x, y) }
+			lc.size == rc.size
+				&& lc.isNotEmpty()
+				&& (lc zip rc).all { (x, y) -> compareExpr(x, y) }
 		}
 		else -> false
 	}

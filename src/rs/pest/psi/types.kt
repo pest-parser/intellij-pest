@@ -29,7 +29,7 @@ class PestTokenType(debugName: String) : IElementType(debugName, PestLanguage.IN
 
 		fun fromText(text: String, project: Project): PsiElement? = PsiFileFactory.getInstance(project).createFileFromText(PestLanguage.INSTANCE, text).firstChild
 		fun createRule(text: String, project: Project) = fromText(text, project) as? PestGrammarRuleMixin
-		fun createBody(text: String, project: Project) = createRule("r=$text", project)?.grammarBody as? PestGrammarBody
+		fun createBody(text: String, project: Project) = createRule("r=$text", project)?.grammarBody
 		fun createExpression(text: String, project: Project) = createBody("{$text}", project)?.expression
 		fun createRuleName(text: String, project: Project) = createRule("$text = {\"d\"}", project)?.nameIdentifier
 	}

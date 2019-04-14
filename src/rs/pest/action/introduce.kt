@@ -122,32 +122,32 @@ class PestIntroduceRuleActionHandler : RefactoringActionHandler {
 		val range = TextRange(first.startOffset, last.endOffset)
 		val rule = PestTokenType.createRule("$name = { ${range.shiftLeft(currentRule.startOffset).substring(currentRule.text).trim()} }", project)!!
 		val expr = rule.grammarBody!!.expression!!
-		val occurrence = mutableMapOf<OccurrencesChooser.ReplaceChoice, MutableList<Array<PestExpression>>>()
-		occurrence[OccurrencesChooser.ReplaceChoice.NO] = mutableListOf(expressions.toTypedArray())
-		val allList = mutableListOf<Array<PestExpression>>()
-		file.acceptChildren(object: PestVisitor() {
-			override fun visitExpression(o: PestExpression) {
-				if (compareExpr(expr, o)) allList.add(arrayOf(o))
-				super.visitExpression(o)
-			}
-		})
+		val occurrence = mutableMapOf<OccurrencesChooser.ReplaceChoice, List<Array<PestExpression>>>()
+		occurrence[OccurrencesChooser.ReplaceChoice.NO] = listOf(expressions.toTypedArray())
+		val allList = SyntaxTraverser.psiTraverser()
+			.withRoot(file)
+			.filterIsInstance<PestExpression>()
+			.filter { compareExpr(expr, it) }
+			.map { arrayOf(it) }
 		if (allList.size > 1)
 			occurrence[OccurrencesChooser.ReplaceChoice.ALL] = allList
 		object : OccurrencesChooser<Array<PestExpression>>(editor) {
 			override fun getOccurrenceRange(occurrence: Array<PestExpression>) =
 				TextRange(occurrence.first().startOffset, occurrence.last().endOffset)
 		}.showChooser(object : Pass<OccurrencesChooser.ReplaceChoice>() {
-			override fun pass(t: OccurrencesChooser.ReplaceChoice?) {
+			override fun pass(choice: OccurrencesChooser.ReplaceChoice?) {
 				WriteCommandAction.runWriteCommandAction(project) {
 					file.addAfter(rule, currentRule.nextSibling)
 					val document = editor.document
 					PsiDocumentManager.getInstance(project).doPostponedOperationsAndUnblockDocument(document)
-					if (expressions.size == 1) {
-						expressions.first().replace(PestTokenType.createExpression(name, project)!!)
-					} else {
-						document.deleteString(range.startOffset, range.endOffset)
-						document.insertString(range.startOffset, name)
+					val all = OccurrencesChooser.ReplaceChoice.ALL
+					if (choice === all) occurrence[all]?.let { exprToReplace ->
+						replaceUsages(exprToReplace)
+					} else occurrence[OccurrencesChooser.ReplaceChoice.NO]?.let { exprToReplace ->
+						replaceUsages(exprToReplace)
 					}
+					if (expressions.size == 1) expressions.first().replace(PestTokenType.createExpression(name, project)!!)
+					else document.replaceString(range.startOffset, range.endOffset, name)
 					val popup = PestIntroduceRulePopupImpl(rule, editor, project, expr)
 					val newRuleStartOffset = currentRule.endOffset + 1
 					editor.caretModel.moveToOffset(newRuleStartOffset)
@@ -157,6 +157,18 @@ class PestIntroduceRuleActionHandler : RefactoringActionHandler {
 					if (lastOffset > fullLength) lastOffset = fullLength
 					document.insertString(lastOffset, "\n")
 					popup.performInplaceRefactoring(null)
+				}
+			}
+
+			private fun replaceUsages(expressions: List<Array<PestExpression>>) {
+				val newExpr = PestTokenType.createExpression(name, project)!!
+				if (expressions.size == 1) {
+					expressions.first().first().replace(newExpr)
+				} else expressions.forEach {
+					val firstExpr = it.first()
+					val parent = firstExpr.parent
+					parent.addBefore(newExpr, firstExpr)
+					parent.deleteChildRange(firstExpr, it.last())
 				}
 			}
 		}, occurrence)
