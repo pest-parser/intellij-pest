@@ -87,9 +87,8 @@ class PestInlineProcessor(
 		.toTypedArray()
 
 	override fun performRefactoring(usages: Array<UsageInfo>) {
-		val grammarBody = rule.grammarBody
-		val expression = grammarBody?.expression ?: return
-		val newText = when (expression) {
+		val grammarBody = rule.grammarBody ?: return
+		val newText = when (val expression = grammarBody.expression ?: return) {
 			is PestString -> expression.text
 			is PestCharacter -> expression.text
 			is PestIdentifier -> expression.text

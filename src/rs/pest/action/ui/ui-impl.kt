@@ -26,10 +26,13 @@ class PestIntroduceRulePopupImpl(
 			button.addActionListener {
 				val runnable = act@{
 					val document = myEditor.document
-					val grammarBody = elementToRename.grammarBody!!
-					val offset = newRuleStartOffset + grammarBody.startOffset
+					val grammarBody = elementToRename.grammarBody ?: return@act
+					val local = elementToRename.startOffset == 0
+					var offset = if (local) newRuleStartOffset + grammarBody.startOffset
+					else grammarBody.startOffset - 1
 					if (document.immutableCharSequence[offset] in "@!_$")
 						document.deleteString(offset, offset + 1)
+					else offset += 1
 					when (button) {
 						normal -> Unit
 						atomic -> document.insertString(offset, "@")
