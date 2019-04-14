@@ -27,7 +27,7 @@ object PestHighlighter : SyntaxHighlighter {
 	@JvmField val SILENT = TextAttributesKey.createTextAttributesKey("PEST_SILENT", DefaultLanguageHighlighterColors.FUNCTION_DECLARATION)
 	@JvmField val ATOMIC = TextAttributesKey.createTextAttributesKey("PEST_ATOMIC", DefaultLanguageHighlighterColors.LOCAL_VARIABLE)
 	@JvmField val COMPOUND_ATOMIC = TextAttributesKey.createTextAttributesKey("PEST_COMPOUND_ATOMIC", DefaultLanguageHighlighterColors.LOCAL_VARIABLE)
-	@JvmField val NON_ATOMIC = TextAttributesKey.createTextAttributesKey("PEST_NON_ATOMIC", DefaultLanguageHighlighterColors.REASSIGNED_LOCAL_VARIABLE)
+	@JvmField val NON_ATOMIC = TextAttributesKey.createTextAttributesKey("PEST_NON_ATOMIC", DefaultLanguageHighlighterColors.LOCAL_VARIABLE)
 	@JvmField val NUMBER = TextAttributesKey.createTextAttributesKey("PEST_NUMBER", DefaultLanguageHighlighterColors.NUMBER)
 	@JvmField val STRING = TextAttributesKey.createTextAttributesKey("PEST_STRING", DefaultLanguageHighlighterColors.STRING)
 	@JvmField val CHAR = TextAttributesKey.createTextAttributesKey("PEST_CHAR", DefaultLanguageHighlighterColors.STRING)
