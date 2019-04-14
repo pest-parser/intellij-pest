@@ -6,12 +6,13 @@ import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiDocumentManager
-import org.rust.lang.core.psi.ext.startOffset
 import rs.pest.psi.PestExpression
 import rs.pest.psi.PestGrammarRule
+import rs.pest.psi.startOffset
 import javax.swing.ButtonGroup
 
 class PestIntroduceRulePopupImpl(
+	newRuleStartOffset: Int,
 	elementToRename: PestGrammarRule,
 	editor: Editor,
 	project: Project,
@@ -22,11 +23,11 @@ class PestIntroduceRulePopupImpl(
 		val buttons = listOf(atomic, compoundAtomic, nonAtomic, normal, silent)
 		with(ButtonGroup()) { buttons.forEach(::add) }
 		buttons.forEach { button ->
-			button.addChangeListener {
+			button.addActionListener {
 				val runnable = act@{
 					val document = myEditor.document
 					val grammarBody = elementToRename.grammarBody!!
-					val offset = grammarBody.startOffset - 1
+					val offset = newRuleStartOffset + grammarBody.startOffset
 					if (document.immutableCharSequence[offset] in "@!_$")
 						document.deleteString(offset, offset + 1)
 					when (button) {

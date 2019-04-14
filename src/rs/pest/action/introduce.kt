@@ -135,37 +135,35 @@ class PestIntroduceRuleActionHandler : RefactoringActionHandler {
 			override fun getOccurrenceRange(occurrence: Array<PestExpression>) =
 				TextRange(occurrence.first().startOffset, occurrence.last().endOffset)
 		}.showChooser(object : Pass<OccurrencesChooser.ReplaceChoice>() {
-			override fun pass(choice: OccurrencesChooser.ReplaceChoice?) {
-				WriteCommandAction.runWriteCommandAction(project) {
-					@Suppress("NAME_SHADOWING")
-					val rule = file.addAfter(rule, currentRule.nextSibling) as PestGrammarRule
-					val document = editor.document
-					PsiDocumentManager.getInstance(project).doPostponedOperationsAndUnblockDocument(document)
-					val all = OccurrencesChooser.ReplaceChoice.ALL
-					if (choice === all) occurrence[all]?.let { exprToReplace ->
-						replaceUsages(exprToReplace)
-					} else occurrence[OccurrencesChooser.ReplaceChoice.NO]?.let { exprToReplace ->
-						replaceUsages(exprToReplace)
-					}
-					val newExpr = PestTokenType.createExpression(name, project)!!
-					if (expressions.size == 1) {
-						expressions.first().replace(newExpr)
-					} else {
-						val firstExpr = expressions.first()
-						val parent = firstExpr.parent
-						parent.addBefore(newExpr, firstExpr)
-						parent.deleteChildRange(firstExpr, expressions.last())
-					}
-					val popup = PestIntroduceRulePopupImpl(rule, editor, project, expr)
-					val newRuleStartOffset = currentRule.endOffset + 1
-					editor.caretModel.moveToOffset(newRuleStartOffset)
-					PsiDocumentManager.getInstance(project).doPostponedOperationsAndUnblockDocument(document)
-					var lastOffset = newRuleStartOffset + rule.textLength
-					val fullLength = document.textLength
-					if (lastOffset > fullLength) lastOffset = fullLength
-					document.insertString(lastOffset, "\n")
-					popup.performInplaceRefactoring(null)
+			override fun pass(choice: OccurrencesChooser.ReplaceChoice?) = WriteCommandAction.runWriteCommandAction(project) {
+				@Suppress("NAME_SHADOWING")
+				val rule = file.addAfter(rule, currentRule.nextSibling) as PestGrammarRule
+				val document = editor.document
+				PsiDocumentManager.getInstance(project).doPostponedOperationsAndUnblockDocument(document)
+				val all = OccurrencesChooser.ReplaceChoice.ALL
+				if (choice === all) occurrence[all]?.let { exprToReplace ->
+					replaceUsages(exprToReplace)
+				} else occurrence[OccurrencesChooser.ReplaceChoice.NO]?.let { exprToReplace ->
+					replaceUsages(exprToReplace)
 				}
+				val newExpr = PestTokenType.createExpression(name, project)!!
+				if (expressions.size == 1) {
+					expressions.first().replace(newExpr)
+				} else {
+					val firstExpr = expressions.first()
+					val parent = firstExpr.parent
+					parent.addBefore(newExpr, firstExpr)
+					parent.deleteChildRange(firstExpr, expressions.last())
+				}
+				val newRuleStartOffset = currentRule.endOffset + 1
+				val popup = PestIntroduceRulePopupImpl(newRuleStartOffset, rule, editor, project, expr)
+				editor.caretModel.moveToOffset(newRuleStartOffset)
+				PsiDocumentManager.getInstance(project).doPostponedOperationsAndUnblockDocument(document)
+				var lastOffset = newRuleStartOffset + rule.textLength
+				val fullLength = document.textLength
+				if (lastOffset > fullLength) lastOffset = fullLength
+				document.insertString(lastOffset, "\n")
+				popup.performInplaceRefactoring(null)
 			}
 
 			private fun replaceUsages(expressions: List<Array<PestExpression>>) {
