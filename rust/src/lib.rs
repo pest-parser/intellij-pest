@@ -1,3 +1,3 @@
-fn main() {
-    println!("Hello, pest!");
+extern "C" fn pest() {
+	println!("Test")
 }
