@@ -1,9 +1,22 @@
+os: Visual Studio 2017
+
 environment:
   JAVA_HOME: C:\Program Files\Java\jdk1.8.0
   JAVA_TOOL_OPTIONS: -Dfile.encoding=UTF-8
 #
 
+install:
+  - appveyor DownloadFile https://win.rustup.rs/ -FileName rustup-init.exe
+  - rustup-init -yv --default-toolchain nightly
+  - rustup-init target add wasm32-unknown-unknown --toolchain nightly
+  - set PATH=%PATH%;%USERPROFILE%\.cargo\bin
+  - rustc -vV
+  - cargo -vV
+
 build_script:
+  - cd rust
+  - cargo build
+  - cd ..
   - gradlew displayCommitHash
   - gradlew buildPlugin --info
   - gradlew verifyPlugin --info
