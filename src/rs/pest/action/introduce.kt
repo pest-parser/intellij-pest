@@ -24,7 +24,7 @@ import rs.pest.action.ui.PestIntroduceRulePopupImpl
 import rs.pest.psi.*
 import rs.pest.psi.impl.PestGrammarRuleMixin
 import rs.pest.psi.impl.bodyText
-import rs.pest.psi.impl.compareExpr
+import rs.pest.psi.impl.extractSimilar
 import rs.pest.psi.impl.findParentExpression
 import java.util.*
 
@@ -37,9 +37,11 @@ class PestIntroduceRuleAction : BasePlatformRefactoringAction() {
 	override fun isAvailableInEditorOnly() = true
 	override fun isAvailableForFile(file: PsiFile?) = file is PestFile
 	override fun isAvailableForLanguage(language: Language?) = language === PestLanguage.INSTANCE
-	override fun isEnabledOnElements(elements: Array<out PsiElement>) = false
+	override fun isEnabledOnElements(elements: Occurrences) = false
 	override fun getRefactoringHandler(provider: RefactoringSupportProvider) = PestIntroduceRuleActionHandler()
 }
+
+typealias Occurrences = Array<out PsiElement>
 
 class PestIntroduceRuleActionHandler : RefactoringActionHandler {
 	override fun invoke(project: Project, editor: Editor, file: PsiFile?, dataContext: DataContext?) {
@@ -54,6 +56,7 @@ class PestIntroduceRuleActionHandler : RefactoringActionHandler {
 		val currentRule = PsiTreeUtil.getParentOfType(file.findElementAt(startOffset), PestGrammarRuleMixin::class.java)
 		var parentExpression = if (currentRule != null) findParentExpression<PestExpression>(file, startOffset, endOffset) else null
 		if (currentRule == null || parentExpression == null) {
+			@Suppress("InvalidBundleOrProperty")
 			CommonRefactoringUtil.showErrorHint(project, editor,
 				RefactoringBundle.message("refactoring.introduce.context.error"),
 				PestBundle.message("pest.actions.general.title.error"), null)
@@ -81,6 +84,7 @@ class PestIntroduceRuleActionHandler : RefactoringActionHandler {
 			val selectedExpression = findSelectedExpressionsInRange(parentExpression, TextRange(startOffset, endOffset))
 			if (selectedExpression.isEmpty()) {
 				CommonRefactoringUtil.showErrorHint(project, editor,
+					@Suppress("InvalidBundleOrProperty")
 					RefactoringBundle.message("refactoring.introduce.selection.error"),
 					PestBundle.message("pest.actions.general.title.error"), null)
 				return
@@ -122,17 +126,17 @@ class PestIntroduceRuleActionHandler : RefactoringActionHandler {
 		val range = TextRange(first.startOffset, last.endOffset)
 		val rule = PestTokenType.createRule("$name = { ${range.shiftLeft(currentRule.startOffset).substring(currentRule.text).trim()} }", project)!!
 		val expr = rule.grammarBody!!.expression!!
-		val occurrence = mutableMapOf<OccurrencesChooser.ReplaceChoice, List<Array<PestExpression>>>()
+		val occurrence = mutableMapOf<OccurrencesChooser.ReplaceChoice, List<Occurrences>>()
 		occurrence[OccurrencesChooser.ReplaceChoice.NO] = listOf(expressions.toTypedArray())
 		val allList = SyntaxTraverser.psiTraverser()
 			.withRoot(file)
 			.filterIsInstance<PestExpression>()
-			.filter { compareExpr(expr, it) }
-			.map { arrayOf(it) }
+			.mapNotNull { extractSimilar(expr, it) }
+			.toList()
 		if (allList.size > 1)
 			occurrence[OccurrencesChooser.ReplaceChoice.ALL] = allList
-		object : OccurrencesChooser<Array<PestExpression>>(editor) {
-			override fun getOccurrenceRange(occurrence: Array<PestExpression>) =
+		object : OccurrencesChooser<Occurrences>(editor) {
+			override fun getOccurrenceRange(occurrence: Occurrences) =
 				TextRange(occurrence.first().startOffset, occurrence.last().endOffset)
 		}.showChooser(object : Pass<OccurrencesChooser.ReplaceChoice>() {
 			override fun pass(choice: OccurrencesChooser.ReplaceChoice?) = WriteCommandAction.runWriteCommandAction(project) {
@@ -166,7 +170,7 @@ class PestIntroduceRuleActionHandler : RefactoringActionHandler {
 				popup.performInplaceRefactoring(null)
 			}
 
-			private fun replaceUsages(expressions: List<Array<PestExpression>>) {
+			private fun replaceUsages(expressions: List<Occurrences>) {
 				val newExpr = PestTokenType.createExpression(name, project)!!
 				if (expressions.size == 1) {
 					expressions.first().first().replace(newExpr)
@@ -181,5 +185,5 @@ class PestIntroduceRuleActionHandler : RefactoringActionHandler {
 	}
 
 	// Unsupported
-	override fun invoke(project: Project, elements: Array<out PsiElement>, dataContext: DataContext?) = Unit
+	override fun invoke(project: Project, elements: Occurrences, dataContext: DataContext?) = Unit
 }

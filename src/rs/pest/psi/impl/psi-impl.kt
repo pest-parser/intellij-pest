@@ -6,6 +6,7 @@ import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.SyntaxTraverser
 import com.intellij.psi.util.PsiTreeUtil
 import rs.pest.psi.*
+import java.util.*
 
 
 /**
@@ -45,8 +46,30 @@ inline fun <reified T : PsiElement> findParentExpression(file: PsiFile, startOff
 	return PsiTreeUtil.getParentOfType(commonParent, T::class.java, false)
 }
 
+class SquashedPsi(val it: PsiElement) {
+	override fun hashCode() = it.hashCode()
+	override fun equals(other: Any?) =
+		if (other !is SquashedPsi) false else compareExpr(it, other.it)
+}
+
+/**
+ * @param std The element that we should be similar to
+ * @param us Us
+ */
+fun extractSimilar(std: PsiElement, us: PsiElement) =
+	if (std.javaClass == us.javaClass && us.javaClass == PestExpressionImpl::class.java) {
+		val lc = std.children
+		val rc = us.children
+		val index = Collections.indexOfSubList(rc.map(::SquashedPsi), lc.map(::SquashedPsi))
+		if (index >= 0) Array(lc.size) { rc[it + index] }
+		else null
+	} else if (compareExpr(std, us)) {
+		arrayOf(us)
+	} else null
+
 fun compareExpr(l: PsiElement, r: PsiElement): Boolean {
-	if (l === r) return true
+	/// Because we don't want to extract ourselves as yet another usage :)
+	if (l == r) return false
 	if (!l.isValid || !r.isValid) return false
 	return when {
 		l is PestCustomizableRuleName && r is PestCustomizableRuleName
