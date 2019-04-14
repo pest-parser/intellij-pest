@@ -137,7 +137,8 @@ class PestIntroduceRuleActionHandler : RefactoringActionHandler {
 		}.showChooser(object : Pass<OccurrencesChooser.ReplaceChoice>() {
 			override fun pass(choice: OccurrencesChooser.ReplaceChoice?) {
 				WriteCommandAction.runWriteCommandAction(project) {
-					file.addAfter(rule, currentRule.nextSibling)
+					@Suppress("NAME_SHADOWING")
+					val rule = file.addAfter(rule, currentRule.nextSibling) as PestGrammarRule
 					val document = editor.document
 					PsiDocumentManager.getInstance(project).doPostponedOperationsAndUnblockDocument(document)
 					val all = OccurrencesChooser.ReplaceChoice.ALL
@@ -146,8 +147,15 @@ class PestIntroduceRuleActionHandler : RefactoringActionHandler {
 					} else occurrence[OccurrencesChooser.ReplaceChoice.NO]?.let { exprToReplace ->
 						replaceUsages(exprToReplace)
 					}
-					if (expressions.size == 1) expressions.first().replace(PestTokenType.createExpression(name, project)!!)
-					else document.replaceString(range.startOffset, range.endOffset, name)
+					val newExpr = PestTokenType.createExpression(name, project)!!
+					if (expressions.size == 1) {
+						expressions.first().replace(newExpr)
+					} else {
+						val firstExpr = expressions.first()
+						val parent = firstExpr.parent
+						parent.addBefore(newExpr, firstExpr)
+						parent.deleteChildRange(firstExpr, expressions.last())
+					}
 					val popup = PestIntroduceRulePopupImpl(rule, editor, project, expr)
 					val newRuleStartOffset = currentRule.endOffset + 1
 					editor.caretModel.moveToOffset(newRuleStartOffset)

@@ -5,6 +5,7 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement
 import com.intellij.lang.ASTNode
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.*
+import com.intellij.psi.search.LocalSearchScope
 import com.intellij.util.IncorrectOperationException
 import icons.PestIcons
 import rs.pest.PestFile
@@ -13,18 +14,23 @@ import rs.pest.psi.*
 abstract class PestElement(node: ASTNode) : ASTWrapperPsiElement(node) {
 	val containingPestFile get() = containingFile as? PestFile
 	protected fun allGrammarRules(): Collection<PestGrammarRuleMixin> = containingPestFile?.rules().orEmpty()
+	override fun getUseScope(): LocalSearchScope {
+		val containingFile = containingFile
+		return LocalSearchScope(containingFile, containingFile.name)
+	}
 }
 
 abstract class PestGrammarRuleMixin(node: ASTNode) : PestElement(node), PsiNameIdentifierOwner, PestGrammarRule {
 	private var recCache: Boolean? = null
-	val isRecursive get() = recCache ?: run {
-		val grammarBody = grammarBody?.expression ?: return@run false
-		val name = name
-		SyntaxTraverser
-			.psiTraverser(grammarBody)
-			.filterTypes { it == PestTypes.IDENTIFIER }
-			.any { it.text == name }
-	}.also { recCache = it }
+	val isRecursive
+		get() = recCache ?: run {
+			val grammarBody = grammarBody?.expression ?: return@run false
+			val name = name
+			SyntaxTraverser
+				.psiTraverser(grammarBody)
+				.filterTypes { it == PestTypes.IDENTIFIER }
+				.any { it.text == name }
+		}.also { recCache = it }
 
 	fun refreshReferenceCache() = refreshReferenceCache(name, nameIdentifier)
 	private fun refreshReferenceCache(myName: String, self: PsiElement) = collectFrom<PestIdentifier>(containingFile, myName, self)
@@ -103,4 +109,5 @@ abstract class PestCustomizableRuleNameMixin(node: ASTNode) : PestResolvableMixi
 	@Throws(IncorrectOperationException::class)
 	override fun handleElementRename(newName: String): PsiElement = throw IncorrectOperationException("Cannot rename")
 }
+
 abstract class PestRuleNameMixin(node: ASTNode) : PestElement(node), PestValidRuleName

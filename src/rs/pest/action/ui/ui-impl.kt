@@ -2,18 +2,17 @@ package rs.pest.action.ui
 
 import com.intellij.codeInsight.lookup.LookupManager
 import com.intellij.codeInsight.lookup.impl.LookupImpl
+import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiDocumentManager
-import com.intellij.psi.PsiNamedElement
-import com.intellij.psi.util.parentOfType
 import org.rust.lang.core.psi.ext.startOffset
 import rs.pest.psi.PestExpression
-import rs.pest.psi.PestGrammarBody
+import rs.pest.psi.PestGrammarRule
 import javax.swing.ButtonGroup
 
 class PestIntroduceRulePopupImpl(
-	elementToRename: PsiNamedElement,
+	elementToRename: PestGrammarRule,
 	editor: Editor,
 	project: Project,
 	expr: PestExpression
@@ -26,7 +25,7 @@ class PestIntroduceRulePopupImpl(
 			button.addChangeListener {
 				val runnable = act@{
 					val document = myEditor.document
-					val grammarBody = expr.parentOfType<PestGrammarBody>() ?: return@act
+					val grammarBody = elementToRename.grammarBody!!
 					val offset = grammarBody.startOffset - 1
 					if (document.immutableCharSequence[offset] in "@!_$")
 						document.deleteString(offset, offset + 1)
@@ -39,11 +38,10 @@ class PestIntroduceRulePopupImpl(
 					}
 					PsiDocumentManager.getInstance(myProject).commitDocument(document)
 				}
-				val lookup = LookupManager.getActiveLookup(myEditor) as? LookupImpl
-				if (lookup != null) {
-					lookup.performGuardedChange(runnable)
-				} else {
-					runnable()
+				WriteCommandAction.runWriteCommandAction(project) {
+					val lookup = LookupManager.getActiveLookup(myEditor) as? LookupImpl
+					if (lookup != null) lookup.performGuardedChange(runnable)
+					else runnable()
 				}
 			}
 		}
