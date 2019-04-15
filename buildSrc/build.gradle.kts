@@ -9,7 +9,7 @@ sourceSets {
 		withConvention(KotlinSourceSet::class) {
 			listOf(java, kotlin).forEach { it.srcDirs("src") }
 		}
-		resources.srcDirs()
+		resources.srcDirs("res")
 	}
 
 	test {
@@ -22,8 +22,6 @@ repositories { jcenter() }
 dependencies {
 	compile(kotlin("stdlib-jdk8"))
 	compile(kotlin("reflect"))
-	compile("com.github.cretz.asmble:asmble-compiler:0.3.0") {
-		exclude(module = "kotlin-stdlib")
-		exclude(module = "kotlin-reflect")
-	}
+	compile("com.github.cretz.asmble:asmble-compiler:0.3.0")
+	compile("com.github.cretz.asmble:asmble-annotations:0.3.0")
 }

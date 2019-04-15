@@ -1,6 +1,8 @@
 #![no_mangle]
 #![feature(box_syntax, box_patterns)]
 
-pub extern "C" fn pest() {
+pub mod str4j;
+
+pub extern "C" fn run_vm() {
 	println!("Test")
 }

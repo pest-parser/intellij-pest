@@ -5,7 +5,11 @@ import asmble.cli.Compile
 import asmble.util.Logger
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
-import org.gradle.api.tasks.*
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.TaskAction
+import org.objectweb.asm.ClassReader
 import java.io.File
 
 open class CompileWasm : DefaultTask() {
