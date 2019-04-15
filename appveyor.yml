@@ -7,6 +7,9 @@ environment:
 
 install:
   - appveyor DownloadFile https://win.rustup.rs/ -FileName rustup-init.exe
+  - appveyor DownloadFile https://github.com/cretz/asmble/releases/download/0.4.0/asmble-0.4.0.zip
+  - 7z e -y asmble-0.4.0.zip
+  - ./asmble-0.4.0/asmble/bin/asmble --help
   - rustup-init -yv --default-toolchain nightly
   - refreshenv
   - rustup target add wasm32-unknown-unknown --toolchain nightly
