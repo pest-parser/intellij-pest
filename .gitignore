@@ -115,3 +115,4 @@ exportToHTML
 .piggy
 pinpoint_piggy
 grammar/*.scm
+asmble
