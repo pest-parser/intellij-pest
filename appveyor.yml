@@ -8,7 +8,7 @@ environment:
 install:
   - appveyor DownloadFile https://win.rustup.rs/ -FileName rustup-init.exe
   - rustup-init -yv --default-toolchain nightly
-  - rustup-init target add wasm32-unknown-unknown --toolchain nightly
+  - rustup target add wasm32-unknown-unknown --toolchain nightly
   - set PATH=%PATH%;%USERPROFILE%\.cargo\bin
   - rustc -vV
   - cargo -vV

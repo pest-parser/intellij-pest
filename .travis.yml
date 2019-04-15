@@ -2,7 +2,7 @@ language: java
 jdk:
   - oraclejdk8
 install:
-  - curl https://sh.rustup.rs -sSf | sh -- -y --default-toolchain nightly
+  - curl https://sh.rustup.rs -sSf -m 60 | sh -s -- -y -v --default-toolchain nightly
   - rustup target add wasm32-unknown-unknown --toolchain nightly
   - rustup run nightly rustc --version --verbose
   - rustup run nightly cargo --version --verbose
