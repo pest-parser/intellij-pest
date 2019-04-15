@@ -6,6 +6,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.*
 import java.nio.file.*
+import rs.pest.build.CompileWasm
 
 val isCI = !System.getenv("CI").isNullOrBlank()
 val commitHash = kotlin.run {
@@ -100,6 +101,7 @@ dependencies {
 	compile("org.eclipse.mylyn.github", "org.eclipse.egit.github.core", "2.1.5") {
 		exclude(module = "gson")
 	}
+	compile(files("$projectDir/rust/target/java"))
 	testCompile(kotlin("test-junit"))
 	testCompile("junit", "junit", "4.12")
 }
@@ -114,6 +116,13 @@ task("isCI") {
 	group = "help"
 	description = "Check if it's running in a continuous-integration"
 	doFirst { println(if (isCI) "Yes, I'm on a CI." else "No, I'm not on CI.") }
+}
+
+val compileWasm = task<CompileWasm>("compileWasm") {
+	buildType = "release"
+	cargoProject = "$projectDir/rust"
+	generatedDir = "$cargoProject/target/java"
+	classQualifiedName = "rs.pest.vm.PestUtil"
 }
 
 fun path(more: Iterable<*>) = more.joinToString(File.separator)
