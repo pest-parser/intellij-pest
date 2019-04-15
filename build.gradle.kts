@@ -143,6 +143,7 @@ val compileWasm = task<Exec>("compileWasm") {
 	val outFile = classQualifiedName
 		.split('.')
 		.fold(rustTarget.resolve("java"), File::resolve)
+		.apply { mkdirs() }
 		.absolutePath + ".class"
 	val wasmFile = rustTarget
 		.resolve("wasm32-unknown-unknown")
@@ -152,9 +153,11 @@ val compileWasm = task<Exec>("compileWasm") {
 		.also { if (it.size != 1) throw GradleException("Expected only one .wasm file, got: $it") }
 		.first()
 		.absolutePath
-	commandLine(buildDir.resolve(asmble).resolve("bin").resolve(asmble),
-		"compile", wasmFile, classQualifiedName,
-		"-out", outFile)
+	val exe = buildDir
+		.resolve("asmble")
+		.resolve("bin")
+		.resolve(if (System.getProperty("os.name").startsWith("Windows")) "asmble.bat" else "asmble")
+	commandLine(exe, "compile", wasmFile, classQualifiedName, "-out", outFile)
 	doFirst {
 		println("Input file: $wasmFile")
 		println("Output file: $outFile")

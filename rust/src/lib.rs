@@ -3,6 +3,8 @@
 
 pub mod str4j;
 
-pub extern "C" fn run_vm() {
+type JavaStr = *mut u8;
+
+pub extern "C" fn run_vm(pest_code: JavaStr, rule_name: JavaStr) {
 	println!("Test")
 }
