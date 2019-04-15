@@ -7,13 +7,10 @@ before_install:
   - rustup target add wasm32-unknown-unknown --toolchain nightly
   - rustup run nightly rustc --version --verbose
   - rustup run nightly cargo --version --verbose
-  - wget https://github.com/cretz/asmble/releases/download/0.4.0/asmble-0.4.0.zip
-  - unzip asmble-0.4.0.zip
 install:
   - cd rust
   - rustup run nightly cargo build --release
   - cd ..
-  - bash ./asmble/bin/asmble compile rust/target/wasm32-unknown-unknown/release/pest_ide.wasm rs.pest.vm.PestUtil -out rust/target/java/rs/pest/vm/PestUtil.class
 script:
   - bash gradlew displayCommitHash
   - bash gradlew isCI

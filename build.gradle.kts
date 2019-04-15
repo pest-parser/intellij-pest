@@ -1,12 +1,11 @@
+import de.undercouch.gradle.tasks.download.Download
 import org.jetbrains.grammarkit.tasks.GenerateLexer
 import org.jetbrains.grammarkit.tasks.GenerateParser
-import org.gradle.language.base.internal.plugins.CleanRule
 import org.jetbrains.intellij.tasks.PatchPluginXmlTask
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.*
-import java.nio.file.*
-import rs.pest.build.CompileWasm
+import java.nio.file.Paths
 
 val isCI = !System.getenv("CI").isNullOrBlank()
 val commitHash = kotlin.run {
@@ -33,6 +32,7 @@ plugins {
 	java
 	id("org.jetbrains.intellij") version "0.4.7"
 	id("org.jetbrains.grammarkit") version "2019.1"
+	id("de.undercouch.download") version "3.4.3"
 	kotlin("jvm") version "1.3.30"
 }
 
@@ -118,11 +118,47 @@ task("isCI") {
 	doFirst { println(if (isCI) "Yes, I'm on a CI." else "No, I'm not on CI.") }
 }
 
-val compileWasm = task<CompileWasm>("compileWasm") {
-	buildType = "release"
-	cargoProject = "$projectDir/rust"
-	generatedDir = "$cargoProject/target/java"
-	classQualifiedName = "rs.pest.vm.PestUtil"
+val asmble = "asmble"
+val rustTarget = projectDir.resolve("rust").resolve("target")
+
+val downloadAsmble = task<Download>("downloadAsmble") {
+	group = asmble
+	src("https://github.com/cretz/asmble/releases/download/0.4.0/asmble-0.4.0.zip")
+	dest(buildDir.absolutePath)
+	overwrite(false)
+}
+
+val unzipAsmble = task<Copy>("unzipAsmble") {
+	group = asmble
+	dependsOn(downloadAsmble)
+	from(zipTree(buildDir.resolve("asmble-0.4.0.zip")))
+	into(buildDir)
+}
+
+val compileWasm = task<Exec>("compileWasm") {
+	group = asmble
+	dependsOn(unzipAsmble)
+	workingDir(projectDir.absolutePath)
+	val classQualifiedName = "rs.pest.vm.PestUtil"
+	val outFile = classQualifiedName
+		.split('.')
+		.fold(rustTarget.resolve("java"), File::resolve)
+		.absolutePath + ".class"
+	val wasmFile = rustTarget
+		.resolve("wasm32-unknown-unknown")
+		.resolve("release")
+		.listFiles { _, name -> name.endsWith(".wasm") }
+		.filterNotNull()
+		.also { if (it.size != 1) throw GradleException("Expected only one .wasm file, got: $it") }
+		.first()
+		.absolutePath
+	commandLine(buildDir.resolve(asmble).resolve("bin").resolve(asmble),
+		"compile", wasmFile, classQualifiedName,
+		"-out", outFile)
+	doFirst {
+		println("Input file: $wasmFile")
+		println("Output file: $outFile")
+	}
 }
 
 fun path(more: Iterable<*>) = more.joinToString(File.separator)
