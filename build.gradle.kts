@@ -149,7 +149,7 @@ val genLexer = task<GenerateLexer>("genLexer") {
 }
 
 tasks.withType<KotlinCompile> {
-	dependsOn(genParser, genLexer)
+	dependsOn(genParser, genLexer, compileWasm)
 	kotlinOptions {
 		jvmTarget = "1.8"
 		languageVersion = "1.3"

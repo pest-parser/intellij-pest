@@ -11,7 +11,7 @@
  [tv-url]: https://travis-ci.org/pest-parser/intellij-pest
  [tv-svg]: https://travis-ci.org/pest-parser/intellij-pest.svg?branch=master
  [av-url]: https://ci.appveyor.com/project/dragostis/intellij-pest-3fx8c/branch/master
- [av-svg]: https://ci.appveyor.com/api/projects/status/yj5hya5hcdtvt9m0/branch/master?svg=true
+ [av-svg]: https://img.shields.io/appveyor/ci/dragostis/intellij-pest-3fx8c/master.svg?label=appveyor
  [av-zip]: https://ci.appveyor.com/project/dragostis/intellij-pest-3fx8c/branch/master/artifacts
 
 The IntelliJ IDEA plugin for [Pest](https://pest.rs).

@@ -8,6 +8,7 @@ environment:
 install:
   - appveyor DownloadFile https://win.rustup.rs/ -FileName rustup-init.exe
   - rustup-init -yv --default-toolchain nightly
+  - refreshenv
   - rustup target add wasm32-unknown-unknown --toolchain nightly
   - set PATH=%PATH%;%USERPROFILE%\.cargo\bin
   - rustc -vV
@@ -15,7 +16,7 @@ install:
 
 build_script:
   - cd rust
-  - cargo build
+  - cargo build --release
   - cd ..
   - gradlew displayCommitHash
   - gradlew buildPlugin --info

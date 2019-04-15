@@ -3,11 +3,12 @@ jdk:
   - oraclejdk8
 install:
   - curl https://sh.rustup.rs -sSf -m 60 | sh -s -- -y -v --default-toolchain nightly
+  - source $HOME/.cargo/env
   - rustup target add wasm32-unknown-unknown --toolchain nightly
   - rustup run nightly rustc --version --verbose
   - rustup run nightly cargo --version --verbose
   - cd rust
-  - rustup run nightly cargo build
+  - rustup run nightly cargo build --release
   - cd ..
 script:
   - bash gradlew displayCommitHash
