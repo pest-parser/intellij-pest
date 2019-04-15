@@ -143,7 +143,7 @@ val compileWasm = task<Exec>("compileWasm") {
 	val outFile = classQualifiedName
 		.split('.')
 		.fold(rustTarget.resolve("java"), File::resolve)
-		.apply { mkdirs() }
+		.apply { parentFile.mkdirs() }
 		.absolutePath + ".class"
 	val wasmFile = rustTarget
 		.resolve("wasm32-unknown-unknown")

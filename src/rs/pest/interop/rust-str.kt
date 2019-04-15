@@ -6,7 +6,7 @@ import java.io.InputStream
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 
-class Str(private val native: PestUtil) {
+class RustStr(private val native: PestUtil) {
 	fun stringLength(str: String): Int {
 		val strPtr = ptrFromString(str)
 		return native.string_len(strPtr.offset, strPtr.size)

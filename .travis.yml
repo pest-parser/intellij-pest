@@ -14,7 +14,8 @@ install:
 script:
   - bash gradlew displayCommitHash
   - bash gradlew isCI
-  - bash gradlew buildPlugin
+  - bash gradlew test
+  - bash gradlew verifyPlugin
 cache:
   directories:
     - $HOME/.gradle/caches/
