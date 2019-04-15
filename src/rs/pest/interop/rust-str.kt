@@ -1,5 +1,6 @@
 package rs.pest.interop
 
+import org.jetbrains.annotations.TestOnly
 import rs.pest.vm.PestUtil
 import java.io.IOException
 import java.io.InputStream
@@ -7,15 +8,29 @@ import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 
 class RustStr(private val native: PestUtil) {
+	@TestOnly
 	fun stringLength(str: String): Int {
 		val strPtr = ptrFromString(str)
 		return native.string_len(strPtr.offset, strPtr.size)
 	}
 
+	@TestOnly
 	fun prependFromRust(str: String): String {
 		val strPtr = ptrFromString(str)
 		val nullTermOffset = native.prepend_from_rust(strPtr.offset, strPtr.size)
 		return nullTermedStringFromOffset(nullTermOffset)
+	}
+
+	fun runVM(pestCode: String, ruleName: String, userCode: String): String {
+		val pestCodePtr = ptrFromString(pestCode)
+		val ruleNamePtr = ptrFromString(ruleName)
+		val userCodePtr = ptrFromString(userCode)
+		val returned = native.run_vm(
+			pestCodePtr.offset, pestCodePtr.size,
+			ruleNamePtr.offset, ruleNamePtr.size,
+			userCodePtr.offset, userCodePtr.size
+		)
+		return nullTermedStringFromOffset(returned)
 	}
 
 	private fun ptrFromString(str: String): Ptr {

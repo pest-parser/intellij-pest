@@ -11,6 +11,7 @@ import rs.pest.psi.PestGrammarRule
 import rs.pest.psi.startOffset
 import javax.swing.ButtonGroup
 
+@Suppress("unused")
 class PestIntroduceRulePopupImpl(
 	newRuleStartOffset: Int,
 	elementToRename: PestGrammarRule,

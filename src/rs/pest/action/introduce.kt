@@ -14,6 +14,7 @@ import com.intellij.refactoring.IntroduceTargetChooser
 import com.intellij.refactoring.RefactoringActionHandler
 import com.intellij.refactoring.RefactoringBundle
 import com.intellij.refactoring.actions.BasePlatformRefactoringAction
+import com.intellij.refactoring.introduce.inplace.InplaceVariableIntroducer
 import com.intellij.refactoring.introduce.inplace.OccurrencesChooser
 import com.intellij.refactoring.util.CommonRefactoringUtil
 import com.intellij.util.containers.ContainerUtil
@@ -160,7 +161,8 @@ class PestIntroduceRuleActionHandler : RefactoringActionHandler {
 					parent.deleteChildRange(firstExpr, expressions.last())
 				}
 				val newRuleStartOffset = currentRule.endOffset + 1
-				val popup = PestIntroduceRulePopupImpl(newRuleStartOffset, rule, editor, project, expr)
+				val popup = object : InplaceVariableIntroducer<PestExpression>(rule, editor, project, PestBundle.message("pest.actions.extract.rule.popup.title"), emptyArray(), expr) {
+				}
 				editor.caretModel.moveToOffset(newRuleStartOffset)
 				PsiDocumentManager.getInstance(project).doPostponedOperationsAndUnblockDocument(document)
 				var lastOffset = newRuleStartOffset + rule.textLength
