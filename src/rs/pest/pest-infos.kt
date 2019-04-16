@@ -34,9 +34,9 @@ class PestFile(viewProvider: FileViewProvider) : PsiFileBase(viewProvider, PestL
 	private var rulesCache: List<PestGrammarRuleMixin>? = null
 	var livePreviewFile: LivePreviewFile? = null
 	/** This information is from Pest VM. */
-	var errors: List<Pair<TextRange, String>> = emptyList()
+	var errors: Sequence<Pair<TextRange, String>> = emptySequence()
 	/** This information is from Pest VM. */
-	var availableRules: List<String> = emptyList()
+	var availableRules: Sequence<String> = emptySequence()
 	val vm = Lib(PestUtil(1926417 + 1919810))
 	fun rebootVM() = vm.reboot()
 	fun reloadVM() = vm.loadVM(text)

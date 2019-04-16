@@ -48,8 +48,8 @@ private fun vmListener(element: PestFile) = object : DocumentListener {
 		val project = element.project
 		val dom = PsiDocumentManager.getInstance(project).getDocument(element) ?: return
 		if (works) {
-			element.errors = emptyList()
-			element.availableRules = messages.toList()
+			element.errors = emptySequence()
+			element.availableRules = messages
 		} else {
 			element.errors = messages.mapNotNull { errorMsgRegex.matchEntire(it)?.groupValues }.map {
 				val startLine = it[1].toInt() - 1
@@ -58,8 +58,8 @@ private fun vmListener(element: PestFile) = object : DocumentListener {
 				val endCol = it[4].toInt() - 1
 				val range = TextRange(dom.getLineStartOffset(startLine) + startCol, dom.getLineStartOffset(endLine) + endCol)
 				Pair(range, it[5])
-			}.toList()
-			element.availableRules = emptyList()
+			}
+			element.availableRules = emptySequence()
 		}
 	}
 }

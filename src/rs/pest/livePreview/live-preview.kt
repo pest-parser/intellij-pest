@@ -10,6 +10,7 @@ import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.fileTypes.LanguageFileType
 import com.intellij.openapi.fileTypes.PlainTextParserDefinition
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.FileViewProvider
 import com.intellij.psi.impl.PsiManagerEx
@@ -17,10 +18,12 @@ import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.IFileElementType
 import com.intellij.testFramework.LightVirtualFile
 import icons.PestIcons
+import rs.pest.PestBundle
 import rs.pest.PestFile
+import rs.pest.action.ui.RuleSelector
 import javax.swing.SwingConstants
 
-fun livePreview(file: PestFile) {
+fun livePreview(file: PestFile, selected: String) {
 	val project = file.project
 	val virtualFile = LightVirtualFile("${file.name}.preview", LivePreviewFileType, "")
 	val psiFile = PsiManagerEx.getInstanceEx(project).findFile(virtualFile) as? LivePreviewFile ?: return
