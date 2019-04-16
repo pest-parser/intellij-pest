@@ -14,10 +14,10 @@ pub extern "C" fn string_len(ptr: *mut u8, len: usize) -> usize {
 #[no_mangle]
 pub extern "C" fn prepend_from_rust(ptr: *mut u8, len: usize) -> *const c_char {
     let bytes = unsafe { Vec::<u8>::from_raw_parts(ptr, len, len) };
-    let s = str::from_utf8(&bytes).unwrap();
-    mem::forget(s);
-    let cstr = CString::new(format!("From Rust: {}", s)).unwrap();
+    let cstr = CString::new(format!("From Rust: {}", str::from_utf8(&bytes).unwrap())).unwrap();
+    println!("{:?}", cstr);
     let ret = cstr.as_ptr();
+    mem::forget(bytes);
     mem::forget(cstr);
     ret
 }

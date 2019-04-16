@@ -1,4 +1,6 @@
 #![feature(box_syntax, box_patterns)]
+#![feature(wasm_import_memory)]
+#![wasm_import_memory]
 
 use std::{mem, str};
 

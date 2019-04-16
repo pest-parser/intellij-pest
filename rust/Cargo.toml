@@ -19,3 +19,8 @@ crate-type = ["cdylib"]
 pest = "2.1"
 pest_meta = "2.1"
 pest_vm = "2.1"
+
+[profile.release]
+lto = true
+panic = 'abort'
+opt-level = 'z'

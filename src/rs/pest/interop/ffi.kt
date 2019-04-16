@@ -2,7 +2,11 @@ package rs.pest.interop
 
 import org.jetbrains.annotations.TestOnly
 import rs.pest.vm.PestUtil
+import java.io.IOException
+import java.io.InputStream
+import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
+import kotlin.streams.asStream
 
 class Lib(private val native: PestUtil) {
 	@TestOnly
@@ -18,10 +22,19 @@ class Lib(private val native: PestUtil) {
 		return nullTermedStringFromOffset(nullTermOffset)
 	}
 
-	fun loadVM(pestCode: String): String {
+	/**
+	 * @return (true, rule names) or (false, error messages)
+	 */
+	fun loadVM(pestCode: String): Pair<Boolean, Sequence<String>> {
 		val pestCodePtr = ptrFromString(pestCode)
 		val returned = native.load_vm(pestCodePtr.offset, pestCodePtr.size)
-		return nullTermedStringFromOffset(returned)
+		val str = nullTermedStringFromOffset(returned)
+		val isError = str.startsWith("Err")
+		return !isError to str
+			.removePrefix("Err")
+			.removeSurrounding(prefix = "[", suffix = "]")
+			.splitToSequence(',')
+			.map { it.removeSurrounding(prefix = "\"", suffix = "\"") }
 	}
 
 	fun renderCode(ruleName: String, userCode: String): String {
@@ -46,12 +59,19 @@ class Lib(private val native: PestUtil) {
 		// We're going to turn the mem into an input stream. This is the
 		//  reasonable way to stream a UTF8 read using standard Java libs
 		//  that I could find.
-		val str = buildString {
-			while (memory.hasRemaining()) append(memory.get().toInt() and 0xFF)
+		val r = InputStreamReader(object : InputStream() {
+			@Throws(IOException::class)
+			override fun read() = if (!memory.hasRemaining()) -1 else memory.get().toInt() and 0xFF
+		}, StandardCharsets.UTF_8)
+		val builder = StringBuilder()
+		while (true) {
+			val c = r.read()
+			if (c <= 0) break
+			builder.append(c.toChar())
 		}
 
 		native.dealloc(offset, memory.position() - offset)
-		return str
+		return builder.toString()
 	}
 
 	internal inner class Ptr(val offset: Int, val size: Int) {
