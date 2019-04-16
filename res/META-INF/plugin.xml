@@ -41,6 +41,13 @@
 		<localInspection
 			language="Pest"
 			level="ERROR"
+			displayName="Errors from Pest VM"
+			groupName="Pest Grammar"
+			enabledByDefault="true"
+			implementationClass="rs.pest.editing.PestVmInspection"/>
+		<localInspection
+			language="Pest"
+			level="ERROR"
 			displayName="Duplicate rules"
 			groupName="Pest Grammar"
 			enabledByDefault="true"
