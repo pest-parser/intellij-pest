@@ -161,14 +161,14 @@ class PestIntroduceRuleActionHandler : RefactoringActionHandler {
 					parent.deleteChildRange(firstExpr, expressions.last())
 				}
 				val newRuleStartOffset = currentRule.endOffset + 1
-				val popup = object : InplaceVariableIntroducer<PestExpression>(rule, editor, project, PestBundle.message("pest.actions.extract.rule.popup.title"), emptyArray(), expr) {
-				}
+				val popup = PestIntroduceRulePopupImpl(newRuleStartOffset, rule, editor, project, expr)
 				editor.caretModel.moveToOffset(newRuleStartOffset)
 				PsiDocumentManager.getInstance(project).doPostponedOperationsAndUnblockDocument(document)
 				var lastOffset = newRuleStartOffset + rule.textLength
 				val fullLength = document.textLength
 				if (lastOffset > fullLength) lastOffset = fullLength
 				document.insertString(lastOffset, "\n")
+				PsiDocumentManager.getInstance(project).commitDocument(document)
 				popup.performInplaceRefactoring(null)
 			}
 
