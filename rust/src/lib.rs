@@ -1,18 +1,20 @@
 #![feature(box_syntax, box_patterns)]
-#![feature(wasm_import_memory)]
-#![wasm_import_memory]
 
+use std::alloc::System;
+use std::ffi::CString;
 use std::{mem, str};
 
 use pest::error::{Error, ErrorVariant};
 use pest_meta::parser::{self, Rule};
 use pest_meta::{optimizer, validator};
 use pest_vm::Vm;
-use std::ffi::CString;
 
 pub mod str4j;
 
 type JavaStr = *mut u8;
+
+#[global_allocator]
+static GLOBAL_ALLOCATOR: System = System;
 static mut VM: Option<Vm> = None;
 
 #[no_mangle]
@@ -21,6 +23,7 @@ pub extern "C" fn connectivity_check_add(a: i32, b: i32) -> i32 {
     a + b
 }
 
+#[inline]
 fn convert_error(error: Error<Rule>) -> String {
     match error.variant {
         ErrorVariant::CustomError { message } => message,

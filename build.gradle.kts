@@ -135,6 +135,33 @@ val unzipAsmble = task<Copy>("unzipAsmble") {
 	into(buildDir)
 }
 
+val wasmFile by lazy {
+	rustTarget
+		.resolve("wasm32-unknown-unknown")
+		.resolve("release")
+		.listFiles { _, name -> name.endsWith(".wasm") }
+		.filterNotNull()
+		.also { if (it.size != 1) throw GradleException("Expected only one .wasm file, got: $it") }
+		.first()
+}
+
+val asmbleExe by lazy {
+	buildDir
+		.resolve("asmble")
+		.resolve("bin")
+		.resolve(if (System.getProperty("os.name").startsWith("Windows")) "asmble.bat" else "asmble")
+}
+
+val translateWasm = task<Exec>("translateWasm") {
+	group = asmble
+	dependsOn(unzipAsmble)
+	workingDir(projectDir.absolutePath)
+	val path = wasmFile.also { inputs.file(it) }.absolutePath
+	val outPath = "${path.dropLast(1)}t".also { outputs.file(it) }
+	commandLine(asmbleExe, "translate", path, outPath, "-out", "wast")
+	doFirst { println("Output file: $outPath") }
+}
+
 val compileWasm = task<Exec>("compileWasm") {
 	group = asmble
 	dependsOn(unzipAsmble)
@@ -146,20 +173,8 @@ val compileWasm = task<Exec>("compileWasm") {
 		.apply { parentFile.mkdirs() }
 		.also { outputs.file(it) }
 		.absolutePath + ".class"
-	val wasmFile = rustTarget
-		.resolve("wasm32-unknown-unknown")
-		.resolve("release")
-		.listFiles { _, name -> name.endsWith(".wasm") }
-		.filterNotNull()
-		.also { if (it.size != 1) throw GradleException("Expected only one .wasm file, got: $it") }
-		.first()
-		.also { inputs.file(it) }
-		.absolutePath
-	val exe = buildDir
-		.resolve("asmble")
-		.resolve("bin")
-		.resolve(if (System.getProperty("os.name").startsWith("Windows")) "asmble.bat" else "asmble")
-	commandLine(exe, "compile", wasmFile, classQualifiedName, "-out", outFile)
+	val wasmFile = wasmFile.also { inputs.file(it) }.absolutePath
+	commandLine(asmbleExe, "compile", wasmFile, classQualifiedName, "-out", outFile)
 	doFirst {
 		println("Input file: $wasmFile")
 		println("Output file: $outFile")
