@@ -2,11 +2,16 @@
 
 use std::{mem, str};
 
+use pest::error::{Error, ErrorVariant};
 use pest_meta::parser::{self, Rule};
+use pest_meta::{optimizer, validator};
+use pest_vm::Vm;
+use std::ffi::CString;
 
 pub mod str4j;
 
 type JavaStr = *mut u8;
+static mut VM: Option<Vm> = None;
 
 #[no_mangle]
 /// For sanity checking.
@@ -14,15 +19,15 @@ pub extern "C" fn connectivity_check_add(a: i32, b: i32) -> i32 {
     a + b
 }
 
+fn convert_error(error: Error<Rule>) -> String {
+    match error.variant {
+        ErrorVariant::CustomError { message } => message,
+        _ => unreachable!(),
+    }
+}
+
 #[no_mangle]
-pub extern "C" fn run_vm(
-    pest_code: JavaStr,
-    pest_code_len: i32,
-    rule_name: JavaStr,
-    rule_name_len: i32,
-    user_code: JavaStr,
-    user_code_len: i32,
-) -> JavaStr {
+pub extern "C" fn load_vm(pest_code: JavaStr, pest_code_len: i32) -> JavaStr {
     let pest_code_len = pest_code_len as usize;
     let pest_code_bytes =
         unsafe { Vec::<u8>::from_raw_parts(pest_code, pest_code_len, pest_code_len) };
@@ -53,8 +58,62 @@ pub extern "C" fn run_vm(
             Rule::range_operator => "`..`".to_owned(),
             Rule::single_quote => "`'`".to_owned(),
             other_rule => format!("{:?}", other_rule),
-        })
+        });
     });
+    let pairs = match pest_code_result {
+        Ok(pairs) => pairs,
+        Err(_) => {
+            let cstr = CString::new("Err!").unwrap();
+            let ptr = cstr.as_ptr() as *mut _;
+            mem::forget(cstr);
+            return ptr;
+        }
+    };
+
+    if let Err(errors) = validator::validate_pairs(pairs.clone()) {
+        let cstr = CString::new(format!(
+            "Err{:?}",
+            errors.into_iter().map(convert_error).collect::<Vec<_>>()
+        ))
+        .unwrap();
+        let ptr = cstr.as_ptr() as *mut _;
+        mem::forget(cstr);
+        return ptr;
+    }
+
+    let ast = match parser::consume_rules(pairs) {
+        Ok(ast) => ast,
+        Err(errors) => {
+            let cstr = CString::new(format!(
+                "Err{:?}",
+                errors.into_iter().map(convert_error).collect::<Vec<_>>()
+            ))
+            .unwrap();
+            let ptr = cstr.as_ptr() as *mut _;
+            mem::forget(cstr);
+            return ptr;
+        }
+    };
+
+    let rules: Vec<_> = ast.iter().map(|rule| rule.name.clone()).collect();
+    unsafe {
+        VM = Some(Vm::new(optimizer::optimize(ast)));
+    }
+
+    let cstr = CString::new(format!("{:?}", rules)).unwrap();
+    let ptr = cstr.as_ptr() as *mut _;
+    mem::forget(pest_code_bytes);
+    mem::forget(cstr);
+    ptr
+}
+
+#[no_mangle]
+pub extern "C" fn render_code(
+    rule_name: JavaStr,
+    rule_name_len: i32,
+    user_code: JavaStr,
+    user_code_len: i32,
+) -> JavaStr {
     // TODO: don't forget to forget about the returned string
     unimplemented!()
 }

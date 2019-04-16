@@ -21,15 +21,18 @@ class RustStr(private val native: PestUtil) {
 		return nullTermedStringFromOffset(nullTermOffset)
 	}
 
-	fun runVM(pestCode: String, ruleName: String, userCode: String): String {
+	fun loadVM(pestCode: String): String {
 		val pestCodePtr = ptrFromString(pestCode)
+		val returned = native.load_vm(pestCodePtr.offset, pestCodePtr.size)
+		return nullTermedStringFromOffset(returned)
+	}
+
+	fun renderCode(ruleName: String, userCode: String): String {
 		val ruleNamePtr = ptrFromString(ruleName)
 		val userCodePtr = ptrFromString(userCode)
-		val returned = native.run_vm(
-			pestCodePtr.offset, pestCodePtr.size,
+		val returned = native.render_code(
 			ruleNamePtr.offset, ruleNamePtr.size,
-			userCodePtr.offset, userCodePtr.size
-		)
+			userCodePtr.offset, userCodePtr.size)
 		return nullTermedStringFromOffset(returned)
 	}
 
