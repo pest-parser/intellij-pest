@@ -78,7 +78,16 @@
 				class="rs.pest.action.PestViewSiteAction"
 				text="View Pest website"
 				icon="PestIcons.PEST"/>
-			<add-to-group group-id="ToolsMenu" anchor="last"/>
+			<action
+				id="Pest.Tools.LivePreview"
+				class="rs.pest.action.PestLivePreviewAction"
+				text="Live Preview"
+				icon="PestIcons.PEST">
+				<keyboard-shortcut keymap="$default" first-keystroke="control alt P"/>
+				<add-to-group group-id="EditorPopupMenu" anchor="last"/>
+				<add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+			</action>
+			<add-to-group group-id="ToolsMenu" anchor="before" relative-to-action="ExternalToolsGroup"/>
 		</group>
 	</actions>
 </idea-plugin>
