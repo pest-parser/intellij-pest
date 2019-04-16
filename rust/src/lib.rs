@@ -4,7 +4,7 @@ use std::alloc::System;
 use std::ffi::CString;
 use std::{mem, str};
 
-use pest::error::{Error, ErrorVariant};
+use pest::error::{Error, ErrorVariant, InputLocation};
 use pest_meta::parser::{self, Rule};
 use pest_meta::{optimizer, validator};
 use pest_vm::Vm;
@@ -23,12 +23,60 @@ pub extern "C" fn connectivity_check_add(a: i32, b: i32) -> i32 {
     a + b
 }
 
-#[inline]
-fn convert_error(error: Error<Rule>) -> String {
-    match error.variant {
+fn line_col(pos: usize, input: &str) -> (usize, usize) {
+    let mut pos = pos;
+    // Position's pos is always a UTF-8 border.
+    let slice = &input[..pos];
+    let mut chars = slice.chars().peekable();
+
+    let mut line_col = (1, 1);
+
+    while pos != 0 {
+        match chars.next() {
+            Some('\r') => {
+                if let Some(&'\n') = chars.peek() {
+                    chars.next();
+
+                    if pos == 1 {
+                        pos -= 1;
+                    } else {
+                        pos -= 2;
+                    }
+
+                    line_col = (line_col.0 + 1, 1);
+                } else {
+                    pos -= 1;
+                    line_col = (line_col.0, line_col.1 + 1);
+                }
+            }
+            Some('\n') => {
+                pos -= 1;
+                line_col = (line_col.0 + 1, 1);
+            }
+            Some(c) => {
+                pos -= c.len_utf8();
+                line_col = (line_col.0, line_col.1 + 1);
+            }
+            None => unreachable!(),
+        }
+    }
+
+    line_col
+}
+
+fn convert_error(error: Error<Rule>, grammar: &str) -> String {
+    let message = match error.variant {
         ErrorVariant::CustomError { message } => message,
         _ => unreachable!(),
-    }
+    };
+    let ((start_line, start_col), (end_line, end_col)) = match error.location {
+        InputLocation::Pos(pos) => (line_col(pos, grammar), line_col(pos, grammar)),
+        InputLocation::Span((start, end)) => (line_col(start, grammar), line_col(end, grammar)),
+    };
+    format!(
+        "{:?}^{:?}^{:?}^{:?}^{}",
+        start_line, start_col, end_line, end_col, message
+    )
 }
 
 #[no_mangle]
@@ -67,8 +115,8 @@ pub extern "C" fn load_vm(pest_code: JavaStr, pest_code_len: i32) -> JavaStr {
     });
     let pairs = match pest_code_result {
         Ok(pairs) => pairs,
-        Err(error) => {
-            let cstr = CString::new(format!("Err[{:?}]", convert_error(error))).unwrap();
+        Err(err) => {
+            let cstr = CString::new(format!("Err[{:?}]", convert_error(err, &pest_code))).unwrap();
             let ptr = cstr.as_ptr() as *mut _;
             mem::forget(cstr);
             return ptr;
@@ -78,7 +126,10 @@ pub extern "C" fn load_vm(pest_code: JavaStr, pest_code_len: i32) -> JavaStr {
     if let Err(errors) = validator::validate_pairs(pairs.clone()) {
         let cstr = CString::new(format!(
             "Err{:?}",
-            errors.into_iter().map(convert_error).collect::<Vec<_>>()
+            errors
+                .into_iter()
+                .map(|e| convert_error(e, &pest_code))
+                .collect::<Vec<_>>()
         ))
         .unwrap();
         let ptr = cstr.as_ptr() as *mut _;
@@ -91,7 +142,10 @@ pub extern "C" fn load_vm(pest_code: JavaStr, pest_code_len: i32) -> JavaStr {
         Err(errors) => {
             let cstr = CString::new(format!(
                 "Err{:?}",
-                errors.into_iter().map(convert_error).collect::<Vec<_>>()
+                errors
+                    .into_iter()
+                    .map(|e| convert_error(e, &pest_code))
+                    .collect::<Vec<_>>()
             ))
             .unwrap();
             let ptr = cstr.as_ptr() as *mut _;

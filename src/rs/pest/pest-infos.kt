@@ -5,11 +5,15 @@ import com.intellij.extapi.psi.PsiFileBase
 import com.intellij.openapi.fileTypes.FileTypeConsumer
 import com.intellij.openapi.fileTypes.FileTypeFactory
 import com.intellij.openapi.fileTypes.LanguageFileType
+import com.intellij.openapi.util.TextRange
 import com.intellij.psi.FileViewProvider
 import icons.PestIcons
 import org.jetbrains.annotations.NonNls
 import org.jetbrains.annotations.PropertyKey
+import rs.pest.livePreview.Lib
+import rs.pest.livePreview.LivePreviewFile
 import rs.pest.psi.impl.PestGrammarRuleMixin
+import rs.pest.vm.PestUtil
 import java.util.*
 
 object PestFileType : LanguageFileType(PestLanguage.INSTANCE) {
@@ -27,7 +31,14 @@ class PestFile(viewProvider: FileViewProvider) : PsiFileBase(viewProvider, PestL
 	}
 
 	private var rulesCache: List<PestGrammarRuleMixin>? = null
+	var livePreviewFile: LivePreviewFile? = null
+	var errors: List<Pair<TextRange, String>> = emptyList()
+	val vm = Lib(PestUtil(1926417 + 1919810))
+	fun rebootVM() = vm.reboot()
+	fun reloadVM() = vm.loadVM(text)
+	var isDocumentListenerAdded = false
 	fun rules() = rulesCache ?: calcRules().also { rulesCache = it }
+	fun livePreviewFile() = livePreviewFile?.takeIf { it.isValid }
 	private fun calcRules() = children.filterIsInstance<PestGrammarRuleMixin>()
 }
 

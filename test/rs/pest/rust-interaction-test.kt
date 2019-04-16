@@ -1,7 +1,7 @@
 package rs.pest
 
 import org.junit.Test
-import rs.pest.interop.Lib
+import rs.pest.livePreview.Lib
 import rs.pest.vm.PestUtil
 import kotlin.random.Random
 import kotlin.test.assertEquals
@@ -35,7 +35,7 @@ class IntegrationTest {
 		val lib = Lib(PestUtil(1919810))
 		val (parses, output) = lib.loadVM("""type = { "Hello" }""")
 		assertFalse(parses)
-		assertEquals(listOf("type is a rust keyword"), output.toList())
+		assertEquals(listOf("1^1^1^5^type is a rust keyword"), output.toList())
 	}
 
 	@Test
@@ -43,6 +43,6 @@ class IntegrationTest {
 		val lib = Lib(PestUtil(1919810))
 		val (parses, output) = lib.loadVM("""bla = { "Hello }""")
 		assertFalse(parses)
-		assertEquals(listOf("""expected `\"`"""), output.toList())
+		assertEquals(listOf("""1^17^1^17^expected `\"`"""), output.toList())
 	}
 }
