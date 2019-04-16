@@ -17,6 +17,8 @@ import org.jetbrains.annotations.NonNls
 @NonNls const val PEST_WEBSITE = "https://pest.rs/"
 @NonNls const val PEST_FOLDING_PLACEHOLDER = "{...}"
 
+@NonNls const val LP_LANGUAGE_NAME = "PEST_LP"
+
 @JvmField val BUILTIN_RULES = listOf(
 	"LETTER",
 	"CASED_LETTER",
