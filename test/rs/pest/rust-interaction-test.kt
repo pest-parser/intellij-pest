@@ -2,6 +2,7 @@ package rs.pest
 
 import org.junit.Test
 import rs.pest.livePreview.Lib
+import rs.pest.livePreview.Rendering
 import rs.pest.vm.PestUtil
 import kotlin.random.Random
 import kotlin.test.assertEquals
@@ -55,5 +56,30 @@ b = { a }
 		val (parses, output) = lib.loadVM("""bla = { "Hello }""")
 		assertFalse(parses)
 		assertEquals(listOf("""1^17^1^17^expected `\"`"""), output.toList())
+	}
+
+	@Test
+	fun `render simple code in Pest VM`() {
+		val lib = Lib(PestUtil(1919810))
+		val (parses, output) = lib.loadVM("""bla = { "Dio" }""")
+		assertTrue(parses)
+		assertEquals(listOf("bla"), output.toList())
+		val renderCode = lib.renderCode("bla", "Dio") as Rendering.Ok
+		assertEquals(listOf("0^5^bla"), renderCode.lexical.toList())
+	}
+
+	@Test
+	fun `render syntactically incorrect code in Pest VM`() {
+		val lib = Lib(PestUtil(1919810))
+		val (parses, output) = lib.loadVM("""bla = { "Hello" }""")
+		assertTrue(parses)
+		assertEquals(listOf("bla"), output.toList())
+		val renderCode = lib.renderCode("bla", "The World!") as Rendering.Err
+		assertEquals(""" --> 1:1
+  |
+1 | The World!
+  | ^---
+  |
+  = expected bla""", renderCode.msg)
 	}
 }

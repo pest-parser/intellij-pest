@@ -5,6 +5,7 @@ use std::ffi::CString;
 use std::{mem, str};
 
 use pest::error::{Error, ErrorVariant, InputLocation};
+use pest::iterators::Pair;
 use pest_meta::parser::{self, Rule};
 use pest_meta::{optimizer, validator};
 use pest_vm::Vm;
@@ -118,6 +119,7 @@ pub extern "C" fn load_vm(pest_code: JavaStr, pest_code_len: i32) -> JavaStr {
         Err(err) => {
             let cstr = CString::new(format!("Err[{:?}]", convert_error(err, &pest_code))).unwrap();
             let ptr = cstr.as_ptr() as *mut _;
+            mem::forget(pest_code_bytes);
             mem::forget(cstr);
             return ptr;
         }
@@ -133,6 +135,7 @@ pub extern "C" fn load_vm(pest_code: JavaStr, pest_code_len: i32) -> JavaStr {
         ))
         .unwrap();
         let ptr = cstr.as_ptr() as *mut _;
+        mem::forget(pest_code_bytes);
         mem::forget(cstr);
         return ptr;
     }
@@ -149,6 +152,7 @@ pub extern "C" fn load_vm(pest_code: JavaStr, pest_code_len: i32) -> JavaStr {
             ))
             .unwrap();
             let ptr = cstr.as_ptr() as *mut _;
+            mem::forget(pest_code_bytes);
             mem::forget(cstr);
             return ptr;
         }
@@ -166,6 +170,16 @@ pub extern "C" fn load_vm(pest_code: JavaStr, pest_code_len: i32) -> JavaStr {
     ptr
 }
 
+fn join_pairs(result: &mut Vec<String>, pair: Pair<&str>) {
+    let span = pair.as_span();
+    let start = span.start();
+    let end = span.end();
+    result.push(format!("{:?}^{:?}^{}", start, end, pair.as_rule()));
+    for child in pair.into_inner() {
+        join_pairs(result, child);
+    }
+}
+
 #[no_mangle]
 pub extern "C" fn render_code(
     rule_name: JavaStr,
@@ -173,6 +187,29 @@ pub extern "C" fn render_code(
     user_code: JavaStr,
     user_code_len: i32,
 ) -> JavaStr {
-    // TODO: don't forget to forget about the returned string
-    unimplemented!()
+    let vm = unsafe { VM.as_ref().unwrap() };
+    let rule_name_len = rule_name_len as usize;
+    let rule_name_bytes =
+        unsafe { Vec::<u8>::from_raw_parts(rule_name, rule_name_len, rule_name_len) };
+    let rule_name = str::from_utf8(&rule_name_bytes).unwrap();
+    let user_code_len = user_code_len as usize;
+    let user_code_bytes =
+        unsafe { Vec::<u8>::from_raw_parts(user_code, user_code_len, user_code_len) };
+    let user_code = str::from_utf8(&user_code_bytes).unwrap();
+    let cstr = CString::new(match vm.parse(rule_name, user_code) {
+        Ok(pairs) => {
+            let mut result = vec![];
+            for pair in pairs {
+                join_pairs(&mut result, pair);
+            }
+            format!("{:?}", result)
+        }
+        Err(err) => format!("Err{}", err.renamed_rules(|r| r.to_string())),
+    })
+    .unwrap();
+    mem::forget(rule_name_bytes);
+    mem::forget(user_code_bytes);
+    let ptr = cstr.as_ptr() as *mut _;
+    mem::forget(cstr);
+    ptr
 }

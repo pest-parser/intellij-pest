@@ -7,6 +7,11 @@ import java.io.InputStreamReader
 import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
 
+sealed class Rendering {
+	data class Err(val msg: String) : Rendering()
+	data class Ok(val lexical: Sequence<String>) : Rendering()
+}
+
 class Lib(private var native: PestUtil) {
 	/**
 	 * @return (true, rule names) or (false, error messages)
@@ -21,20 +26,26 @@ class Lib(private var native: PestUtil) {
 			.removeSurrounding(prefix = "[", suffix = "]")
 			.splitToSequence(',')
 			.map { it.trim() }
-			.map { it.removeSurrounding(prefix = "\"", suffix = "\"") }
+			.map { it.removeSurrounding(delimiter = "\"") }
 	}
 
 	fun reboot(newMemory: ByteBuffer = native.memory.duplicate()) {
 		native = PestUtil(newMemory)
 	}
 
-	fun renderCode(ruleName: String, userCode: String): String {
+	fun renderCode(ruleName: String, userCode: String): Rendering {
 		val ruleNamePtr = ptrFromString(ruleName)
 		val userCodePtr = ptrFromString(userCode)
 		val returned = native.render_code(
 			ruleNamePtr.offset, ruleNamePtr.size,
 			userCodePtr.offset, userCodePtr.size)
-		return nullTermedStringFromOffset(returned)
+		val str = nullTermedStringFromOffset(returned)
+		return if (str.startsWith("Err")) Rendering.Err(str.removePrefix("Err"))
+		else Rendering.Ok(str
+			.removeSurrounding(prefix = "[", suffix = "]")
+			.splitToSequence(',')
+			.map { it.trim() }
+			.map { it.removeSurrounding(delimiter = "\"") })
 	}
 
 	private fun ptrFromString(str: String): Ptr {
