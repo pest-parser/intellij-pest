@@ -1,14 +1,11 @@
 package rs.pest
 
 import com.intellij.CommonBundle
-import com.intellij.codeInsight.template.TemplateContextType
-import com.intellij.codeInsight.template.impl.DefaultLiveTemplatesProvider
 import com.intellij.extapi.psi.PsiFileBase
 import com.intellij.openapi.fileTypes.FileTypeConsumer
 import com.intellij.openapi.fileTypes.FileTypeFactory
 import com.intellij.openapi.fileTypes.LanguageFileType
 import com.intellij.psi.FileViewProvider
-import com.intellij.psi.PsiFile
 import icons.PestIcons
 import org.jetbrains.annotations.NonNls
 import org.jetbrains.annotations.PropertyKey

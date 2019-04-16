@@ -4,9 +4,10 @@ import rs.pest.vm.PestUtil
 import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
+import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
 
-class Lib(private val native: PestUtil) {
+class Lib(private var native: PestUtil) {
 	/**
 	 * @return (true, rule names) or (false, error messages)
 	 */
@@ -20,6 +21,10 @@ class Lib(private val native: PestUtil) {
 			.removeSurrounding(prefix = "[", suffix = "]")
 			.splitToSequence(',')
 			.map { it.removeSurrounding(prefix = "\"", suffix = "\"") }
+	}
+
+	fun reboot(newMemory: ByteBuffer = native.memory.duplicate()) {
+		native = PestUtil(newMemory)
 	}
 
 	fun renderCode(ruleName: String, userCode: String): String {

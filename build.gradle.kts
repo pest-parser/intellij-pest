@@ -24,6 +24,8 @@ val commitHash = kotlin.run {
 val pluginComingVersion = "0.2.2"
 val pluginVersion = if (isCI) "$pluginComingVersion-$commitHash" else pluginComingVersion
 val packageName = "rs.pest"
+val asmble = "asmble"
+val rustTarget = projectDir.resolve("rust").resolve("target")
 
 group = packageName
 version = pluginVersion
@@ -83,7 +85,7 @@ sourceSets {
 		withConvention(KotlinSourceSet::class) {
 			listOf(java, kotlin).forEach { it.srcDirs("src", "gen") }
 		}
-		resources.srcDirs("res")
+		resources.srcDirs("res", rustTarget.resolve("java").absolutePath)
 	}
 
 	test {
@@ -117,9 +119,6 @@ task("isCI") {
 	description = "Check if it's running in a continuous-integration"
 	doFirst { println(if (isCI) "Yes, I'm on a CI." else "No, I'm not on CI.") }
 }
-
-val asmble = "asmble"
-val rustTarget = projectDir.resolve("rust").resolve("target")
 
 val downloadAsmble = task<Download>("downloadAsmble") {
 	group = asmble
