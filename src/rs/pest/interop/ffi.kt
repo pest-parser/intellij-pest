@@ -2,12 +2,9 @@ package rs.pest.interop
 
 import org.jetbrains.annotations.TestOnly
 import rs.pest.vm.PestUtil
-import java.io.IOException
-import java.io.InputStream
-import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 
-class RustStr(private val native: PestUtil) {
+class Lib(private val native: PestUtil) {
 	@TestOnly
 	fun stringLength(str: String): Int {
 		val strPtr = ptrFromString(str)
@@ -49,19 +46,12 @@ class RustStr(private val native: PestUtil) {
 		// We're going to turn the mem into an input stream. This is the
 		//  reasonable way to stream a UTF8 read using standard Java libs
 		//  that I could find.
-		val r = InputStreamReader(object : InputStream() {
-			@Throws(IOException::class)
-			override fun read() = if (!memory.hasRemaining()) -1 else memory.get().toInt() and 0xFF
-		}, StandardCharsets.UTF_8)
-		val builder = StringBuilder()
-		while (true) {
-			val c = r.read()
-			if (c <= 0) break
-			builder.append(c.toChar())
+		val str = buildString {
+			while (memory.hasRemaining()) append(memory.get().toInt() and 0xFF)
 		}
 
 		native.dealloc(offset, memory.position() - offset)
-		return builder.toString()
+		return str
 	}
 
 	internal inner class Ptr(val offset: Int, val size: Int) {
