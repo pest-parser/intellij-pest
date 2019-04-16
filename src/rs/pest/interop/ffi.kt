@@ -1,27 +1,12 @@
 package rs.pest.interop
 
-import org.jetbrains.annotations.TestOnly
 import rs.pest.vm.PestUtil
 import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
-import kotlin.streams.asStream
 
 class Lib(private val native: PestUtil) {
-	@TestOnly
-	fun stringLength(str: String): Int {
-		val strPtr = ptrFromString(str)
-		return native.string_len(strPtr.offset, strPtr.size)
-	}
-
-	@TestOnly
-	fun prependFromRust(str: String): String {
-		val strPtr = ptrFromString(str)
-		val nullTermOffset = native.prepend_from_rust(strPtr.offset, strPtr.size)
-		return nullTermedStringFromOffset(nullTermOffset)
-	}
-
 	/**
 	 * @return (true, rule names) or (false, error messages)
 	 */

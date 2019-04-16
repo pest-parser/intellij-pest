@@ -63,12 +63,12 @@ pub extern "C" fn load_vm(pest_code: JavaStr, pest_code_len: i32) -> JavaStr {
             Rule::range_operator => "`..`".to_owned(),
             Rule::single_quote => "`'`".to_owned(),
             other_rule => format!("{:?}", other_rule),
-        });
+        })
     });
     let pairs = match pest_code_result {
         Ok(pairs) => pairs,
-        Err(_) => {
-            let cstr = CString::new("Err!").unwrap();
+        Err(error) => {
+            let cstr = CString::new(format!("Err[{:?}]", convert_error(error))).unwrap();
             let ptr = cstr.as_ptr() as *mut _;
             mem::forget(cstr);
             return ptr;

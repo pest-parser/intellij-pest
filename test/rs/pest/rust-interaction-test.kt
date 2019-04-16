@@ -19,26 +19,6 @@ class InteractionTest {
 			assertEquals(a + b, instance.connectivity_check_add(a, b))
 		}
 	}
-
-	@Test
-	fun `text length function`() {
-		val random = Random(System.currentTimeMillis())
-		val instance = Lib(PestUtil(1919810))
-		repeat(10) {
-			val a = random.nextDouble().toString()
-			assertEquals(a.length, instance.stringLength(a))
-		}
-	}
-
-	@Test
-	fun `text prepend function`() {
-		val random = Random(System.currentTimeMillis())
-		val instance = Lib(PestUtil(114514 * 514))
-		repeat(3) {
-			val a = random.nextDouble().toString().drop(2)
-			assertEquals("From Rust: $a", instance.prependFromRust(a))
-		}
-	}
 }
 
 class IntegrationTest {
@@ -63,6 +43,6 @@ class IntegrationTest {
 		val lib = Lib(PestUtil(1919810))
 		val (parses, output) = lib.loadVM("""bla = { "Hello }""")
 		assertFalse(parses)
-		assertEquals(listOf("!"), output.toList())
+		assertEquals(listOf("""expected `\"`"""), output.toList())
 	}
 }
