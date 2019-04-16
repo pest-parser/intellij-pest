@@ -7,6 +7,7 @@ import com.intellij.openapi.fileTypes.FileTypeFactory
 import com.intellij.openapi.fileTypes.LanguageFileType
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.FileViewProvider
+import com.intellij.psi.PsiElement
 import icons.PestIcons
 import org.jetbrains.annotations.NonNls
 import org.jetbrains.annotations.PropertyKey
@@ -32,7 +33,7 @@ class PestFile(viewProvider: FileViewProvider) : PsiFileBase(viewProvider, PestL
 
 	/** This information is from the Psi system. */
 	private var rulesCache: List<PestGrammarRuleMixin>? = null
-	var livePreviewFile: LivePreviewFile? = null
+	var livePreviewFile: MutableList<LivePreviewFile> = mutableListOf()
 	/** This information is from Pest VM. */
 	var errors: Sequence<Pair<TextRange, String>> = emptySequence()
 	/** This information is from Pest VM. */
@@ -42,7 +43,7 @@ class PestFile(viewProvider: FileViewProvider) : PsiFileBase(viewProvider, PestL
 	fun reloadVM() = vm.loadVM(text)
 	var isDocumentListenerAdded = false
 	fun rules() = rulesCache ?: calcRules().also { rulesCache = it }
-	fun livePreviewFile() = livePreviewFile?.takeIf { it.isValid }
+	fun livePreviewFile() = livePreviewFile.also { it.retainAll(PsiElement::isValid) }
 	private fun calcRules() = children.filterIsInstance<PestGrammarRuleMixin>()
 }
 
@@ -53,7 +54,8 @@ class PestFileTypeFactory : FileTypeFactory() {
 }
 
 object PestBundle {
-	@NonNls private const val BUNDLE = "rs.pest.pest-bundle"
+	@NonNls
+	private const val BUNDLE = "rs.pest.pest-bundle"
 	private val bundle: ResourceBundle by lazy { ResourceBundle.getBundle(BUNDLE) }
 
 	@JvmStatic

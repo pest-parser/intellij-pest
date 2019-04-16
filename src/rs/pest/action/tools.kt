@@ -6,6 +6,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.project.DumbAware
+import com.intellij.openapi.ui.popup.Balloon
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.psi.util.PsiTreeUtil
 import rs.pest.PEST_WEBSITE
@@ -28,6 +29,7 @@ class PestLivePreviewAction : AnAction(), DumbAware {
 			CommonDataKeys.EDITOR.getData(e.dataContext) != null
 				&& !PsiTreeUtil.hasErrorElements(psiFile)
 				&& psiFile.errors.none()
+				&& psiFile.availableRules.any()
 	}
 
 	override fun actionPerformed(e: AnActionEvent) {
@@ -37,17 +39,20 @@ class PestLivePreviewAction : AnAction(), DumbAware {
 			.firstOrNull()
 			?.component
 			?: return
+		lateinit var balloon: Balloon
 		val popup = RuleSelector().apply {
-			file.availableRules.forEach(ruleCombo::addItem)
+			file.availableRules.map { object { override fun toString() = it } }.forEach(ruleCombo::addItem)
 			ruleCombo.selectedIndex = 0
 			okButton.addActionListener {
+				balloon.hide(true)
 				val selected = ruleCombo.selectedItem.toString()
 				livePreview(file, selected)
 			}
 		}
-		JBPopupFactory.getInstance()
+		balloon = JBPopupFactory.getInstance()
 			.createDialogBalloonBuilder(popup.mainPanel, PestBundle.message("pest.actions.live-preview.popup.title"))
+			.setHideOnClickOutside(true)
 			.createBalloon()
-			.showInCenterOf(parentComponent)
+		balloon.showInCenterOf(parentComponent)
 	}
 }

@@ -31,6 +31,17 @@ class IntegrationTest {
 	}
 
 	@Test
+	fun `load Pest VM with multiple rules`() {
+		val lib = Lib(PestUtil(1919810))
+		val (works, output) = lib.loadVM("""
+a = { "Hello" }
+b = { a }
+""")
+		assertEquals(listOf("a", "b"), output.toList())
+		assertTrue(works)
+	}
+
+	@Test
 	fun `load Pest VM with invalid rule name`() {
 		val lib = Lib(PestUtil(1919810))
 		val (parses, output) = lib.loadVM("""type = { "Hello" }""")

@@ -20,6 +20,7 @@ class Lib(private var native: PestUtil) {
 			.removePrefix("Err")
 			.removeSurrounding(prefix = "[", suffix = "]")
 			.splitToSequence(',')
+			.map { it.trim() }
 			.map { it.removeSurrounding(prefix = "\"", suffix = "\"") }
 	}
 

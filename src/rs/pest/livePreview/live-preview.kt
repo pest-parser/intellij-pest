@@ -25,10 +25,10 @@ import javax.swing.SwingConstants
 
 fun livePreview(file: PestFile, selected: String) {
 	val project = file.project
-	val virtualFile = LightVirtualFile("${file.name}.preview", LivePreviewFileType, "")
+	val virtualFile = LightVirtualFile("${file.name}.$selected.preview", LivePreviewFileType, "")
 	val psiFile = PsiManagerEx.getInstanceEx(project).findFile(virtualFile) as? LivePreviewFile ?: return
 	psiFile.pestFile = file
-	file.livePreviewFile = psiFile
+	file.livePreviewFile.add(psiFile)
 	val editorManager = FileEditorManagerEx.getInstanceEx(project)
 	editorManager.currentWindow.split(SwingConstants.HORIZONTAL, false, virtualFile, true)
 	editorManager.openFile(virtualFile, true)
