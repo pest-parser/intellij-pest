@@ -65,7 +65,7 @@ b = { a }
 		assertTrue(parses)
 		assertEquals(listOf("bla"), output.toList())
 		val renderCode = lib.renderCode("bla", "Dio") as Rendering.Ok
-		assertEquals(listOf("0^5^bla"), renderCode.lexical.toList())
+		assertEquals(listOf("0^3^bla"), renderCode.lexical.toList())
 	}
 
 	@Test

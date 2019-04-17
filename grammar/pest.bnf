@@ -25,18 +25,17 @@ grammar_body  ::= OPENING_BRACE expression CLOSING_BRACE {
 
 private grammar_body_recover ::= !rule_name
 
-grammar_rule  ::= rule_name ASSIGNMENT_OPERATOR modifier? grammar_body {
+grammar_rule  ::= LINE_DOC_COMMENT? rule_name ASSIGNMENT_OPERATOR modifier? grammar_body {
 	implements=["com.intellij.psi.PsiNameIdentifierOwner"]
 	mixin="rs.pest.psi.impl.PestGrammarRuleMixin"
-	pin=1
+	pin=2
 	recoverWhile=grammar_rule_recover
 }
 
-private rule_name ::=
+rule_name ::=
     valid_rule_name
   | customizable_rule_name
   | fixed_builtin_rule_name
-  { pin=1 }
 
 fixed_builtin_rule_name ::= commands | builtin {
 	mixin="rs.pest.psi.impl.PestFixedBuiltinRuleNameMixin"

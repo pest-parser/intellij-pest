@@ -17,11 +17,10 @@ class PestElementType(debugName: String) : IElementType(debugName, PestLanguage.
 class PestTokenType(debugName: String) : IElementType(debugName, PestLanguage.INSTANCE) {
 	companion object Builtin {
 		@JvmField val LINE_COMMENT = PestTokenType("line comment")
-		@JvmField val LINE_DOC_COMMENT = PestTokenType("doc comment")
 		@JvmField val BLOCK_COMMENT = PestTokenType("block comment")
 		@JvmField val STRING_INCOMPLETE = PestTokenType("incomplete string")
 		@JvmField val CHAR_INCOMPLETE = PestTokenType("incomplete char")
-		@JvmField val COMMENTS = TokenSet.create(LINE_COMMENT, LINE_DOC_COMMENT, BLOCK_COMMENT)
+		@JvmField val COMMENTS = TokenSet.create(LINE_COMMENT, PestTypes.LINE_DOC_COMMENT, BLOCK_COMMENT)
 		@JvmField val STRINGS = TokenSet.create(PestTypes.STRING_TOKEN, PestTypes.CHAR_TOKEN)
 		@JvmField val WHITE_SPACE = TokenSet.create(TokenType.WHITE_SPACE)
 		@JvmField val INCOMPLETE_STRINGS = TokenSet.create(STRING_INCOMPLETE, CHAR_INCOMPLETE)

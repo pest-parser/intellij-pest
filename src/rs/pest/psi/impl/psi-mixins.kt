@@ -39,7 +39,8 @@ abstract class PestGrammarRuleMixin(node: ASTNode) : PestElement(node), PsiNameI
 		recCache = null
 	}
 
-	override fun getNameIdentifier(): PsiElement = firstChild
+	val docComment: PsiComment? get() = firstChild as? PsiComment
+	override fun getNameIdentifier(): PsiElement = ruleName.firstChild
 	override fun getIcon(flags: Int) = PestIcons.PEST
 	override fun getName(): String = nameIdentifier.text
 	@Throws(IncorrectOperationException::class)

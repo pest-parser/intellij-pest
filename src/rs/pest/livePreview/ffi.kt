@@ -33,6 +33,9 @@ class Lib(private var native: PestUtil) {
 		native = PestUtil(newMemory)
 	}
 
+	/**
+	 * @return Syntax information or error message (it's pretty. Need special printing)
+	 */
 	fun renderCode(ruleName: String, userCode: String): Rendering {
 		val ruleNamePtr = ptrFromString(ruleName)
 		val userCodePtr = ptrFromString(userCode)
