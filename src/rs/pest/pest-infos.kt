@@ -40,7 +40,7 @@ class PestFile(viewProvider: FileViewProvider) : PsiFileBase(viewProvider, PestL
 	var availableRules: Sequence<String> = emptySequence()
 	val vm = Lib(PestUtil(1926417 + 1919810))
 	fun rebootVM() = vm.reboot()
-	fun reloadVM() = vm.loadVM(text)
+	fun reloadVM(code: String = text) = vm.loadVM(code)
 	var isDocumentListenerAdded = false
 	fun rules() = rulesCache ?: calcRules().also { rulesCache = it }
 	fun livePreviewFile() = livePreviewFile.also { it.retainAll(PsiElement::isValid) }

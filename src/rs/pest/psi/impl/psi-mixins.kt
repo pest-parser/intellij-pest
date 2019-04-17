@@ -5,10 +5,14 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement
 import com.intellij.lang.ASTNode
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.*
+import com.intellij.psi.impl.PsiImplUtil
 import com.intellij.psi.search.LocalSearchScope
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.psi.util.PsiUtilBase
+import com.intellij.psi.util.PsiUtilCore
 import com.intellij.util.IncorrectOperationException
 import icons.PestIcons
+import org.rust.lang.core.psi.ext.elementType
 import rs.pest.PestFile
 import rs.pest.psi.*
 
@@ -51,9 +55,15 @@ abstract class PestGrammarRuleMixin(node: ASTNode) : PestElement(node), PsiNameI
 	}
 
 	val docComment: PsiComment?
-		get() = PsiTreeUtil
-			.getPrevSiblingOfType(this, PsiComment::class.java)
-			?.takeIf { it.tokenType == PestTokenType.LINE_DOC_COMMENT }
+		get() {
+			var prevSibling = prevSibling
+			while (prevSibling != null) {
+				if (prevSibling is PsiComment && prevSibling.elementType == PestTokenType.LINE_DOC_COMMENT) return prevSibling
+				else if (prevSibling is PestGrammarRule) return null
+				else prevSibling = prevSibling.prevSibling
+			}
+			return null
+		}
 
 	fun preview(maxSizeExpected: Int) = grammarBody?.expression?.bodyText(maxSizeExpected)
 	private var typeCache: PestRuleType? = null
