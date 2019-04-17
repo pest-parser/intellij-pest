@@ -28,6 +28,7 @@ fun livePreview(file: PestFile, selected: String) {
 	val virtualFile = LightVirtualFile("${file.name}.$selected.preview", LivePreviewFileType, "")
 	val psiFile = PsiManagerEx.getInstanceEx(project).findFile(virtualFile) as? LivePreviewFile ?: return
 	psiFile.pestFile = file
+	psiFile.ruleName = selected
 	file.livePreviewFile.add(psiFile)
 	val editorManager = FileEditorManagerEx.getInstanceEx(project)
 	editorManager.currentWindow.split(SwingConstants.HORIZONTAL, false, virtualFile, true)
@@ -44,6 +45,7 @@ object LivePreviewFileType : LanguageFileType(LivePreviewLanguage.INSTANCE) {
 class LivePreviewFile(viewProvider: FileViewProvider) : PsiFileBase(viewProvider, LivePreviewLanguage.INSTANCE) {
 	override fun getFileType() = LivePreviewFileType
 	var pestFile: PestFile? = null
+	var ruleName: String? = null
 }
 
 class LivePreviewParser : PsiParser, LightPsiParser {

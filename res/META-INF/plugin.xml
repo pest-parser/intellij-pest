@@ -35,6 +35,7 @@
 		<completion.contributor language="Pest" implementationClass="rs.pest.editing.PestBuiltinCompletionContributor"/>
 
 		<lang.parserDefinition language="PEST_LP" implementationClass="rs.pest.livePreview.LivePreviewParserDefinition"/>
+		<annotator language="PEST_LP" implementationClass="rs.pest.livePreview.LivePreviewAnnotator"/>
 
 		<quoteHandler fileType="Pest" className="rs.pest.editing.PestQuoteHandler"/>
 
