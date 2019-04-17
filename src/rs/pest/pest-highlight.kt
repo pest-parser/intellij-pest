@@ -36,6 +36,7 @@ object PestHighlighter : SyntaxHighlighter {
 	@JvmField val BRACE = TextAttributesKey.createTextAttributesKey("PEST_BRACES", DefaultLanguageHighlighterColors.BRACES)
 	@JvmField val BRACK = TextAttributesKey.createTextAttributesKey("PEST_BRACKET", DefaultLanguageHighlighterColors.BRACKETS)
 	@JvmField val COMMENT = TextAttributesKey.createTextAttributesKey("PEST_LINE_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT)
+	@JvmField val DOC_COMMENT = TextAttributesKey.createTextAttributesKey("PEST_DOC_COMMENT", DefaultLanguageHighlighterColors.DOC_COMMENT)
 	@JvmField val BLOCK_COMMENT = TextAttributesKey.createTextAttributesKey("PEST_BLOCK_COMMENT", DefaultLanguageHighlighterColors.BLOCK_COMMENT)
 
 	@JvmField val KEYWORD_KEY = arrayOf(KEYWORD)
@@ -49,6 +50,7 @@ object PestHighlighter : SyntaxHighlighter {
 	@JvmField val BRACE_KEY = arrayOf(BRACE)
 	@JvmField val BRACK_KEY = arrayOf(BRACK)
 	@JvmField val COMMENT_KEY = arrayOf(COMMENT)
+	@JvmField val DOC_COMMENT_KEY = arrayOf(DOC_COMMENT)
 	@JvmField val BLOCK_COMMENT_KEY = arrayOf(BLOCK_COMMENT)
 
 	private val BUILTINS_LIST = listOf(PestTypes.LETTER_TOKEN,
@@ -181,6 +183,7 @@ object PestHighlighter : SyntaxHighlighter {
 		PestTypes.STRING_TOKEN -> STRING_KEY
 		PestTypes.CHAR_TOKEN -> CHAR_KEY
 		PestTokenType.LINE_COMMENT -> COMMENT_KEY
+		PestTokenType.LINE_DOC_COMMENT -> DOC_COMMENT_KEY
 		PestTokenType.BLOCK_COMMENT -> BLOCK_COMMENT_KEY
 		PestTypes.NUMBER,
 		PestTypes.MINUS -> NUMBER_KEY
@@ -235,6 +238,7 @@ class PestColorSettingsPage : ColorSettingsPage {
 	override fun getDemoText() = """// Syntax Sample
 /* Block comment */
 <CompoundAtomic>compound_atomic_rule</CompoundAtomic> = @{ <Simple>simple_rule</Simple> ~ !"a"{2, 3} }
+///Red
 <Silent>silent_rule</Silent> = _{ <Atomic>atomic_rule</Atomic> ~ '1'..'2' }
 <Atomic>atomic_rule</Atomic> = ${'$'}{ <NonAtomic>non_atomic_rule</NonAtomic> }
 <NonAtomic>non_atomic_rule</NonAtomic> = !{ <CompoundAtomic>compound_atomic_rule</CompoundAtomic> }
