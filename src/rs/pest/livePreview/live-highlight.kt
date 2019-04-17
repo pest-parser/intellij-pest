@@ -4,6 +4,7 @@ import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.Annotator
 import com.intellij.openapi.editor.markup.TextAttributes
 import com.intellij.openapi.util.TextRange
+import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
 import org.intellij.lang.annotations.Language
 import java.awt.Color
@@ -12,6 +13,9 @@ fun rgbToAttributes(rgb: String) = Color::class.java.fields
 	.firstOrNull { it.name.equals(rgb, ignoreCase = true) }
 	?.let { it.get(null) as? Color }
 	?.let { TextAttributes().apply { foregroundColor = it } }
+
+fun textAttrFromDoc(docComment: PsiComment) =
+	docComment.text.removePrefix("///").trim().let(::rgbToAttributes)
 
 @Language("RegExp")
 private val lexicalRegex = Regex("\\A(\\d+)\\^(\\d+)\\^(.*)$")
@@ -40,7 +44,7 @@ class LivePreviewAnnotator : Annotator {
 				res.lexical.mapNotNull { lexicalRegex.matchEntire(it) }.forEach {
 					val (_, start, end, rule) = it.groupValues
 					val docComment = rules[rule] ?: return@forEach
-					val attr = docComment.text.removePrefix("///").trim().let(::rgbToAttributes) ?: return@forEach
+					val attr = textAttrFromDoc(docComment) ?: return@forEach
 					val range = TextRange(start.toInt(), end.toInt())
 					holder.createInfoAnnotation(range, rule).enforcedTextAttributes = attr
 				}

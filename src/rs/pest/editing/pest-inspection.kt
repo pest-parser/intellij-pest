@@ -43,8 +43,12 @@ private val errorMsgRegex = Regex("\\A(\\d+)\\^(\\d+)\\^(\\d+)\\^(\\d+)\\^(.*)$"
 private fun vmListener(element: PestFile) = object : DocumentListener {
 	override fun documentChanged(event: DocumentEvent) {
 		if (PsiTreeUtil.hasErrorElements(element)) return
-		element.rebootVM()
-		val (works, messages) = element.reloadVM()
+		val (works, messages) = try {
+			element.reloadVM()
+		} catch (e: Exception) {
+			element.rebootVM()
+			element.reloadVM()
+		}
 		val project = element.project
 		val dom = PsiDocumentManager.getInstance(project).getDocument(element) ?: return
 		if (works) {
