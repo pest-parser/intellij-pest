@@ -15,11 +15,8 @@ install:
   - cargo -vV
 
 build_script:
-  - cd rust
-  - cargo build --release
-  - cd ..
   - gradlew displayCommitHash
-  - gradlew buildPlugin --info
+  - gradlew compileRust buildPlugin --info
   - gradlew verifyPlugin --info
 #
 
