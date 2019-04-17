@@ -1,9 +1,11 @@
 package rs.pest.editing
 
+import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer
 import com.intellij.codeInspection.InspectionManager
 import com.intellij.codeInspection.LocalInspectionTool
 import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.codeInspection.ProblemsHolder
+import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.event.DocumentEvent
 import com.intellij.openapi.editor.event.DocumentListener
 import com.intellij.openapi.util.TextRange
@@ -41,29 +43,31 @@ class DuplicateRuleInspection : LocalInspectionTool() {
 private val errorMsgRegex = Regex("\\A(\\d+)\\^(\\d+)\\^(\\d+)\\^(\\d+)\\^(.*)$")
 
 private fun vmListener(element: PestFile) = object : DocumentListener {
-	override fun documentChanged(event: DocumentEvent) {
-		if (PsiTreeUtil.hasErrorElements(element)) return
-		val dom = event.document
-		val (works, messages) = try {
-			element.reloadVM(dom.text)
-		} catch (e: Exception) {
-			element.rebootVM()
-			element.reloadVM(dom.text)
+	override fun documentChanged(event: DocumentEvent) = reloadVM(event.document, element)
+}
+
+fun reloadVM(dom: Document, element: PestFile) {
+	if (PsiTreeUtil.hasErrorElements(element)) return
+	val (works, messages) = try {
+		element.reloadVM(dom.text)
+	} catch (e: Exception) {
+		element.rebootVM()
+		element.reloadVM(dom.text)
+	}
+	if (works) with(element) {
+		errors = emptySequence()
+		availableRules = messages
+		livePreviewFile().forEach(DaemonCodeAnalyzer.getInstance(element.project)::restart)
+	} else with(element) {
+		errors = messages.mapNotNull { errorMsgRegex.matchEntire(it)?.groupValues }.map {
+			val startLine = it[1].toInt() - 1
+			val startCol = it[2].toInt() - 1
+			val endLine = it[3].toInt() - 1
+			val endCol = it[4].toInt() - 1
+			val range = TextRange(dom.getLineStartOffset(startLine) + startCol, dom.getLineStartOffset(endLine) + endCol)
+			Pair(range, it[5])
 		}
-		if (works) {
-			element.errors = emptySequence()
-			element.availableRules = messages
-		} else {
-			element.errors = messages.mapNotNull { errorMsgRegex.matchEntire(it)?.groupValues }.map {
-				val startLine = it[1].toInt() - 1
-				val startCol = it[2].toInt() - 1
-				val endLine = it[3].toInt() - 1
-				val endCol = it[4].toInt() - 1
-				val range = TextRange(dom.getLineStartOffset(startLine) + startCol, dom.getLineStartOffset(endLine) + endCol)
-				Pair(range, it[5])
-			}
-			element.availableRules = emptySequence()
-		}
+		availableRules = emptySequence()
 	}
 }
 
@@ -73,6 +77,7 @@ class PestVmInspection : LocalInspectionTool() {
 		val project = file.project
 		if (!file.isDocumentListenerAdded) {
 			PsiDocumentManager.getInstance(project).getDocument(file)?.apply {
+				reloadVM(this, file)
 				file.isDocumentListenerAdded = true
 				addDocumentListener(vmListener(file))
 			}
