@@ -19,6 +19,8 @@ The IntelliJ IDEA plugin for [Pest](https://pest.rs).
 ## Features
 
 See [JetBrains Plugin Marketplace][jb] page.
+<br/>
+This plugin features in a bundled pest-vm which can do real-time syntax highlighting for you.
 
 ## Maintainer
 
