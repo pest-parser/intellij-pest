@@ -8,7 +8,6 @@ import com.intellij.psi.FileViewProvider
 import com.intellij.psi.PsiElement
 import com.intellij.psi.stubs.PsiFileStubImpl
 import com.intellij.psi.tree.IStubFileElementType
-import com.intellij.psi.tree.TokenSet
 import rs.pest.psi.PestLexer
 import rs.pest.psi.PestParser
 import rs.pest.psi.PestTokenType

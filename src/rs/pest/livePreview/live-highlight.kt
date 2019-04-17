@@ -22,10 +22,13 @@ class LivePreviewAnnotator : Annotator {
 		val pestFile = element.pestFile ?: return
 		val ruleName = element.ruleName ?: return
 		val rules = pestFile.rules().mapNotNull { it.docComment?.let { doc -> it.name to doc } }.toMap()
+		if (rules.isEmpty()) return
+		if (pestFile.errors.any()) return
+		if (pestFile.availableRules.none()) return
 		val vm = pestFile.vm
 		when (val res = try {
 			vm.renderCode(ruleName, element.text)
-		} catch (e: IndexOutOfBoundsException) {
+		} catch (e: Exception) {
 			vm.reboot()
 			vm.loadVM(pestFile.text)
 			vm.renderCode(ruleName, element.text)
@@ -39,7 +42,7 @@ class LivePreviewAnnotator : Annotator {
 					val docComment = rules[rule] ?: return@forEach
 					val attr = docComment.text.removePrefix("///").trim().let(::rgbToAttributes) ?: return@forEach
 					val range = TextRange(start.toInt(), end.toInt())
-					holder.createInfoAnnotation(range, null).enforcedTextAttributes = attr
+					holder.createInfoAnnotation(range, rule).enforcedTextAttributes = attr
 				}
 			}
 		}
