@@ -6,7 +6,7 @@ before_install:
   - source $HOME/.cargo/env
   - rustup target add wasm32-unknown-unknown --toolchain nightly
 script:
-  - bash gradlew displayCommitHash compileRust isCI test verifyPlugin --info
+  - bash gradlew displayCommitHash compileRust isCI test verifyPlugin --info --no-daemon
 cache:
   directories:
     - $HOME/.gradle/caches/
