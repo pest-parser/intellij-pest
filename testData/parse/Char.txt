@@ -1,8 +1,7 @@
 FILE
   PestGrammarRuleImpl(GRAMMAR_RULE)
-    PestRuleNameImpl(RULE_NAME)
-      PestValidRuleNameImpl(VALID_RULE_NAME)
-        PsiElement(IDENTIFIER_TOKEN)('test')
+    PestValidRuleNameImpl(VALID_RULE_NAME)
+      PsiElement(IDENTIFIER_TOKEN)('test')
     PsiWhiteSpace(' ')
     PsiElement(ASSIGNMENT_OPERATOR)('=')
     PsiWhiteSpace(' ')

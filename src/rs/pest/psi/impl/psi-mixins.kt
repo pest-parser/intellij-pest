@@ -6,6 +6,7 @@ import com.intellij.lang.ASTNode
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.*
 import com.intellij.psi.search.LocalSearchScope
+import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.IncorrectOperationException
 import icons.PestIcons
 import rs.pest.PestFile
@@ -39,8 +40,7 @@ abstract class PestGrammarRuleMixin(node: ASTNode) : PestElement(node), PsiNameI
 		recCache = null
 	}
 
-	val docComment: PsiComment? get() = firstChild as? PsiComment
-	override fun getNameIdentifier(): PsiElement = ruleName.firstChild
+	override fun getNameIdentifier(): PsiElement = firstChild
 	override fun getIcon(flags: Int) = PestIcons.PEST
 	override fun getName(): String = nameIdentifier.text
 	@Throws(IncorrectOperationException::class)
@@ -50,6 +50,10 @@ abstract class PestGrammarRuleMixin(node: ASTNode) : PestElement(node), PsiNameI
 		return this
 	}
 
+	val docComment: PsiComment?
+		get() = PsiTreeUtil
+			.getPrevSiblingOfType(this, PsiComment::class.java)
+			?.takeIf { it.tokenType == PestTokenType.LINE_DOC_COMMENT }
 
 	fun preview(maxSizeExpected: Int) = grammarBody?.expression?.bodyText(maxSizeExpected)
 	private var typeCache: PestRuleType? = null
