@@ -36,11 +36,16 @@ fun textAttrFromDoc(docComment: PsiComment) =
 private val lexicalRegex = Regex("\\A(\\d+)\\^(\\d+)\\^(.*)$")
 
 @Language("RegExp")
-private val errMsgRegex = Regex("\\A\\s+-->\\s+(\\d+):(\\d+)\\p{all}*")
+private val errLineRegex = Regex("\\A\\s+-->\\s+(\\d+):(\\d+)$")
+
+@Language("RegExp")
+private val errInfoRegex = Regex("\\A\\s+=\\s+(\\p{all}*)$")
 
 class LivePreviewAnnotator : Annotator {
 	override fun annotate(element: PsiElement, holder: AnnotationHolder) {
 		if (element !is LivePreviewFile) return
+		val project = element.project
+		val dom = PsiDocumentManager.getInstance(project).getDocument(element) ?: return
 		val pestFile = element.pestFile ?: return
 		val ruleName = element.ruleName ?: return
 		val rules = pestFile.rules().map { it.name to it }.toMap()
@@ -55,24 +60,22 @@ class LivePreviewAnnotator : Annotator {
 			vm.loadVM(pestFile.text)
 			vm.renderCode(ruleName, element.text)
 		}) {
-			is Rendering.Err -> errMsgRegex.matchEntire(res.msg)?.apply {
-				val dom = PsiDocumentManager.getInstance(element.project).getDocument(element) ?: return@apply
+			is Rendering.Err -> run {
+				val errorLines = res.msg.lines()
+				val firstLine = errorLines.firstOrNull() ?: return@run null
+				val lastLine = errorLines.lastOrNull() ?: return@run null
 				val length = dom.textLength
-				if (length == 0) return@apply
-				val (_, lineS, colS) = groupValues
-				val line = lineS.toIntOrNull() ?: return@apply
-				val col = colS.toIntOrNull() ?: return@apply
+				if (length == 0) return@run null
+				val (_, lineS, colS) = errLineRegex.matchEntire(firstLine)?.groupValues ?: return@run null
+				val line = lineS.toIntOrNull() ?: return@run null
+				val col = colS.toIntOrNull() ?: return@run null
 				val lineStart = dom.getLineStartOffset(line - 1)
 				val offset = lineStart + col - 1
 				val range = if (offset >= dom.textLength) TextRange(length - 1, length)
 				else TextRange(offset, offset + 1)
-				holder.createErrorAnnotation(range, null).apply {
-					//language=HTML
-					tooltip = XmlStringUtil.wrapInHtml(res.msg).replace("\n", "<br/>")
-				}
+				val errorMsg = errInfoRegex.matchEntire(lastLine)?.run { groupValues[1] }
+				holder.createErrorAnnotation(range, errorMsg)
 			} ?: ApplicationManager.getApplication().invokeLater {
-				val project = element.project
-				val dom = PsiDocumentManager.getInstance(project).getDocument(element) ?: return@invokeLater
 				val panel = JPanel().apply { add(JBTextArea().apply { text = res.msg }) }
 				val editor = EditorFactory.getInstance()
 					.getEditors(dom, project)
