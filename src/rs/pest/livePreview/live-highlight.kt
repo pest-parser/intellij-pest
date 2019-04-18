@@ -9,10 +9,15 @@ import com.intellij.psi.PsiElement
 import org.intellij.lang.annotations.Language
 import java.awt.Color
 
-fun rgbToAttributes(rgb: String) = Color::class.java.fields
-	.firstOrNull { it.name.equals(rgb, ignoreCase = true) }
-	?.let { it.get(null) as? Color }
+fun rgbToAttributes(rgb: String) = stringToColor(rgb)
 	?.let { TextAttributes().apply { foregroundColor = it } }
+
+private fun stringToColor(rgb: String) = when {
+	rgb.startsWith("#") -> rgb.drop(1).toIntOrNull(16)?.let(::Color)
+	else -> Color::class.java.fields
+		.firstOrNull { it.name.equals(rgb, ignoreCase = true) }
+		?.let { it.get(null) as? Color }
+}
 
 fun textAttrFromDoc(docComment: PsiComment) =
 	docComment.text.removePrefix("///").trim().let(::rgbToAttributes)
