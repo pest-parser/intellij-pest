@@ -4,9 +4,14 @@
 This is a bridge library for the [IntelliJ IDEA plugin for Pest][jb].
 
  [jb]: https://plugins.jetbrains.com/plugin/12046-pest
+ [asmble]:https://github.com/cretz/asmble
 
 It's supposed to be compiled only with the wasm32 backend of nightly rustc
 (at least at this moment).
+
+After compiling as wasm, it's translated to JVM bytecode with [asmble][asmble] and then
+loaded in the plugin.
+Thus no JNI.
 */
 
 #![feature(box_syntax, box_patterns)]

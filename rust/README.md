@@ -19,7 +19,7 @@ For the plugin please head to the [plugin page][plugin].
  [v-svg]: https://img.shields.io/jetbrains/plugin/v/12046-pest.svg
  [jb]: https://plugins.jetbrains.com/plugin/12046-pest
  [tv-url]: https://travis-ci.org/pest-parser/intellij-pest
- [dv-svg]: https://docs.rs/mio/badge.svg
+ [dv-svg]: https://docs.rs/pest-ide/badge.svg
  [dv-url]: https://docs.rs/pest-ide
  [tv-svg]: https://travis-ci.org/pest-parser/intellij-pest.svg?branch=master
  [av-url]: https://ci.appveyor.com/project/dragostis/intellij-pest-3fx8c/branch/master
