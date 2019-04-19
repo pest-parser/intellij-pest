@@ -1,3 +1,14 @@
+/*!
+# Pest IDE
+
+This is a bridge library for the [IntelliJ IDEA plugin for Pest][jb].
+
+ [jb]: https://plugins.jetbrains.com/plugin/12046-pest
+
+It's supposed to be compiled only with the wasm32 backend of nightly rustc
+(at least at this moment).
+*/
+
 #![feature(box_syntax, box_patterns)]
 
 use std::alloc::System;
@@ -10,6 +21,9 @@ use pest_meta::parser::{self, Rule};
 use pest_meta::{optimizer, validator};
 use pest_vm::Vm;
 
+/// Allocation library for Java use.
+///
+/// On Java side, it can create a Rust string based on the codes in this module.
 pub mod str4j;
 
 type JavaStr = *mut u8;
