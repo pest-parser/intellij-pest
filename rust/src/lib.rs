@@ -24,6 +24,7 @@ pub extern "C" fn connectivity_check_add(a: i32, b: i32) -> i32 {
     a + b
 }
 
+/// From position to line-column pair.
 fn line_col(pos: usize, input: &str) -> (usize, usize) {
     let mut pos = pos;
     // Position's pos is always a UTF-8 border.
@@ -65,6 +66,7 @@ fn line_col(pos: usize, input: &str) -> (usize, usize) {
     line_col
 }
 
+/// Convert the error to a readable format.
 fn convert_error(error: Error<Rule>, grammar: &str) -> String {
     let message = match error.variant {
         ErrorVariant::CustomError { message } => message,
@@ -81,6 +83,7 @@ fn convert_error(error: Error<Rule>, grammar: &str) -> String {
 }
 
 #[no_mangle]
+/// Load the Pest VM as a global variable.
 pub extern "C" fn load_vm(pest_code: JavaStr, pest_code_len: i32) -> JavaStr {
     let pest_code_len = pest_code_len as usize;
     let pest_code_bytes =
@@ -170,6 +173,8 @@ pub extern "C" fn load_vm(pest_code: JavaStr, pest_code_len: i32) -> JavaStr {
     ptr
 }
 
+/// Convert the pair information to a string that the plugin
+/// understands.
 fn join_pairs(result: &mut Vec<String>, pair: Pair<&str>) {
     let span = pair.as_span();
     let start = span.start();
@@ -181,6 +186,9 @@ fn join_pairs(result: &mut Vec<String>, pair: Pair<&str>) {
 }
 
 #[no_mangle]
+/// After loading the VM, this function can parse the code with the
+/// currently loaded VM.
+/// Assumes the VM is already loaded, otherwise it'll panic.
 pub extern "C" fn render_code(
     rule_name: JavaStr,
     rule_name_len: i32,

@@ -26,6 +26,16 @@ This plugin features in a bundled pest-vm which can do real-time syntax highligh
 
 + [@ice1000](https://github.com/ice1000)
 
+## Videos
+
+There's a video about the *Live Preview* functionality.
+
++ [YouTube][YouTube]
++ [Bilibili][Bilibili]
+
+ [YouTube]: https://www.youtube.com/watch?v=AnUhekAENm4
+ [Bilibili]: https://www.bilibili.com/video/av49762905/
+
 ## Screenshots
 
 ### Rust code injection

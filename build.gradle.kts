@@ -21,7 +21,7 @@ val commitHash = kotlin.run {
 	output.trim()
 }
 
-val pluginComingVersion = "0.2.3"
+val pluginComingVersion = "0.2.4"
 val pluginVersion = if (isCI) "$pluginComingVersion-$commitHash" else pluginComingVersion
 val packageName = "rs.pest"
 val asmble = "asmble"
@@ -32,7 +32,7 @@ version = pluginVersion
 
 plugins {
 	java
-	id("org.jetbrains.intellij") version "0.4.7"
+	id("org.jetbrains.intellij") version "0.4.8"
 	id("org.jetbrains.grammarkit") version "2019.1"
 	id("de.undercouch.download") version "3.4.3"
 	kotlin("jvm") version "1.3.30"
@@ -76,7 +76,7 @@ java {
 tasks.withType<PatchPluginXmlTask> {
 	changeNotes(file("res/META-INF/change-notes.html").readText())
 	pluginDescription(file("res/META-INF/description.html").readText())
-	version(pluginComingVersion)
+	version(pluginVersion)
 	pluginId(packageName)
 }
 

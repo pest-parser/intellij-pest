@@ -9,7 +9,7 @@ keywords = ["pest", "grammar", "ide"]
 repository = "https://github.com/pest-parser/intellij-pest/tree/master/rust"
 homepage = "https://pest-parser.github.io/"
 edition = "2018"
-readme = "../README.md"
+readme = "README.md"
 
 [badges]
 appveyor = { repository = "pest-parser/intellij-pest", service = "github" }
@@ -18,6 +18,9 @@ maintenance = { status = "experimental" }
 
 [lib]
 crate-type = ["cdylib"]
+
+[package.metadata.docs.rs]
+rustdoc-args = ["--document-private-items"]
 
 [dependencies]
 pest = "2.1.1"
