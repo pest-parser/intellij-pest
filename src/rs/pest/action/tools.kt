@@ -1,6 +1,5 @@
 package rs.pest.action
 
-import com.intellij.ide.browsers.BrowserLauncher
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
@@ -9,15 +8,21 @@ import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.ui.popup.Balloon
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.psi.util.PsiTreeUtil
-import rs.pest.PEST_WEBSITE
 import rs.pest.PestBundle
 import rs.pest.PestFile
+import rs.pest.action.ui.PestIdeBridgeInfoImpl
 import rs.pest.action.ui.RuleSelector
 import rs.pest.livePreview.livePreview
 
-class PestViewSiteAction : AnAction(), DumbAware {
+class PestViewInfoAction : AnAction(), DumbAware {
 	override fun actionPerformed(e: AnActionEvent) {
-		BrowserLauncher.instance.open(PEST_WEBSITE)
+		val editor = CommonDataKeys.EDITOR.getData(e.dataContext) ?: return
+		val component = PestIdeBridgeInfoImpl().component
+		JBPopupFactory.getInstance()
+			.createDialogBalloonBuilder(component, PestBundle.message("pest.actions.info.title"))
+			.setHideOnClickOutside(true)
+			.createBalloon()
+			.showInCenterOf(editor.component)
 	}
 }
 

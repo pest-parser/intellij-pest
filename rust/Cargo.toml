@@ -1,6 +1,6 @@
 [package]
 name = "pest-ide"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["ice1000 <ice1000kotlin@foxmail.com>"]
 license = "Apache-2.0"
 description = "Helper library for the IntelliJ IDEA plugin for Pest."

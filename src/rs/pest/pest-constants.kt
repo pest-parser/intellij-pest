@@ -15,6 +15,7 @@ import org.jetbrains.annotations.NonNls
 @NonNls const val PEST_PLUGIN_ID = "rs.pest"
 
 @NonNls const val PEST_WEBSITE = "https://pest.rs/"
+@NonNls const val PEST_IDE_CRATE_LINK = "https://crates.io/crates/pest-ide"
 @NonNls const val PEST_FOLDING_PLACEHOLDER = "{...}"
 
 @NonNls const val LP_LANGUAGE_NAME = "PEST_LP"

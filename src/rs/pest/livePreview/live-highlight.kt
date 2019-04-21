@@ -13,7 +13,6 @@ import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
 import com.intellij.ui.JBColor
 import com.intellij.ui.components.JBTextArea
-import com.intellij.xml.util.XmlStringUtil
 import org.intellij.lang.annotations.Language
 import rs.pest.PestBundle
 import java.awt.Color

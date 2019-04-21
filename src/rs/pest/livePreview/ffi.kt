@@ -12,6 +12,12 @@ sealed class Rendering {
 	data class Ok(val lexical: Sequence<String>) : Rendering()
 }
 
+data class CrateInfo(
+	val version: String,
+	val author: String,
+	val description: String
+)
+
 class Lib(private var native: PestUtil) {
 	/**
 	 * @return (true, rule names) or (false, error messages)
@@ -49,6 +55,12 @@ class Lib(private var native: PestUtil) {
 			.splitToSequence(',')
 			.map { it.trim() }
 			.map { it.removeSurrounding(delimiter = "\"") })
+	}
+
+	fun crateInfo(): CrateInfo {
+		val info = nullTermedStringFromOffset(native.crate_info())
+		val (version, author, description) = info.split('\n')
+		return CrateInfo(version, author, description)
 	}
 
 	private fun ptrFromString(str: String): Ptr {

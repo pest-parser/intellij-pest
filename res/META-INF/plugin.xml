@@ -82,9 +82,9 @@
 			icon="PestIcons.PEST"
 			popup="true">
 			<action
-				id="Pest.Tools.ViewSite"
-				class="rs.pest.action.PestViewSiteAction"
-				text="View Pest website"
+				id="Pest.Tools.Info"
+				class="rs.pest.action.PestViewInfoAction"
+				text="View Pest IDE Information"
 				icon="PestIcons.PEST"/>
 			<action
 				id="Pest.Tools.LivePreview"

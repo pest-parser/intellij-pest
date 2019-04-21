@@ -162,7 +162,6 @@ val translateWasm = task<Exec>("translateWasm") {
 }
 
 val compileRust = task<Exec>("compileRust") {
-	group = "build"
 	workingDir(projectDir.resolve("rust").absolutePath)
 	commandLine("rustup", "run", "nightly", "cargo", "build", "--release")
 }

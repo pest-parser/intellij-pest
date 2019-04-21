@@ -2,13 +2,18 @@ package rs.pest.action.ui
 
 import com.intellij.codeInsight.lookup.LookupManager
 import com.intellij.codeInsight.lookup.impl.LookupImpl
+import com.intellij.ide.browsers.BrowserLauncher
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiDocumentManager
+import rs.pest.PEST_IDE_CRATE_LINK
+import rs.pest.PEST_WEBSITE
+import rs.pest.livePreview.Lib
 import rs.pest.psi.PestExpression
 import rs.pest.psi.PestGrammarRule
 import rs.pest.psi.startOffset
+import rs.pest.vm.PestUtil
 import javax.swing.ButtonGroup
 
 @Suppress("unused")
@@ -53,4 +58,22 @@ class PestIntroduceRulePopupImpl(
 	}
 
 	override fun getComponent() = mainPanel
+}
+
+class PestIdeBridgeInfoImpl : PestIdeBridgeInfo() {
+	val component get() = mainPanel
+
+	companion object {
+		private val info by lazy { Lib(PestUtil(114514 * 10)).crateInfo() }
+	}
+
+	init {
+		websiteLink.text = PEST_WEBSITE
+		websiteLink.setListener({ _, _ -> BrowserLauncher.instance.open(PEST_WEBSITE) }, null)
+		crateLink.text = PEST_IDE_CRATE_LINK
+		crateLink.setListener({ _, _ -> BrowserLauncher.instance.open(PEST_IDE_CRATE_LINK) }, null)
+		versionLabel.text = info.version
+		authorLabel.text = info.author
+		descriptionLabel.text = info.description
+	}
 }

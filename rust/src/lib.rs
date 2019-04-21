@@ -26,22 +26,19 @@ use pest_meta::parser::{self, Rule};
 use pest_meta::{optimizer, validator};
 use pest_vm::Vm;
 
+use self::misc::JavaStr;
+
 /// Allocation library for Java use.
 ///
 /// On Java side, it can create a Rust string based on the codes in this module.
 pub mod str4j;
 
-type JavaStr = *mut u8;
+/// Everything that are not related to pest.
+pub mod misc;
 
 #[global_allocator]
 static GLOBAL_ALLOCATOR: System = System;
 static mut VM: Option<Vm> = None;
-
-#[no_mangle]
-/// For sanity checking.
-pub extern "C" fn connectivity_check_add(a: i32, b: i32) -> i32 {
-    a + b
-}
 
 /// From position to line-column pair.
 fn line_col(pos: usize, input: &str) -> (usize, usize) {
