@@ -4,12 +4,16 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiWhiteSpace
+import com.intellij.psi.tree.IElementType
 
 val PsiElement.childrenWithLeaves: Sequence<PsiElement>
 	get() = generateSequence(this.firstChild) { it.nextSibling }
 
 val PsiElement.startOffset: Int
 	get() = textRange.startOffset
+
+val PsiElement.elementType: IElementType?
+	get() = node?.elementType
 
 val PsiElement.endOffset: Int
 	get() = textRange.endOffset
