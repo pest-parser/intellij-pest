@@ -52,6 +52,7 @@ import org.eclipse.egit.github.core.service.IssueService
 import org.jetbrains.annotations.NonNls
 import org.jetbrains.annotations.PropertyKey
 import rs.pest.PEST_PLUGIN_ID
+import rs.pest.action.ui.PestIdeBridgeInfoImpl
 import java.awt.Component
 import java.io.IOException
 import java.io.ObjectInputStream
@@ -231,6 +232,7 @@ class GitHubErrorBean(
 	val message: String) {
 	val exceptionHash: String
 	val stackTrace: String
+
 	init {
 		val trace = throwable.stackTrace
 		exceptionHash = Arrays.hashCode(trace).toString()
@@ -248,7 +250,8 @@ class GitHubErrorBean(
  * Messages and strings used by the error reporter
  */
 private object ErrorReportBundle {
-	@NonNls private const val BUNDLE = "rs.pest.error.report-bundle"
+	@NonNls
+	private const val BUNDLE = "rs.pest.error.report-bundle"
 	private val bundle: ResourceBundle by lazy { ResourceBundle.getBundle(BUNDLE) }
 
 	@JvmStatic
@@ -282,6 +285,7 @@ private fun getKeyValuePairs(
 		"error.description" to error.description,
 		"Plugin Name" to error.pluginName,
 		"Plugin Version" to error.pluginVersion,
+		"Bundled Pest Version" to PestIdeBridgeInfoImpl.info.version,
 		"OS Name" to SystemInfo.OS_NAME,
 		"Java Version" to SystemInfo.JAVA_VERSION,
 		"App Name" to namesInfo.productName,

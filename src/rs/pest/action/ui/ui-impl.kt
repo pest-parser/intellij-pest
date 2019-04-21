@@ -64,7 +64,7 @@ class PestIdeBridgeInfoImpl : PestIdeBridgeInfo() {
 	val component get() = mainPanel
 
 	companion object {
-		private val info by lazy { Lib(PestUtil(114514 * 10)).crateInfo() }
+		val info by lazy { Lib(PestUtil(114514 * 50)).crateInfo() }
 	}
 
 	init {

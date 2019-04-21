@@ -5,6 +5,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.project.DumbAware
+import com.intellij.openapi.ui.DialogBuilder
 import com.intellij.openapi.ui.popup.Balloon
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.psi.util.PsiTreeUtil
@@ -16,17 +17,15 @@ import rs.pest.livePreview.livePreview
 
 class PestViewInfoAction : AnAction(), DumbAware {
 	override fun actionPerformed(e: AnActionEvent) {
-		val editor = CommonDataKeys.EDITOR.getData(e.dataContext) ?: return
 		val component = PestIdeBridgeInfoImpl().component
-		JBPopupFactory.getInstance()
-			.createDialogBalloonBuilder(component, PestBundle.message("pest.actions.info.title"))
-			.setHideOnClickOutside(true)
-			.createBalloon()
-			.showInCenterOf(editor.component)
+		DialogBuilder()
+			.title(PestBundle.message("pest.actions.info.title"))
+			.centerPanel(component)
+			.show()
 	}
 }
 
-class PestLivePreviewAction : AnAction(), DumbAware {
+class PestLivePreviewAction : AnAction() {
 	override fun update(e: AnActionEvent) {
 		super.update(e)
 		val psiFile = CommonDataKeys.PSI_FILE.getData(e.dataContext) as? PestFile ?: return
@@ -46,7 +45,11 @@ class PestLivePreviewAction : AnAction(), DumbAware {
 			?: return
 		lateinit var balloon: Balloon
 		val popup = RuleSelector().apply {
-			file.availableRules.map { object { override fun toString() = it } }.forEach(ruleCombo::addItem)
+			file.availableRules.map {
+				object {
+					override fun toString() = it
+				}
+			}.forEach(ruleCombo::addItem)
 			ruleCombo.selectedIndex = 0
 			okButton.addActionListener {
 				balloon.hide(true)
