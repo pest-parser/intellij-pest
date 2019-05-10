@@ -23,7 +23,6 @@ import static com.intellij.psi.TokenType.WHITE_SPACE;
 %function advance
 %type IElementType
 %unicode
-%ignorecase
 %eof{ return;
 %eof}
 
