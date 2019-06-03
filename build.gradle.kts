@@ -73,7 +73,7 @@ intellij {
 
 	version = "2019.1"
 	if (!isCI) setPlugins("PsiViewer:192-SNAPSHOT")
-	setPlugins("org.rust.lang:0.2.98.2126-192")
+	setPlugins("org.rust.lang:0.2.98.2125-191")
 }
 
 java {
