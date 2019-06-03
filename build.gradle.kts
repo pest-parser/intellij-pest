@@ -21,7 +21,7 @@ val commitHash = kotlin.run {
 	output.trim()
 }
 
-val pluginComingVersion = "0.2.4"
+val pluginComingVersion = "0.2.5"
 val pluginVersion = if (isCI) "$pluginComingVersion-$commitHash" else pluginComingVersion
 val packageName = "rs.pest"
 val asmble = "asmble"
@@ -38,34 +38,42 @@ plugins {
 	kotlin("jvm") version "1.3.30"
 }
 
-fun fromToolbox(path: String) = file(path).listFiles().orEmpty().filter { it.isDirectory }.maxBy {
-	val (major, minor, patch) = it.name.split('.')
-	String.format("%5s%5s%5s", major, minor, patch)
-}
+allprojects { apply { plugin("org.jetbrains.grammarkit") } }
 
-allprojects {
-	apply { plugin("org.jetbrains.grammarkit") }
-
-	intellij {
-		updateSinceUntilBuild = false
-		instrumentCode = true
-		val user = System.getProperty("user.name")
-		when (System.getProperty("os.name")) {
-			"Linux" -> {
-				val root = "/home/$user/.local/share/JetBrains/Toolbox/apps"
-				val intellijPath = fromToolbox("$root/IDEA-C/ch-0")
-					?: fromToolbox("$root/IDEA-U/ch-0")
-					?: fromToolbox("$root/IDEA-JDK11/ch-0")
-				intellijPath?.absolutePath?.let { localPath = it }
-				val pycharmPath = fromToolbox("$root/PyCharm-C/ch-0")
-					?: fromToolbox("$root/IDEA-C/ch-0")
-					?: fromToolbox("$root/IDEA-JDK11/ch-0")
-				pycharmPath?.absolutePath?.let { alternativeIdePath = it }
-			}
-		}
-
-		setPlugins("org.rust.lang:0.2.96.2122-191")
+fun fromToolbox(root: String, ide: String) = file(root)
+	.resolve(ide)
+	.takeIf { it.exists() }
+	?.resolve("ch-0")
+	?.listFiles()
+	.orEmpty()
+	.filterNotNull()
+	.filter { it.isDirectory }
+	.minBy {
+		val (major, minor, patch) = it.name.split('.')
+		String.format("%5s%5s%5s", major, minor, patch)
 	}
+	?.also { println("Picked: $it") }
+
+intellij {
+	updateSinceUntilBuild = false
+	instrumentCode = true
+	val user = System.getProperty("user.name")
+	val os = System.getProperty("os.name")
+	val root = when {
+		os.startsWith("Windows") -> "C:\\Users\\$user\\AppData\\Local\\JetBrains\\Toolbox\\apps"
+		os == "Linux" -> "/home/$user/.local/share/JetBrains/Toolbox/apps"
+		else -> return@intellij
+	}
+	val intellijPath = sequenceOf("IDEA-C-JDK11", "IDEA-C", "IDEA-JDK11", "IDEA-U")
+		.mapNotNull { fromToolbox(root, it) }.firstOrNull()
+	intellijPath?.absolutePath?.let { localPath = it }
+	val pycharmPath = sequenceOf("PyCharm-C", "IDEA-C-JDK11", "IDEA-C", "IDEA-JDK11", "IDEA-U")
+		.mapNotNull { fromToolbox(root, it) }.firstOrNull()
+	pycharmPath?.absolutePath?.let { alternativeIdePath = it }
+
+	version = "2019.1"
+	if (!isCI) setPlugins("PsiViewer:192-SNAPSHOT")
+	setPlugins("org.rust.lang:0.2.98.2126-192")
 }
 
 java {

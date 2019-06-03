@@ -28,7 +28,11 @@ class PestViewInfoAction : AnAction(), DumbAware {
 class PestLivePreviewAction : AnAction() {
 	override fun update(e: AnActionEvent) {
 		super.update(e)
-		val psiFile = CommonDataKeys.PSI_FILE.getData(e.dataContext) as? PestFile ?: return
+		val psiFile = CommonDataKeys.PSI_FILE.getData(e.dataContext) as? PestFile
+		if (psiFile == null) {
+			e.presentation.isEnabledAndVisible = false
+			return
+		}
 		e.presentation.isEnabledAndVisible =
 			CommonDataKeys.EDITOR.getData(e.dataContext) != null
 				&& !PsiTreeUtil.hasErrorElements(psiFile)
