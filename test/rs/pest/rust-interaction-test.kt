@@ -25,7 +25,7 @@ class InteractionTest {
 class IntegrationTest {
 	@Test
 	fun `load Pest VM`() {
-		val lib = Lib(PestUtil(1919810))
+		val lib = Lib(1919810)
 		val (works, output) = lib.loadVM("""a = { "Hello" }""")
 		assertEquals(listOf("a"), output.toList())
 		assertTrue(works)
@@ -33,7 +33,7 @@ class IntegrationTest {
 
 	@Test
 	fun `load Pest VM with multiple rules`() {
-		val lib = Lib(PestUtil(1919810))
+		val lib = Lib(1919810)
 		val (works, output) = lib.loadVM("""
 a = { "Hello" }
 b = { a }
@@ -44,7 +44,7 @@ b = { a }
 
 	@Test
 	fun `load Pest VM with invalid rule name`() {
-		val lib = Lib(PestUtil(1919810))
+		val lib = Lib(1919810)
 		val (parses, output) = lib.loadVM("""type = { "Hello" }""")
 		assertFalse(parses)
 		assertEquals(listOf("1^1^1^5^type is a rust keyword"), output.toList())
@@ -52,7 +52,7 @@ b = { a }
 
 	@Test
 	fun `load Pest VM with syntax error`() {
-		val lib = Lib(PestUtil(1919810))
+		val lib = Lib(1919810)
 		val (parses, output) = lib.loadVM("""bla = { "Hello }""")
 		assertFalse(parses)
 		assertEquals(listOf("""1^17^1^17^expected `\"`"""), output.toList())
@@ -60,7 +60,7 @@ b = { a }
 
 	@Test
 	fun `render simple code in Pest VM`() {
-		val lib = Lib(PestUtil(1919810))
+		val lib = Lib(1919810)
 		val (parses, output) = lib.loadVM("""bla = { "Dio" }""")
 		assertTrue(parses)
 		assertEquals(listOf("bla"), output.toList())
@@ -70,7 +70,7 @@ b = { a }
 
 	@Test
 	fun `render syntactically incorrect code in Pest VM`() {
-		val lib = Lib(PestUtil(1919810))
+		val lib = Lib(1919810)
 		val (parses, output) = lib.loadVM("""bla = { "Hello" }""")
 		assertTrue(parses)
 		assertEquals(listOf("bla"), output.toList())

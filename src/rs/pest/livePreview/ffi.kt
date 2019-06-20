@@ -19,6 +19,8 @@ data class CrateInfo(
 )
 
 class Lib(private var native: PestUtil) {
+	constructor(size: Int) : this(PestUtil(size))
+
 	/**
 	 * @return (true, rule names) or (false, error messages)
 	 */
@@ -35,7 +37,7 @@ class Lib(private var native: PestUtil) {
 			.map { it.removeSurrounding(delimiter = "\"") }
 	}
 
-	fun reboot(newMemory: ByteBuffer = native.memory.duplicate()) {
+	fun reboot(newMemory: ByteBuffer = ByteBuffer.allocate(native.memory.limit() * 3 / 2)) {
 		native = PestUtil(newMemory)
 	}
 

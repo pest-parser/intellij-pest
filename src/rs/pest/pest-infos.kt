@@ -14,7 +14,6 @@ import org.jetbrains.annotations.PropertyKey
 import rs.pest.livePreview.Lib
 import rs.pest.livePreview.LivePreviewFile
 import rs.pest.psi.impl.PestGrammarRuleMixin
-import rs.pest.vm.PestUtil
 import java.util.*
 
 object PestFileType : LanguageFileType(PestLanguage.INSTANCE) {
@@ -38,7 +37,7 @@ class PestFile(viewProvider: FileViewProvider) : PsiFileBase(viewProvider, PestL
 	var errors: Sequence<Pair<TextRange, String>> = emptySequence()
 	/** This information is from Pest VM. */
 	var availableRules: Sequence<String> = emptySequence()
-	val vm = Lib(PestUtil(1926417 + 1919810))
+	val vm = Lib(1926417 + 1919810)
 	fun rebootVM() = vm.reboot()
 	fun reloadVM(code: String = text) = vm.loadVM(code)
 	var isDocumentListenerAdded = false

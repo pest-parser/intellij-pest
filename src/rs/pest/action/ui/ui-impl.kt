@@ -13,7 +13,6 @@ import rs.pest.livePreview.Lib
 import rs.pest.psi.PestExpression
 import rs.pest.psi.PestGrammarRule
 import rs.pest.psi.startOffset
-import rs.pest.vm.PestUtil
 import javax.swing.ButtonGroup
 
 @Suppress("unused")
@@ -64,7 +63,7 @@ class PestIdeBridgeInfoImpl : PestIdeBridgeInfo() {
 	val component get() = mainPanel
 
 	companion object {
-		val info by lazy { Lib(PestUtil(114514 * 50)).crateInfo() }
+		val info by lazy { Lib(114514 * 50).crateInfo() }
 	}
 
 	init {

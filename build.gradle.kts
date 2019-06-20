@@ -170,6 +170,7 @@ val gcWasm = task/*<Exec>*/("gcWasm") {
 	outputs.file(wasmGcFile)
 	commandLine("wasm-gc", wasmFile.absolutePath, wasmGcFile.absolutePath)
 */
+	doFirst { wasmFile.copyTo(wasmGcFile, overwrite = true) }
 }
 
 val translateWasm = task<Exec>("translateWasm") {
