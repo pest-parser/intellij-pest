@@ -8,11 +8,9 @@ before_install:
   - rustup run nightly rustc --version --verbose
   - rustup run nightly cargo --version --verbose
 install:
-  - cd rust
-  - rustup run nightly cargo build --release
-  - cd ..
+  - rustup run nightly cargo install --git https://github.com/alexcrichton/wasm-gc
 script:
-  - bash gradlew displayCommitHash compileRust isCI test verifyPlugin --info --no-daemon
+  - bash gradlew displayCommitHash isCI test verifyPlugin --info --no-daemon
 cache:
   directories:
     - $HOME/.gradle/caches/

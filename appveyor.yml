@@ -13,11 +13,9 @@ install:
   - set PATH=%PATH%;%USERPROFILE%\.cargo\bin
   - rustc -vV
   - cargo -vV
+  - cargo install --git https://github.com/alexcrichton/wasm-gc
 
 build_script:
-  - cd rust
-  - cargo build --release
-  - cd ..
   - gradlew displayCommitHash buildPlugin --info
   - gradlew verifyPlugin --info
 #

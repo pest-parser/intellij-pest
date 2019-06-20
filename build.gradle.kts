@@ -32,8 +32,8 @@ version = pluginVersion
 
 plugins {
 	java
-	id("org.jetbrains.intellij") version "0.4.8"
-	id("org.jetbrains.grammarkit") version "2019.1"
+	id("org.jetbrains.intellij") version "0.4.9"
+	id("org.jetbrains.grammarkit") version "2019.2"
 	id("de.undercouch.download") version "3.4.3"
 	kotlin("jvm") version "1.3.30"
 }
@@ -48,7 +48,7 @@ fun fromToolbox(root: String, ide: String) = file(root)
 	.orEmpty()
 	.filterNotNull()
 	.filter { it.isDirectory }
-	.minBy {
+	.maxBy {
 		val (major, minor, patch) = it.name.split('.')
 		String.format("%5s%5s%5s", major, minor, patch)
 	}
@@ -71,9 +71,8 @@ intellij {
 		.mapNotNull { fromToolbox(root, it) }.firstOrNull()
 	pycharmPath?.absolutePath?.let { alternativeIdePath = it }
 
-	version = "2019.1"
 	if (!isCI) setPlugins("PsiViewer:192-SNAPSHOT")
-	setPlugins("org.rust.lang:0.2.98.2125-191")
+	setPlugins("org.rust.lang:0.2.98.2126-192", "java")
 }
 
 java {
@@ -142,15 +141,11 @@ val unzipAsmble = task<Copy>("unzipAsmble") {
 	into(buildDir)
 }
 
-val wasmFile by lazy {
-	rustTarget
-		.resolve("wasm32-unknown-unknown")
-		.resolve("release")
-		.listFiles { _, name -> name.endsWith(".wasm") }
-		.filterNotNull()
-		.also { if (it.size != 1) throw GradleException("Expected only one .wasm file, got: $it") }
-		.first()
-}
+val wasmFile = rustTarget
+	.resolve("wasm32-unknown-unknown")
+	.resolve("release")
+	.resolve("pest_ide.wasm")
+val wasmGcFile = wasmFile.resolveSibling("pest_ide_gc.wasm")
 
 val asmbleExe by lazy {
 	buildDir
@@ -159,36 +154,49 @@ val asmbleExe by lazy {
 		.resolve(if (System.getProperty("os.name").startsWith("Windows")) "asmble.bat" else "asmble")
 }
 
+val compileRust = task<Exec>("compileRust") {
+	val rustDir = projectDir.resolve("rust")
+	workingDir(rustDir)
+	inputs.dir(rustDir.resolve("src"))
+	outputs.dir(rustDir.resolve("target"))
+	commandLine("rustup", "run", "nightly", "cargo", "build", "--release")
+}
+
+val gcWasm = task/*<Exec>*/("gcWasm") {
+	dependsOn(compileRust)
+/* Asmble is broken for GCed wasm.
+	workingDir(projectDir)
+	inputs.file(wasmFile)
+	outputs.file(wasmGcFile)
+	commandLine("wasm-gc", wasmFile.absolutePath, wasmGcFile.absolutePath)
+*/
+}
+
 val translateWasm = task<Exec>("translateWasm") {
 	group = asmble
-	dependsOn(unzipAsmble)
-	workingDir(projectDir.absolutePath)
-	val path = wasmFile.also { inputs.file(it) }.absolutePath
+	dependsOn(unzipAsmble, gcWasm)
+	workingDir(projectDir)
+	val path = wasmGcFile.also { inputs.file(it) }.absolutePath
 	val outPath = "${path.dropLast(1)}t".also { outputs.file(it) }
 	commandLine(asmbleExe, "translate", path, outPath, "-out", "wast")
 	doFirst { println("Output file: $outPath") }
 }
 
-val compileRust = task<Exec>("compileRust") {
-	workingDir(projectDir.resolve("rust").absolutePath)
-	commandLine("rustup", "run", "nightly", "cargo", "build", "--release")
-}
-
 val compileWasm = task<Exec>("compileWasm") {
 	group = asmble
-	dependsOn(unzipAsmble)
+	dependsOn(unzipAsmble, gcWasm)
 	workingDir(projectDir.absolutePath)
-	val classQualifiedName = "rs.pest.vm.PestUtil"
-	val outFile = classQualifiedName
-		.split('.')
+	val classRelativePath = listOf("rs", "pest", "vm", "PestUtil.class")
+	val outFile = classRelativePath
 		.fold(rustTarget.resolve("java"), File::resolve)
 		.apply { parentFile.mkdirs() }
 		.also { outputs.file(it) }
-		.absolutePath + ".class"
-	val wasmFile = wasmFile.also { inputs.file(it) }.absolutePath
-	commandLine(asmbleExe, "compile", wasmFile, classQualifiedName, "-out", outFile)
+		.absolutePath
+	val wasmGcFile = wasmGcFile.also { inputs.file(it) }.absolutePath
+	val cls = classRelativePath.joinToString(separator = ".").removeSuffix(".class")
+	commandLine(asmbleExe, "compile", wasmGcFile, cls, "-out", outFile)
 	doFirst {
-		println("Input file: $wasmFile")
+		println("Input file: $wasmGcFile")
 		println("Output file: $outFile")
 	}
 }
