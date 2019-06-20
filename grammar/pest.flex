@@ -170,6 +170,7 @@ ASCII_ALPHA_UPPER { return ASCII_ALPHA_UPPER_TOKEN; }
 ASCII_ALPHA_LOWER { return ASCII_ALPHA_LOWER_TOKEN; }
 "_" { return SILENT_MODIFIER; }
 {IDENTIFIER} { return IDENTIFIER_TOKEN; }
+"//!"[^\r\n]* { return LINE_REGEX_COMMENT; }
 "///"[^\r\n]* { return LINE_DOC_COMMENT; }
 "//"[^\r\n]* { return LINE_COMMENT; }
 "=" { return ASSIGNMENT_OPERATOR; }

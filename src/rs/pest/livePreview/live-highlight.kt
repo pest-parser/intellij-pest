@@ -15,6 +15,9 @@ import com.intellij.ui.JBColor
 import com.intellij.ui.components.JBTextArea
 import org.intellij.lang.annotations.Language
 import rs.pest.PestBundle
+import rs.pest.psi.PestTokenType
+import rs.pest.psi.childrenWithLeaves
+import rs.pest.psi.elementType
 import java.awt.Color
 import javax.swing.JPanel
 
@@ -48,6 +51,21 @@ class LivePreviewAnnotator : Annotator {
 		val pestFile = element.pestFile ?: return
 		val ruleName = element.ruleName ?: return
 		val rules = pestFile.rules().map { it.name to it }.toMap()
+		val regexes = pestFile.childrenWithLeaves
+			.filter { it.elementType == PestTokenType.LINE_REGEX_COMMENT }
+			.mapNotNull {
+				val expr = it.text.removePrefix("//!")
+				val (color, regex) = expr.split(":", limit = 2)
+					.takeIf { it.size == 2 } ?: return@mapNotNull null
+				val c = rgbToAttributes(color) ?: return@mapNotNull null
+				val r = try {
+					Regex(regex.trim())
+				} catch (_: Exception) {
+					return@mapNotNull null
+				}
+				c to r
+			}
+			.toList()
 		if (rules.isEmpty()) return
 		if (pestFile.errors.any()) return
 		if (pestFile.availableRules.none()) return
@@ -93,9 +111,11 @@ class LivePreviewAnnotator : Annotator {
 				val psiRule = rules[rule] ?: return@forEach
 				val range = TextRange(start.toInt(), end.toInt())
 				val annotation = holder.createInfoAnnotation(range, rule)
-				psiRule.docComment?.let(::textAttrFromDoc)?.let { attr ->
-					annotation.enforcedTextAttributes = attr
-				}
+				val attributes = psiRule.docComment?.let(::textAttrFromDoc)
+					?: regexes.asSequence().firstOrNull { (_, regex) ->
+						regex.matchEntire(psiRule.name) != null
+					}?.first ?: return@forEach
+				annotation.enforcedTextAttributes = attributes
 			}
 		}
 	}

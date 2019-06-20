@@ -19,7 +19,7 @@ import com.intellij.usageView.UsageViewDescriptor
 import com.intellij.usageView.UsageViewNodeTextLocation
 import rs.pest.PestBundle
 import rs.pest.PestLanguage
-import rs.pest.psi.PestTokenType
+import rs.pest.psi.*
 import rs.pest.psi.impl.PestGrammarRuleMixin
 import rs.pest.psi.impl.bodyText
 
