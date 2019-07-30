@@ -33,6 +33,7 @@
 		<lang.psiStructureViewFactory language="Pest" implementationClass="rs.pest.editing.PestStructureViewFactory"/>
 		<spellchecker.support language="Pest" implementationClass="rs.pest.editing.PestSpellCheckingStrategy"/>
 		<completion.contributor language="Pest" implementationClass="rs.pest.editing.PestBuiltinCompletionContributor"/>
+		<lang.formatter language="Pest" implementationClass="rs.pest.format.PestFormattingModelBuilder"/>
 
 		<lang.parserDefinition language="PEST_LP" implementationClass="rs.pest.livePreview.LivePreviewParserDefinition"/>
 		<annotator language="PEST_LP" implementationClass="rs.pest.livePreview.LivePreviewAnnotator"/>
@@ -43,14 +44,14 @@
 			language="Pest"
 			level="ERROR"
 			displayName="Errors from Pest VM"
-			groupName="Pest Grammar"
+			groupName="Pest grammar"
 			enabledByDefault="true"
 			implementationClass="rs.pest.editing.PestVmInspection"/>
 		<localInspection
 			language="Pest"
 			level="ERROR"
 			displayName="Duplicate rules"
-			groupName="Pest Grammar"
+			groupName="Pest grammar"
 			enabledByDefault="true"
 			implementationClass="rs.pest.editing.DuplicateRuleInspection"/>
 		<codeInsight.lineMarkerProvider

@@ -1,5 +1,6 @@
 package rs.pest.psi
 
+import com.intellij.lang.ASTNode
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
@@ -8,6 +9,9 @@ import com.intellij.psi.tree.IElementType
 
 val PsiElement.childrenWithLeaves: Sequence<PsiElement>
 	get() = generateSequence(this.firstChild) { it.nextSibling }
+
+val ASTNode.childrenWithLeaves: Sequence<ASTNode>
+	get() = generateSequence(this.firstChildNode) { it.treeNext }
 
 val PsiElement.startOffset: Int
 	get() = textRange.startOffset
