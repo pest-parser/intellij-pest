@@ -50,7 +50,7 @@ HEXDIGIT=[a-fA-F0-9]
 	}
 	[^/\*]+ { }
 	\/[^\*]+ { }
-	\*[^\/]+ { }
+	\*[^\/\*]+ { }
 }
 
 "/*" { yybegin(INSIDE_COMMENT); commentDepth = 1; commentStart = getTokenStart(); }
