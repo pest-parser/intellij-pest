@@ -21,7 +21,7 @@ val commitHash = kotlin.run {
 	output.trim()
 }
 
-val pluginComingVersion = "0.2.6"
+val pluginComingVersion = "0.2.7"
 val pluginVersion = if (isCI) "$pluginComingVersion-$commitHash" else pluginComingVersion
 val packageName = "rs.pest"
 val asmble = "asmble"
@@ -32,10 +32,10 @@ version = pluginVersion
 
 plugins {
 	java
-	id("org.jetbrains.intellij") version "0.4.9"
+	id("org.jetbrains.intellij") version "0.4.10"
 	id("org.jetbrains.grammarkit") version "2019.2"
 	id("de.undercouch.download") version "3.4.3"
-	kotlin("jvm") version "1.3.30"
+	kotlin("jvm") version "1.3.50"
 }
 
 allprojects { apply { plugin("org.jetbrains.grammarkit") } }
@@ -72,7 +72,7 @@ intellij {
 	pycharmPath?.absolutePath?.let { alternativeIdePath = it }
 
 	if (!isCI) setPlugins("PsiViewer:192-SNAPSHOT")
-	setPlugins("org.rust.lang:0.2.98.2126-192", "java")
+	setPlugins("org.rust.lang:0.2.105.2133-192", "java")
 }
 
 java {
@@ -209,7 +209,7 @@ val genParser = task<GenerateParser>("genParser") {
 	description = "Generate the Parser and PsiElement classes"
 	source = "grammar/pest.bnf"
 	targetRoot = "gen/"
-	val parserRoot = Paths.get("rs", "pest")!!
+	val parserRoot = Paths.get("rs", "pest")
 	pathToParser = path(parserRoot + "PestParser.java")
 	pathToPsiRoot = path(parserRoot + "psi")
 	purgeOldFiles = true
