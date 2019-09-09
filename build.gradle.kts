@@ -129,7 +129,7 @@ task("isCI") {
 
 val downloadAsmble = task<Download>("downloadAsmble") {
 	group = asmble
-	src("https://github.com/cretz/asmble/releases/download/0.4.0/asmble-0.4.0.zip")
+	src("https://github.com/pest-parser/intellij-pest/files/3592625/asmble.zip")
 	dest(buildDir.absolutePath)
 	overwrite(false)
 }
@@ -137,7 +137,7 @@ val downloadAsmble = task<Download>("downloadAsmble") {
 val unzipAsmble = task<Copy>("unzipAsmble") {
 	group = asmble
 	dependsOn(downloadAsmble)
-	from(zipTree(buildDir.resolve("asmble-0.4.0.zip")))
+	from(zipTree(buildDir.resolve("asmble.zip")))
 	into(buildDir)
 }
 
