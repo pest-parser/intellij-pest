@@ -33,7 +33,7 @@
 		<lang.psiStructureViewFactory language="Pest" implementationClass="rs.pest.editing.PestStructureViewFactory"/>
 		<spellchecker.support language="Pest" implementationClass="rs.pest.editing.PestSpellCheckingStrategy"/>
 		<completion.contributor language="Pest" implementationClass="rs.pest.editing.PestBuiltinCompletionContributor"/>
-		<lang.formatter language="Pest" implementationClass="rs.pest.format.PestFormattingModelBuilder"/>
+		<!--<lang.formatter language="Pest" implementationClass="rs.pest.format.PestFormattingModelBuilder"/>-->
 
 		<lang.parserDefinition language="PEST_LP" implementationClass="rs.pest.livePreview.LivePreviewParserDefinition"/>
 		<annotator language="PEST_LP" implementationClass="rs.pest.livePreview.LivePreviewAnnotator"/>
@@ -79,7 +79,7 @@
 		<group
 			id="Pest.ToolsMenu"
 			text="Pest"
-			description="Pest Tools"
+			description="Pest tools"
 			icon="PestIcons.PEST"
 			popup="true">
 			<action
