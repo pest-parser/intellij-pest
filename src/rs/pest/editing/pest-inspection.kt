@@ -22,8 +22,8 @@ class DuplicateRuleInspection : LocalInspectionTool() {
 	override fun checkFile(file: PsiFile, manager: InspectionManager, isOnTheFly: Boolean): Array<ProblemDescriptor> {
 		if (file !is PestFile) return emptyArray()
 		val problemsHolder = ProblemsHolder(manager, file, isOnTheFly)
-		val ruleSet = ContainerUtil.newHashMap<String, PestGrammarRuleMixin>()
-		val problematicRules = ContainerUtil.newLinkedHashSet<PestGrammarRuleMixin>()
+		val ruleSet = hashMapOf<String, PestGrammarRuleMixin>()
+		val problematicRules = hashSetOf<PestGrammarRuleMixin>()
 		file.rules().forEach {
 			val name = it.name
 			val tried = ruleSet[name]
@@ -59,12 +59,16 @@ fun reloadVM(dom: Document, element: PestFile) {
 		availableRules = messages
 		livePreviewFile().forEach(DaemonCodeAnalyzer.getInstance(element.project)::restart)
 	} else with(element) {
-		errors = messages.mapNotNull { errorMsgRegex.matchEntire(it)?.groupValues }.map {
+		errors = messages.mapNotNull { errorMsgRegex.matchEntire(it)?.groupValues }.mapNotNull {
 			val startLine = it[1].toInt() - 1
 			val startCol = it[2].toInt() - 1
 			val endLine = it[3].toInt() - 1
 			val endCol = it[4].toInt() - 1
-			val range = TextRange(dom.getLineStartOffset(startLine) + startCol, dom.getLineStartOffset(endLine) + endCol)
+			val range = try {
+				TextRange(dom.getLineStartOffset(startLine) + startCol, dom.getLineStartOffset(endLine) + endCol)
+			} catch (e: IndexOutOfBoundsException) {
+				return@mapNotNull null
+			}
 			Pair(range, it[5])
 		}
 		availableRules = emptySequence()
