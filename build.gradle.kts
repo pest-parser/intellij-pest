@@ -40,6 +40,10 @@ plugins {
 
 allprojects { apply { plugin("org.jetbrains.grammarkit") } }
 
+grammarKit {
+	grammarKitRelease = "07f30a1e7666f36ae780f614b6bbc89690ba36c3"
+}
+
 fun fromToolbox(root: String, ide: String) = file(root)
 	.resolve(ide)
 	.takeIf { it.exists() }
@@ -48,6 +52,7 @@ fun fromToolbox(root: String, ide: String) = file(root)
 	.orEmpty()
 	.filterNotNull()
 	.filter { it.isDirectory }
+	.filterNot { it.name.endsWith(".plugins") }
 	.maxBy {
 		val (major, minor, patch) = it.name.split('.')
 		String.format("%5s%5s%5s", major, minor, patch)
@@ -71,7 +76,7 @@ intellij {
 		.mapNotNull { fromToolbox(root, it) }.firstOrNull()
 	pycharmPath?.absolutePath?.let { alternativeIdePath = it }
 
-	if (!isCI) setPlugins("PsiViewer:192-SNAPSHOT")
+	if (!isCI) setPlugins("PsiViewer:193-SNAPSHOT")
 	setPlugins("org.rust.lang:0.2.105.2133-192", "java")
 }
 

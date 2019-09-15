@@ -183,7 +183,7 @@ object PestHighlighter : SyntaxHighlighter {
 		PestTypes.STRING_TOKEN -> STRING_KEY
 		PestTypes.CHAR_TOKEN -> CHAR_KEY
 		PestTokenType.LINE_COMMENT -> COMMENT_KEY
-		PestTokenType.LINE_DOC_COMMENT -> DOC_COMMENT_KEY
+		PestTokenType.LINE_DOC_COMMENT, PestTokenType.LINE_REGEX_COMMENT -> DOC_COMMENT_KEY
 		PestTokenType.BLOCK_COMMENT -> BLOCK_COMMENT_KEY
 		PestTypes.NUMBER,
 		PestTypes.MINUS -> NUMBER_KEY
