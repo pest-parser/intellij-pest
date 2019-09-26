@@ -33,9 +33,9 @@ private fun toHtml(file: LivePreviewFile, html: Appendable, indicator: ProgressI
 			val chars = file.textToCharArray()
 			val highlights = arrayOfNulls<Pair<Color?, String>>(chars.size)
 			highlight(file, { range, err ->
-				for (i in range.startOffset..range.endOffset) highlights[i] = null to err.orEmpty()
+				for (i in range.startOffset until range.endOffset) highlights[i] = null to err.orEmpty()
 			}) { range, info, attributes ->
-				for (i in range.startOffset..range.endOffset)
+				for (i in range.startOffset until range.endOffset)
 					highlights[i] = attributes.foregroundColor to info
 			}
 			indicator.text = "Writing html"
