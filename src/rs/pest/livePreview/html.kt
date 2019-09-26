@@ -15,6 +15,7 @@ fun defaultPreviewToHtml(file: LivePreviewFile, indicator: ProgressIndicator) {
 	val fileName = "${file.pestFile?.name}-${file.ruleName}.html"
 	val folder = file.pestFile?.virtualFile?.parent ?: file.project.guessProjectDir() ?: return
 	val ioFile = File("${folder.canonicalPath}").resolve(fileName)
+	ioFile.deleteOnExit()
 	ioFile.writer().use {
 		toHtml(file, it, indicator)
 		it.flush()
@@ -59,7 +60,10 @@ private fun PRE.render(highlights: Array<Pair<Color?, String>?>, chars: CharArra
 }
 
 private class FONT(consumer: TagConsumer<*>, color: Color) : HTMLTag("font",
-	consumer, mapOf("color" to "#${color.rgb}"), inlineTag = true, emptyTag = false
+	consumer,
+	mapOf("color" to "#${Integer.toHexString(color.rgb).drop(2)}"),
+	inlineTag = true,
+	emptyTag = false
 ), HtmlInlineTag
 
 private fun PRE.font(color: Color, block: FONT.() -> Unit = {}) {
