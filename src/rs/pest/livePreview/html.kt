@@ -52,9 +52,14 @@ private fun PRE.render(highlights: Array<Pair<Color?, String>?>, chars: CharArra
 		if (highlight == null) +chars[i].toString()
 		else {
 			val color = highlight.first
-			if (color == null) {
-				TODO("highlight parse failures")
-			} else font(color) { +chars[i].toString() }
+			if (color == null) a {
+				attributes["title"] = highlight.second
+				attributes["style"] = "text-decoration: underline; text-decoration-color: red"
+				+chars[i].toString()
+			} else font(color) {
+				attributes["title"] = highlight.second
+				+chars[i].toString()
+			}
 		}
 	}
 }
