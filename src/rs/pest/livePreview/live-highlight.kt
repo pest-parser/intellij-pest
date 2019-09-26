@@ -35,88 +35,103 @@ fun textAttrFromDoc(docComment: PsiComment) =
 	docComment.text.removePrefix("///").trim().let(::rgbToAttributes)
 
 @Language("RegExp")
-private val lexicalRegex = Regex("\\A(\\d+)\\^(\\d+)\\^(.*)$")
+@JvmField
+val lexicalRegex = Regex("\\A(\\d+)\\^(\\d+)\\^(.*)$")
 
 @Language("RegExp")
-private val errLineRegex = Regex("\\A\\s+-->\\s+(\\d+):(\\d+)$")
+@JvmField
+val errLineRegex = Regex("\\A\\s+-->\\s+(\\d+):(\\d+)$")
 
 @Language("RegExp")
-private val errInfoRegex = Regex("\\A\\s+=\\s+(\\p{all}*)$")
+@JvmField
+val errInfoRegex = Regex("\\A\\s+=\\s+(\\p{all}*)$")
 
 class LivePreviewAnnotator : Annotator {
 	override fun annotate(element: PsiElement, holder: AnnotationHolder) {
 		if (element !is LivePreviewFile) return
-		val project = element.project
-		val dom = PsiDocumentManager.getInstance(project).getDocument(element) ?: return
-		val pestFile = element.pestFile ?: return
-		val ruleName = element.ruleName ?: return
-		val rules = pestFile.rules().map { it.name to it }.toMap()
-		val regexes = pestFile.childrenWithLeaves
-			.filter { it.elementType == PestTokenType.LINE_REGEX_COMMENT }
-			.mapNotNull {
-				val expr = it.text.removePrefix("//!")
-				val (color, regex) = expr.split(":", limit = 2)
-					.takeIf { it.size == 2 } ?: return@mapNotNull null
-				val c = rgbToAttributes(color) ?: return@mapNotNull null
-				val r = try {
-					Regex(regex.trim())
-				} catch (_: Exception) {
-					return@mapNotNull null
-				}
-				c to r
+		highlight(element, holder::createErrorAnnotation) { range, rule, attributes ->
+			holder.createInfoAnnotation(range, rule)
+				.enforcedTextAttributes = attributes
+		}
+	}
+}
+
+inline fun highlight(
+	element: LivePreviewFile,
+	err: (TextRange, String?) -> Any,
+	okk: (TextRange, String, TextAttributes) -> Unit
+) {
+	val project = element.project
+	val dom = PsiDocumentManager.getInstance(project).getDocument(element)
+		?: return
+	val pestFile = element.pestFile ?: return
+	val ruleName = element.ruleName ?: return
+	val rules = pestFile.rules().map { it.name to it }.toMap()
+	val regexes = pestFile.childrenWithLeaves
+		.filter { it.elementType == PestTokenType.LINE_REGEX_COMMENT }
+		.mapNotNull {
+			val expr = it.text.removePrefix("//!")
+			val (color, regex) = expr.split(":", limit = 2)
+				.takeIf { it.size == 2 } ?: return@mapNotNull null
+			val c = rgbToAttributes(color) ?: return@mapNotNull null
+			val r = try {
+				Regex(regex.trim())
+			} catch (_: Exception) {
+				return@mapNotNull null
 			}
-			.toList()
-		if (rules.isEmpty()) return
-		if (pestFile.errors.any()) return
-		if (pestFile.availableRules.none()) return
-		val vm = pestFile.vm
-		when (val res = try {
-			vm.renderCode(ruleName, element.text)
-		} catch (e: Exception) {
-			vm.reboot()
-			vm.loadVM(pestFile.text)
-			vm.renderCode(ruleName, element.text)
-		}) {
-			is Rendering.Err -> run {
-				val errorLines = res.msg.lines()
-				val firstLine = errorLines.firstOrNull() ?: return@run null
-				val lastLine = errorLines.lastOrNull() ?: return@run null
-				val length = dom.textLength
-				if (length == 0) return@run null
-				val (_, lineS, colS) = errLineRegex.matchEntire(firstLine)?.groupValues ?: return@run null
-				val line = lineS.toIntOrNull() ?: return@run null
-				val col = colS.toIntOrNull() ?: return@run null
-				val lineStart = dom.getLineStartOffset(line - 1)
-				val offset = lineStart + col - 1
-				val range = if (offset >= dom.textLength) TextRange(length - 1, length)
-				else TextRange(offset, offset + 1)
-				val errorMsg = errInfoRegex.matchEntire(lastLine)?.run { groupValues[1] }
-				holder.createErrorAnnotation(range, errorMsg)
-			} ?: ApplicationManager.getApplication().invokeLater {
-				val panel = JPanel().apply { add(JBTextArea().apply { text = res.msg }) }
-				val editor = EditorFactory.getInstance()
-					.getEditors(dom, project)
-					.firstOrNull()
-					?: return@invokeLater
-				val factory = JBPopupFactory.getInstance()
-				factory
-					.createBalloonBuilder(panel)
-					.setTitle(PestBundle.message("pest.annotator.live-preview.error.title"))
-					.setFillColor(JBColor.RED)
-					.createBalloon()
-					.show(factory.guessBestPopupLocation(editor), Balloon.Position.below)
-			}
-			is Rendering.Ok -> res.lexical.mapNotNull(lexicalRegex::matchEntire).forEach {
-				val (_, start, end, rule) = it.groupValues
-				val psiRule = rules[rule] ?: return@forEach
-				val range = TextRange(start.toInt(), end.toInt())
-				val annotation = holder.createInfoAnnotation(range, rule)
-				val attributes = psiRule.docComment?.let(::textAttrFromDoc)
-					?: regexes.asSequence().firstOrNull { (_, regex) ->
-						regex.matchEntire(psiRule.name) != null
-					}?.first ?: return@forEach
-				annotation.enforcedTextAttributes = attributes
-			}
+			c to r
+		}
+		.toList()
+	if (rules.isEmpty()) return
+	if (pestFile.errors.any()) return
+	if (pestFile.availableRules.none()) return
+	val vm = pestFile.vm
+	when (val res = try {
+		vm.renderCode(ruleName, element.text)
+	} catch (e: Exception) {
+		vm.reboot()
+		vm.loadVM(pestFile.text)
+		vm.renderCode(ruleName, element.text)
+	}) {
+		is Rendering.Err -> run {
+			val errorLines = res.msg.lines()
+			val firstLine = errorLines.firstOrNull() ?: return@run null
+			val lastLine = errorLines.lastOrNull() ?: return@run null
+			val length = dom.textLength
+			if (length == 0) return@run null
+			val (_, lineS, colS) = errLineRegex.matchEntire(firstLine)?.groupValues
+				?: return@run null
+			val line = lineS.toIntOrNull() ?: return@run null
+			val col = colS.toIntOrNull() ?: return@run null
+			val lineStart = dom.getLineStartOffset(line - 1)
+			val offset = lineStart + col - 1
+			val range = if (offset >= dom.textLength) TextRange(length - 1, length)
+			else TextRange(offset, offset + 1)
+			val errorMsg = errInfoRegex.matchEntire(lastLine)?.run { groupValues[1] }
+			err(range, errorMsg)
+		} ?: ApplicationManager.getApplication().invokeLater {
+			val panel = JPanel().apply { add(JBTextArea().apply { text = res.msg }) }
+			val editor = EditorFactory.getInstance()
+				.getEditors(dom, project)
+				.firstOrNull()
+				?: return@invokeLater
+			val factory = JBPopupFactory.getInstance()
+			factory
+				.createBalloonBuilder(panel)
+				.setTitle(PestBundle.message("pest.annotator.live-preview.error.title"))
+				.setFillColor(JBColor.RED)
+				.createBalloon()
+				.show(factory.guessBestPopupLocation(editor), Balloon.Position.below)
+		}
+		is Rendering.Ok -> res.lexical.mapNotNull(lexicalRegex::matchEntire).forEach {
+			val (_, start, end, rule) = it.groupValues
+			val psiRule = rules[rule] ?: return@forEach
+			val attributes = psiRule.docComment?.let(::textAttrFromDoc)
+				?: regexes.asSequence().firstOrNull { (_, regex) ->
+					regex.matchEntire(psiRule.name) != null
+				}?.first ?: return@forEach
+			val range = TextRange(start.toInt(), end.toInt())
+			okk(range, rule, attributes)
 		}
 	}
 }

@@ -57,8 +57,8 @@ class PestLivePreviewAction : AnAction() {
 			ruleCombo.selectedIndex = 0
 			okButton.addActionListener {
 				balloon.hide(true)
-				val selected = ruleCombo.selectedItem.toString()
-				livePreview(file, selected)
+				val selectedItem: Any? = ruleCombo.selectedItem
+				livePreview(file, selectedItem.toString())
 			}
 		}
 		balloon = JBPopupFactory.getInstance()
