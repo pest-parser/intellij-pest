@@ -34,7 +34,7 @@ plugins {
 	java
 	id("org.jetbrains.intellij") version "0.4.10"
 	id("org.jetbrains.grammarkit") version "2019.2"
-	id("de.undercouch.download") version "3.4.3"
+	id("de.undercouch.download") version "4.0.0"
 	kotlin("jvm") version "1.3.50"
 }
 
@@ -114,6 +114,9 @@ dependencies {
 	compile(kotlin("stdlib-jdk8"))
 	compile("org.eclipse.mylyn.github", "org.eclipse.egit.github.core", "2.1.5") {
 		exclude(module = "gson")
+	}
+	compile("org.jetbrains.kotlinx", "kotlinx-html-jvm", "0.6.12") {
+		exclude(module = "kotlin-stdlib")
 	}
 	compile(files("$projectDir/rust/target/java"))
 	testCompile(kotlin("test-junit"))
