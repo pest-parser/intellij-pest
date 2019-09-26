@@ -49,7 +49,9 @@ val errInfoRegex = Regex("\\A\\s+=\\s+(\\p{all}*)$")
 class LivePreviewAnnotator : Annotator {
 	override fun annotate(element: PsiElement, holder: AnnotationHolder) {
 		if (element !is LivePreviewFile) return
-		highlight(element, holder::createErrorAnnotation) { range, rule, attributes ->
+		highlight(element, { range, info ->
+			holder.createErrorAnnotation(range, info)
+		}) { range, rule, attributes ->
 			holder.createInfoAnnotation(range, rule)
 				.enforcedTextAttributes = attributes
 		}
@@ -58,7 +60,7 @@ class LivePreviewAnnotator : Annotator {
 
 inline fun highlight(
 	element: LivePreviewFile,
-	err: (TextRange, String?) -> Any,
+	err: (TextRange, String?) -> Unit,
 	okk: (TextRange, String, TextAttributes) -> Unit
 ) {
 	val project = element.project

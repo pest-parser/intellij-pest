@@ -108,7 +108,10 @@ sourceSets {
 	}
 }
 
-repositories { mavenCentral() }
+repositories {
+	mavenCentral()
+	jcenter()
+}
 
 dependencies {
 	compile(kotlin("stdlib-jdk8"))
