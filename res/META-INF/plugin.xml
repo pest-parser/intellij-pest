@@ -96,6 +96,14 @@
 				<add-to-group group-id="EditorPopupMenu" anchor="last"/>
 				<add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
 			</action>
+			<action
+				id="Pest.Tools.LivePreviewToHtml"
+				class="rs.pest.action.PestLivePreviewToHtmlAction"
+				text="Live Preview to Html"
+				icon="PestIcons.PEST">
+				<add-to-group group-id="EditorPopupMenu" anchor="last"/>
+				<add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+			</action>
 			<add-to-group group-id="ToolsMenu" anchor="before" relative-to-action="ExternalToolsGroup"/>
 		</group>
 	</actions>
