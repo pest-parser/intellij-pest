@@ -4,6 +4,7 @@ import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressIndicatorProvider
+import com.intellij.openapi.project.guessProjectDir
 import com.intellij.openapi.vfs.VfsUtil
 import kotlinx.html.*
 import kotlinx.html.stream.appendHTML
@@ -12,7 +13,8 @@ import java.io.File
 
 fun defaultPreviewToHtml(file: LivePreviewFile, indicator: ProgressIndicator) {
 	val fileName = "${file.pestFile?.name}-${file.ruleName}.html"
-	val ioFile = File(fileName)
+	val folder = file.pestFile?.virtualFile?.parent ?: file.project.guessProjectDir() ?: return
+	val ioFile = File("${folder.canonicalPath}").resolve(fileName)
 	ioFile.writer().use {
 		toHtml(file, it, indicator)
 		it.flush()
@@ -26,17 +28,19 @@ private fun toHtml(file: LivePreviewFile, html: Appendable, indicator: ProgressI
 	html.appendHTML().html {
 		head { charset("UTF-8") }
 		comment("Generated with love by IntelliJ-Pest")
-		val chars = file.textToCharArray()
-		val highlights = arrayOfNulls<Pair<Color?, String>>(chars.size)
-		highlight(file, { range, err ->
-			for (i in range.startOffset..range.endOffset) highlights[i] = null to err.orEmpty()
-		}) { range, info, attributes ->
-			for (i in range.startOffset..range.endOffset)
-				highlights[i] = attributes.foregroundColor to info
+		ReadAction.run<ProcessCanceledException> {
+			val chars = file.textToCharArray()
+			val highlights = arrayOfNulls<Pair<Color?, String>>(chars.size)
+			highlight(file, { range, err ->
+				for (i in range.startOffset..range.endOffset) highlights[i] = null to err.orEmpty()
+			}) { range, info, attributes ->
+				for (i in range.startOffset..range.endOffset)
+					highlights[i] = attributes.foregroundColor to info
+			}
+			indicator.text = "Writing html"
+			indicator.fraction = 0.2
+			body { pre { render(highlights, chars, indicator) } }
 		}
-		indicator.text = "Writing html"
-		indicator.fraction = 0.2
-		body { pre { ReadAction.run<ProcessCanceledException> { render(highlights, chars, indicator) } } }
 	}
 }
 
