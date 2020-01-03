@@ -92,7 +92,7 @@ private repeat_min     ::= OPENING_BRACE NUMBER COMMA CLOSING_BRACE
 private repeat_max     ::= OPENING_BRACE COMMA NUMBER CLOSING_BRACE
 private repeat_min_max ::= OPENING_BRACE NUMBER COMMA NUMBER CLOSING_BRACE
 
-integer    ::= MINUS? NUMBER { pin=1 }
+integer    ::= MINUS? NUMBER
 identifier ::= IDENTIFIER_TOKEN {
 	mixin="rs.pest.psi.impl.PestIdentifierMixin"
 	extends=expression
