@@ -21,7 +21,7 @@ val commitHash = kotlin.run {
 	output.trim()
 }
 
-val pluginComingVersion = "0.3.0"
+val pluginComingVersion = "0.3.1"
 val pluginVersion = if (isCI) "$pluginComingVersion-$commitHash" else pluginComingVersion
 val packageName = "rs.pest"
 val asmble = "asmble"
@@ -32,17 +32,13 @@ version = pluginVersion
 
 plugins {
 	java
-	id("org.jetbrains.intellij") version "0.4.10"
-	id("org.jetbrains.grammarkit") version "2019.2"
-	id("de.undercouch.download") version "4.0.0"
-	kotlin("jvm") version "1.3.50"
+	id("org.jetbrains.intellij") version "0.4.18"
+	id("org.jetbrains.grammarkit") version "2020.1.2"
+	id("de.undercouch.download") version "4.0.4"
+	kotlin("jvm") version "1.3.72"
 }
 
 allprojects { apply { plugin("org.jetbrains.grammarkit") } }
-
-grammarKit {
-	grammarKitRelease = "07f30a1e7666f36ae780f614b6bbc89690ba36c3"
-}
 
 fun fromToolbox(root: String, ide: String) = file(root)
 	.resolve(ide)
@@ -69,20 +65,21 @@ intellij {
 		os == "Linux" -> "/home/$user/.local/share/JetBrains/Toolbox/apps"
 		else -> return@intellij
 	}
-	val intellijPath = sequenceOf("IDEA-C-JDK11", "IDEA-C", "IDEA-JDK11", "IDEA-U")
+	val intellijPath = sequenceOf("IDEA-C", "IDEA-U")
 		.mapNotNull { fromToolbox(root, it) }.firstOrNull()
 	intellijPath?.absolutePath?.let { localPath = it }
-	val pycharmPath = sequenceOf("PyCharm-C", "IDEA-C-JDK11", "IDEA-C", "IDEA-JDK11", "IDEA-U")
+	val pycharmPath = sequenceOf("IDEA-C", "PyCharm-C", "IDEA-U")
 		.mapNotNull { fromToolbox(root, it) }.firstOrNull()
 	pycharmPath?.absolutePath?.let { alternativeIdePath = it }
 
-	if (!isCI) setPlugins("PsiViewer:193-SNAPSHOT")
-	setPlugins("org.rust.lang:0.2.105.2133-192", "java")
+	if (!isCI) setPlugins("PsiViewer:201.6251.22-EAP-SNAPSHOT.3")
+	else version = "2020.1"
+	setPlugins("org.rust.lang:0.2.120.2202-201", "org.toml.lang:0.2.120.37-193", "java")
 }
 
 java {
-	sourceCompatibility = JavaVersion.VERSION_1_8
-	targetCompatibility = JavaVersion.VERSION_1_8
+	sourceCompatibility = JavaVersion.VERSION_11
+	targetCompatibility = JavaVersion.VERSION_11
 }
 
 tasks.withType<PatchPluginXmlTask> {
@@ -118,7 +115,7 @@ dependencies {
 	compile("org.eclipse.mylyn.github", "org.eclipse.egit.github.core", "2.1.5") {
 		exclude(module = "gson")
 	}
-	compile("org.jetbrains.kotlinx", "kotlinx-html-jvm", "0.6.12") {
+	compile("org.jetbrains.kotlinx", "kotlinx-html-jvm", "0.7.1") {
 		exclude(module = "kotlin-stdlib")
 	}
 	compile(files("$projectDir/rust/target/java"))
