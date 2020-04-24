@@ -63,7 +63,7 @@ class PestIntroduceRuleActionHandler : RefactoringActionHandler {
 			return
 		}
 		if (!selectionModel.hasSelection()) {
-			val expressions = ContainerUtil.newArrayList<PestExpression>()
+			val expressions = ArrayList<PestExpression>()
 			while (parentExpression != null) {
 				expressions.add(parentExpression)
 				parentExpression = PsiTreeUtil.getParentOfType<PestExpression>(parentExpression, PestExpression::class.java)
@@ -95,7 +95,7 @@ class PestIntroduceRuleActionHandler : RefactoringActionHandler {
 
 	private fun findSelectedExpressionsInRange(parentExpression: PestExpression, range: TextRange): List<PestExpression> {
 		if (parentExpression.textRange == range) return listOf(parentExpression)
-		val list = ContainerUtil.newArrayList<PestExpression>()
+		val list = ArrayList<PestExpression>()
 		var c: PsiElement? = parentExpression.firstChild
 		while (c != null) {
 			if (c is PsiWhiteSpace) {

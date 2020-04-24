@@ -42,15 +42,20 @@ HEXDIGIT=[a-fA-F0-9]
 
 <INSIDE_COMMENT> {
 	"/*" { ++commentDepth; }
-	"*/" { if (--commentDepth <= 0) {yybegin(YYINITIAL); zzStartRead = commentStart; return BLOCK_COMMENT;} }
+	\*+\/ {
+		if (--commentDepth <= 0) {
+			yybegin(YYINITIAL);
+			zzStartRead = commentStart;
+			return BLOCK_COMMENT;
+		}
+	}
 	<<EOF>> {
 		yybegin(YYINITIAL);
 		zzStartRead = commentStart;
 		return BLOCK_COMMENT;
 	}
-	[^/\*]+ { }
-	\/[^\*]+ { }
-	\*[^\/\*]+ { }
+	\**[^/*]+ { }
+	\/+[^/*]+ { }
 }
 
 "/*" { yybegin(INSIDE_COMMENT); commentDepth = 1; commentStart = getTokenStart(); }

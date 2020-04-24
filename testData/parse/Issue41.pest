@@ -1,0 +1,18 @@
+/*
+
+Concat        : '~~';
+Destruct      : '~=';
+
+/* |&! */
+
+DoubleBang : '!!';
+BitNot     : '!' | '\uFF01'; //U+FF01 ！
+
+/* $ @ */
+Curry     : '@@@';
+Apply     : '@@';
+LetAssign : '@=';
+
+*/
+
+rule = { "114514" }

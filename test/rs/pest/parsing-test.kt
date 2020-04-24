@@ -11,6 +11,7 @@ class ParsingTest : ParsingTestCase("parse", "pest", PestParserDefinition()) {
 	fun testBuiltins() = doTest(true)
 	fun testParen() = doTest(true)
 	fun testIssue25() = doTest(true)
+	fun testIssue41() = doTest(true)
 }
 
 /// To inspect Rust plugin's parsed output.
