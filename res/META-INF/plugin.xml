@@ -10,11 +10,11 @@
 		<additionalTextAttributes scheme="Default" file="/colorSchemes/Pest.xml"/>
 		<additionalTextAttributes scheme="Darcula" file="/colorSchemes/Pest_dark.xml"/>
 
-		<fileTypeFactory implementation="rs.pest.PestFileTypeFactory"/>
+		<fileType name="Pest" language="Pest" fieldName="INSTANCE" implementationClass="rs.pest.PestFileType" extensions="pest"/>
 		<errorHandler implementation="rs.pest.error.GitHubErrorReporter"/>
 		<liveTemplateContext implementation="rs.pest.editing.PestDefaultContext"/>
 		<liveTemplateContext implementation="rs.pest.editing.PestLocalContext"/>
-		<defaultLiveTemplatesProvider implementation="rs.pest.editing.PestLiveTemplateProvider"/>
+		<defaultLiveTemplates file="/liveTemplates/Pest.xml"/>
 		<inlineActionHandler implementation="rs.pest.action.PestInlineRuleActionHandler"/>
 
 		<lang.parserDefinition language="Pest" implementationClass="rs.pest.PestParserDefinition"/>

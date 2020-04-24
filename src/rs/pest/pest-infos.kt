@@ -2,8 +2,6 @@ package rs.pest
 
 import com.intellij.AbstractBundle
 import com.intellij.extapi.psi.PsiFileBase
-import com.intellij.openapi.fileTypes.FileTypeConsumer
-import com.intellij.openapi.fileTypes.FileTypeFactory
 import com.intellij.openapi.fileTypes.LanguageFileType
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.FileViewProvider
@@ -44,12 +42,6 @@ class PestFile(viewProvider: FileViewProvider) : PsiFileBase(viewProvider, PestL
 	fun rules() = rulesCache ?: calcRules().also { rulesCache = it }
 	fun livePreviewFile() = livePreviewFile.also { it.retainAll(PsiElement::isValid) }
 	private fun calcRules() = children.filterIsInstance<PestGrammarRuleMixin>()
-}
-
-class PestFileTypeFactory : FileTypeFactory() {
-	override fun createFileTypes(consumer: FileTypeConsumer) {
-		consumer.consume(PestFileType, PEST_EXTENSION)
-	}
 }
 
 object PestBundle {
