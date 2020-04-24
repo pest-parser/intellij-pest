@@ -111,16 +111,16 @@ repositories {
 }
 
 dependencies {
-	compile(kotlin("stdlib-jdk8"))
-	compile("org.eclipse.mylyn.github", "org.eclipse.egit.github.core", "2.1.5") {
+	implementation(kotlin("stdlib-jdk8"))
+	implementation("org.eclipse.mylyn.github", "org.eclipse.egit.github.core", "2.1.5") {
 		exclude(module = "gson")
 	}
-	compile("org.jetbrains.kotlinx", "kotlinx-html-jvm", "0.7.1") {
+	implementation("org.jetbrains.kotlinx", "kotlinx-html-jvm", "0.7.1") {
 		exclude(module = "kotlin-stdlib")
 	}
-	compile(files("$projectDir/rust/target/java"))
-	testCompile(kotlin("test-junit"))
-	testCompile("junit", "junit", "4.12")
+	implementation(files("$projectDir/rust/target/java"))
+	testImplementation(kotlin("test-junit"))
+	testImplementation("junit", "junit", "4.12")
 }
 
 task("displayCommitHash") {

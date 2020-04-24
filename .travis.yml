@@ -7,8 +7,8 @@ before_install:
   - rustup target add wasm32-unknown-unknown --toolchain nightly
   - rustup run nightly rustc --version --verbose
   - rustup run nightly cargo --version --verbose
-install:
-  - rustup run nightly cargo install --git https://github.com/alexcrichton/wasm-gc
+#install:
+#  - rustup run nightly cargo install --git https://github.com/alexcrichton/wasm-gc
 script:
   - bash gradlew displayCommitHash isCI test verifyPlugin --info --no-daemon
 cache:
