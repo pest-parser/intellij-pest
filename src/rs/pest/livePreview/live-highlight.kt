@@ -2,6 +2,7 @@ package rs.pest.livePreview
 
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.Annotator
+import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.editor.markup.TextAttributes
@@ -50,10 +51,14 @@ class LivePreviewAnnotator : Annotator {
 	override fun annotate(element: PsiElement, holder: AnnotationHolder) {
 		if (element !is LivePreviewFile) return
 		highlight(element, { range, info ->
-			holder.createErrorAnnotation(range, info)
+			holder.newAnnotation(HighlightSeverity.ERROR, info.orEmpty())
+					.range(range)
+					.create()
 		}) { range, rule, attributes ->
-			holder.createInfoAnnotation(range, rule)
-				.enforcedTextAttributes = attributes
+			holder.newAnnotation(HighlightSeverity.INFORMATION, rule)
+					.enforcedTextAttributes(attributes)
+					.range(range)
+					.create()
 		}
 	}
 }

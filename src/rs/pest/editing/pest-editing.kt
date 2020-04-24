@@ -11,7 +11,6 @@ import com.intellij.lang.cacheBuilder.DefaultWordsScanner
 import com.intellij.lang.findUsages.FindUsagesProvider
 import com.intellij.lang.folding.CustomFoldingBuilder
 import com.intellij.lang.folding.FoldingDescriptor
-import com.intellij.lang.folding.NamedFoldingDescriptor
 import com.intellij.lang.refactoring.NamesValidator
 import com.intellij.lang.refactoring.RefactoringSupportProvider
 import com.intellij.lexer.Lexer
@@ -129,7 +128,7 @@ class PestPairBackspaceHandler : BackspaceHandlerDelegate() {
 class PestFoldingBuilder : CustomFoldingBuilder() {
 	override fun isRegionCollapsedByDefault(node: ASTNode) = node.textLength > 80
 	override fun getLanguagePlaceholderText(node: ASTNode, range: TextRange): String = "..."
-	private fun foldingDescriptor(elem: PsiElement) = NamedFoldingDescriptor(elem.node, elem.textRange, null, PEST_FOLDING_PLACEHOLDER)
+	private fun foldingDescriptor(elem: PsiElement) = FoldingDescriptor(elem.node, elem.textRange, null, PEST_FOLDING_PLACEHOLDER)
 	override fun buildLanguageFoldRegions(descriptors: MutableList<FoldingDescriptor>, root: PsiElement, document: Document, quick: Boolean) {
 		if (root !is PestFile) return
 		root.rules().mapNotNullTo(descriptors) { it.grammarBody?.let(::foldingDescriptor) }

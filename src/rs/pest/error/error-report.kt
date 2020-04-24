@@ -280,6 +280,7 @@ private fun getKeyValuePairs(
 		"error.description" to error.description,
 		"Plugin Name" to error.pluginName,
 		"Plugin Version" to error.pluginVersion,
+		"Rust Plugin Version" to error.rustPluginVersion,
 		"Bundled Pest Version" to PestIdeBridgeInfoImpl.info.version,
 		"OS Name" to SystemInfo.OS_NAME,
 		"Java Version" to SystemInfo.JAVA_VERSION,
