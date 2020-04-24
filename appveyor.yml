@@ -17,6 +17,9 @@ install:
 #  - cargo install --git https://github.com/alexcrichton/wasm-gc
 
 build_script:
+  - set PATH=%JDK_HOME%\bin;%PATH%;%USERPROFILE%\.cargo\bin
+  - java -version
+  - javac -version
   - gradlew displayCommitHash buildPlugin --info
   - gradlew verifyPlugin --info
 #

@@ -2,6 +2,7 @@ package rs.pest
 
 import com.intellij.testFramework.ParsingTestCase
 import org.rust.lang.core.parser.RustParserDefinition
+import kotlin.test.Ignore
 
 class ParsingTest : ParsingTestCase("parse", "pest", PestParserDefinition()) {
 	override fun getTestDataPath() = "testData"
@@ -15,6 +16,7 @@ class ParsingTest : ParsingTestCase("parse", "pest", PestParserDefinition()) {
 }
 
 /// To inspect Rust plugin's parsed output.
+@Ignore
 class RustAstStructureTest : ParsingTestCase("rust", "rs", RustParserDefinition()) {
 	override fun getTestDataPath() = "testData"
 	fun testExternal() = doTest(true)

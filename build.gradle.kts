@@ -8,20 +8,14 @@ import java.io.*
 import java.nio.file.Paths
 
 val isCI = !System.getenv("CI").isNullOrBlank()
-val commitHash = kotlin.run {
-	val process: Process = Runtime.getRuntime().exec("git rev-parse --short HEAD")
-	process.waitFor()
-	@Suppress("RemoveExplicitTypeArguments")
-	val output = process.inputStream.use {
-		process.inputStream.use {
-			it.readBytes().let<ByteArray, String>(::String)
-		}
-	}
-	process.destroy()
+val commitHash = Runtime.getRuntime().exec("git rev-parse --short HEAD").run {
+	waitFor()
+	val output = inputStream.use { inputStream.use { it.readBytes().let(::String) } }
+	destroy()
 	output.trim()
 }
 
-val pluginComingVersion = "0.3.2"
+val pluginComingVersion = "0.3.3"
 val pluginVersion = if (isCI) "$pluginComingVersion-$commitHash" else pluginComingVersion
 val packageName = "rs.pest"
 val asmble = "asmble"
