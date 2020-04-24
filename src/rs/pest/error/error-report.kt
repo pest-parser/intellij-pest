@@ -21,12 +21,11 @@
 
 package rs.pest.error
 
-import com.intellij.CommonBundle
+import com.intellij.AbstractBundle
 import com.intellij.diagnostic.AbstractMessage
-import com.intellij.diagnostic.IdeErrorsDialog
 import com.intellij.diagnostic.ReportMessages
 import com.intellij.ide.DataManager
-import com.intellij.ide.plugins.PluginManager
+import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.idea.IdeaLogger
 import com.intellij.notification.NotificationListener
 import com.intellij.notification.NotificationType
@@ -80,7 +79,7 @@ private object AnonymousFeedback {
 	 * @return The report info that is then used in [GitHubErrorReporter] to show the user a balloon with the link
 	 * of the created issue.
 	 */
-	internal fun sendFeedback(environmentDetails: MutableMap<String, String>): SubmittedReportInfo {
+	fun sendFeedback(environmentDetails: MutableMap<String, String>): SubmittedReportInfo {
 		val logger = Logger.getInstance(javaClass.name)
 		try {
 			val resource: URL? = javaClass.classLoader.getResource(tokenFile)
@@ -184,14 +183,6 @@ class GitHubErrorReporter : ErrorReportSubmitter() {
 			IdeaLogger.ourLastActionId.orEmpty(),
 			description ?: "<No description>",
 			event.message ?: event.throwable.message.toString())
-		IdeErrorsDialog.findPluginId(event.throwable)?.let { pluginId ->
-			PluginManager.getPlugin(pluginId)?.let { ideaPluginDescriptor ->
-				if (!ideaPluginDescriptor.isBundled) {
-					bean.pluginName = ideaPluginDescriptor.name
-					bean.pluginVersion = ideaPluginDescriptor.version
-				}
-			}
-		}
 
 		(event.data as? AbstractMessage)?.let { bean.attachments = it.includedAttachments }
 		val project = CommonDataKeys.PROJECT.getData(dataContext)
@@ -212,10 +203,10 @@ class GitHubErrorReporter : ErrorReportSubmitter() {
 		private val project: Project?) : Consumer<SubmittedReportInfo> {
 		override fun consume(reportInfo: SubmittedReportInfo) {
 			consumer.consume(reportInfo)
-			if (reportInfo.status == SubmissionStatus.FAILED) ReportMessages.GROUP.createNotification(ReportMessages.ERROR_REPORT,
-				reportInfo.linkText, NotificationType.ERROR, null).setImportant(false).notify(project)
-			else ReportMessages.GROUP.createNotification(ReportMessages.ERROR_REPORT, reportInfo.linkText,
-				NotificationType.INFORMATION, NotificationListener.URL_OPENING_LISTENER).setImportant(false).notify(project)
+			if (reportInfo.status == SubmissionStatus.FAILED) ReportMessages.GROUP.createNotification(ReportMessages.getErrorReport(),
+					reportInfo.linkText, NotificationType.ERROR, null).setImportant(false).notify(project)
+			else ReportMessages.GROUP.createNotification(ReportMessages.getErrorReport(), reportInfo.linkText,
+					NotificationType.INFORMATION, NotificationListener.URL_OPENING_LISTENER).setImportant(false).notify(project)
 		}
 	}
 }
@@ -243,6 +234,7 @@ class GitHubErrorBean(
 
 	var pluginName = ""
 	var pluginVersion = ""
+	var rustPluginVersion = ""
 	var attachments: List<Attachment> = emptyList()
 }
 
@@ -255,8 +247,8 @@ private object ErrorReportBundle {
 	private val bundle: ResourceBundle by lazy { ResourceBundle.getBundle(BUNDLE) }
 
 	@JvmStatic
-	internal fun message(@PropertyKey(resourceBundle = BUNDLE) key: String, vararg params: Any) =
-		CommonBundle.message(bundle, key, *params)
+	fun message(@PropertyKey(resourceBundle = BUNDLE) key: String, vararg params: Any) =
+			AbstractBundle.message(bundle, key, *params)
 }
 
 private class AnonymousFeedbackTask(
@@ -277,9 +269,12 @@ private fun getKeyValuePairs(
 	error: GitHubErrorBean,
 	appInfo: ApplicationInfoEx,
 	namesInfo: ApplicationNamesInfo): MutableMap<String, String> {
-	PluginManager.getPlugin(PluginId.findId(PEST_PLUGIN_ID))?.run {
+	PluginManagerCore.getPlugin(PluginId.findId(PEST_PLUGIN_ID))?.run {
 		if (error.pluginName.isBlank()) error.pluginName = name
 		if (error.pluginVersion.isBlank()) error.pluginVersion = version
+	}
+	PluginManagerCore.getPlugin(PluginId.findId("org.rust.lang"))?.run {
+		if (error.rustPluginVersion.isBlank()) error.rustPluginVersion = version
 	}
 	val params = mutableMapOf(
 		"error.description" to error.description,

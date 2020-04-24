@@ -1,6 +1,6 @@
 package rs.pest
 
-import com.intellij.CommonBundle
+import com.intellij.AbstractBundle
 import com.intellij.extapi.psi.PsiFileBase
 import com.intellij.openapi.fileTypes.FileTypeConsumer
 import com.intellij.openapi.fileTypes.FileTypeFactory
@@ -59,5 +59,5 @@ object PestBundle {
 
 	@JvmStatic
 	fun message(@PropertyKey(resourceBundle = BUNDLE) key: String, vararg params: Any) =
-		CommonBundle.message(bundle, key, *params)
+		AbstractBundle.message(bundle, key, *params)
 }
