@@ -15,7 +15,7 @@ val commitHash = Runtime.getRuntime().exec("git rev-parse --short HEAD").run {
 	output.trim()
 }
 
-val pluginComingVersion = "0.3.3"
+val pluginComingVersion = "0.4.0"
 val pluginVersion = if (isCI) "$pluginComingVersion-$commitHash" else pluginComingVersion
 val packageName = "rs.pest"
 val asmble = "asmble"
@@ -26,10 +26,14 @@ version = pluginVersion
 
 plugins {
 	java
-	id("org.jetbrains.intellij") version "0.4.18"
-	id("org.jetbrains.grammarkit") version "2020.1.2"
-	id("de.undercouch.download") version "4.0.4"
-	kotlin("jvm") version "1.3.72"
+	// Kotlin support
+	kotlin("jvm") version "1.9.22"
+	// https://github.com/JetBrains/gradle-intellij-plugin
+	id("org.jetbrains.intellij") version "1.17.1"
+	// https://github.com/JetBrains/gradle-changelog-plugin
+	id("org.jetbrains.changelog") version "2.2.0"
+	// https://github.com/JetBrains/gradle-grammar-kit-plugin
+	id("org.jetbrains.grammarkit") version "2022.3.2.1"
 }
 
 allprojects { apply { plugin("org.jetbrains.grammarkit") } }
