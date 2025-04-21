@@ -14,7 +14,8 @@ loaded in the plugin.
 Thus no JNI.
 */
 
-#![feature(box_syntax, box_patterns)]
+#![feature(box_patterns)]
+#[rustc_box]
 
 use std::alloc::System;
 use std::ffi::CString;
@@ -98,7 +99,7 @@ fn convert_error(error: Error<Rule>, grammar: &str) -> String {
     )
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 /// Load the Pest VM as a global variable.
 pub extern "C" fn load_vm(pest_code: JavaStr, pest_code_len: i32) -> JavaStr {
     let pest_code_len = pest_code_len as usize;
@@ -201,7 +202,7 @@ fn join_pairs(result: &mut Vec<String>, pair: Pair<&str>) {
     }
 }
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 /// After loading the VM, this function can parse the code with the
 /// currently loaded VM.
 /// Assumes the VM is already loaded, otherwise it'll panic.

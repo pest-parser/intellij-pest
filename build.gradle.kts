@@ -48,22 +48,6 @@ intellijPlatform.pluginConfiguration {
 }
 
 intellij {
-	updateSinceUntilBuild = false
-	instrumentCode = true
-	val user = System.getProperty("user.name")
-	val os = System.getProperty("os.name")
-	val root = when {
-		os.startsWith("Windows") -> "C:\\Users\\$user\\AppData\\Local\\JetBrains\\Toolbox\\apps"
-		os == "Linux" -> "/home/$user/.local/share/JetBrains/Toolbox/apps"
-		else -> return@intellij
-	}
-	val intellijPath = sequenceOf("IDEA-C", "IDEA-U")
-		.mapNotNull { fromToolbox(root, it) }.firstOrNull()
-	intellijPath?.absolutePath?.let { localPath = it }
-	val pycharmPath = sequenceOf("IDEA-C", "PyCharm-C", "IDEA-U")
-		.mapNotNull { fromToolbox(root, it) }.firstOrNull()
-	pycharmPath?.absolutePath?.let { alternativeIdePath = it }
-
 	if (!isCI) setPlugins("PsiViewer:201.6251.22-EAP-SNAPSHOT.3")
 	else version = "2020.1"
 	setPlugins("org.rust.lang:251.23774.445", "org.toml.lang:0.2.120.37-193", "java")

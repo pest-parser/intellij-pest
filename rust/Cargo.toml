@@ -22,9 +22,9 @@ crate-type = ["cdylib"]
 rustdoc-args = ["--document-private-items"]
 
 [dependencies]
-pest = "2.1"
-pest_meta = "2.1"
-pest_vm = "2.1"
+pest = "2.8"
+pest_meta = "2.8"
+pest_vm = "2.8"
 
 [profile.release]
 lto = true
