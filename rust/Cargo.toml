@@ -8,12 +8,11 @@ categories = ["development-tools"]
 keywords = ["pest", "grammar", "ide"]
 repository = "https://github.com/pest-parser/intellij-pest/tree/master/rust"
 homepage = "https://pest-parser.github.io/"
-edition = "2018"
+edition = "2024"
 readme = "README.md"
 
 [badges]
 appveyor = { repository = "pest-parser/intellij-pest", service = "github" }
-travis-ci = { repository = "pest-parser/intellij-pest" }
 maintenance = { status = "experimental" }
 
 [lib]

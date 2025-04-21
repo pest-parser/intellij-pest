@@ -25,33 +25,27 @@ group = packageName
 version = pluginVersion
 
 plugins {
+	// Java support
 	java
 	// Kotlin support
-	kotlin("jvm") version "1.9.22"
+	kotlin("jvm") version "2.1.0"
 	// https://github.com/JetBrains/gradle-intellij-plugin
-	id("org.jetbrains.intellij") version "1.17.1"
+	id("org.jetbrains.intellij.platform") version "2.2.1"
 	// https://github.com/JetBrains/gradle-changelog-plugin
-	id("org.jetbrains.changelog") version "2.2.0"
+	id("org.jetbrains.changelog") version "2.2.1"
 	// https://github.com/JetBrains/gradle-grammar-kit-plugin
-	id("org.jetbrains.grammarkit") version "2022.3.2.1"
+	id("org.jetbrains.grammarkit") version "2022.3.2.2"
 }
 
-allprojects { apply { plugin("org.jetbrains.grammarkit") } }
+// Configure project's dependencies
+repositories {
+  mavenCentral()
+  intellijPlatform.defaultRepositories()
+}
 
-fun fromToolbox(root: String, ide: String) = file(root)
-	.resolve(ide)
-	.takeIf { it.exists() }
-	?.resolve("ch-0")
-	?.listFiles()
-	.orEmpty()
-	.filterNotNull()
-	.filter { it.isDirectory }
-	.filterNot { it.name.endsWith(".plugins") }
-	.maxBy {
-		val (major, minor, patch) = it.name.split('.')
-		String.format("%5s%5s%5s", major, minor, patch)
-	}
-	?.also { println("Picked: $it") }
+intellijPlatform.pluginConfiguration {
+  name = "IntelliJ Pest"
+}
 
 intellij {
 	updateSinceUntilBuild = false
@@ -72,15 +66,17 @@ intellij {
 
 	if (!isCI) setPlugins("PsiViewer:201.6251.22-EAP-SNAPSHOT.3")
 	else version = "2020.1"
-	setPlugins("org.rust.lang:0.2.120.2202-201", "org.toml.lang:0.2.120.37-193", "java")
+	setPlugins("org.rust.lang:251.23774.445", "org.toml.lang:0.2.120.37-193", "java")
 }
 
 java {
-	sourceCompatibility = JavaVersion.VERSION_11
-	targetCompatibility = JavaVersion.VERSION_11
+  withSourcesJar()
+  toolchain {
+    languageVersion.set(JavaLanguageVersion.of(21))
+  }
 }
 
-tasks.withType<PatchPluginXmlTask> {
+tasks.patchPluginXml {
 	changeNotes(file("res/META-INF/change-notes.html").readText())
 	pluginDescription(file("res/META-INF/description.html").readText())
 	version(pluginVersion)
