@@ -16,7 +16,6 @@ import com.intellij.refactoring.RefactoringBundle
 import com.intellij.refactoring.actions.BasePlatformRefactoringAction
 import com.intellij.refactoring.introduce.inplace.OccurrencesChooser
 import com.intellij.refactoring.util.CommonRefactoringUtil
-import com.intellij.util.containers.ContainerUtil
 import rs.pest.PestBundle
 import rs.pest.PestFile
 import rs.pest.PestLanguage

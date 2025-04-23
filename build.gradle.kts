@@ -76,6 +76,7 @@ kotlin.sourceSets {
 dependencies {
 	intellijPlatform {
 		rustRover("2025.1", useInstaller = false)
+		bundledPlugins("com.jetbrains.rust")
 		testFramework(TestFrameworkType.Platform)
 	}
 	implementation(kotlin("stdlib"))
@@ -158,7 +159,7 @@ val compileWasm = tasks.register<Exec>("compileWasm") {
 		.absolutePath
 	val wasmGcFile = wasmGcFile.also { inputs.file(it) }.absolutePath
 	val cls = classRelativePath.joinToString(separator = ".").removeSuffix(".class")
-	commandLine(asmbleExe, "compile", wasmGcFile, cls, "-out", outFile)
+	commandLine(asmbleExe, "compile", wasmGcFile, cls, "-out", outFile, "-log", "info")
 	doFirst {
 		println("Input file: $wasmGcFile")
 		println("Output file: $outFile")

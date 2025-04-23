@@ -63,7 +63,6 @@ class PestInlineDialog(project: Project, val element: PestGrammarRuleMixin, priv
 	override fun getNameLabelText() = ElementDescriptionUtil.getElementDescription(element, UsageViewNodeTextLocation.INSTANCE)
 	override fun getInlineThisText() = PestBundle.message("pest.actions.inline.dialog.this")
 	override fun getInlineAllText() = PestBundle.message("pest.actions.inline.dialog.all")
-	override fun getBorderTitle() = PestBundle.message("pest.actions.inline.dialog.title")
 	override fun doAction() = invokeRefactoring(PestInlineProcessor(project, element, reference, isInlineThisOnly))
 }
 

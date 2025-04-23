@@ -1,2 +1,4 @@
 [build]
 target = "wasm32-unknown-unknown"
+# https://github.com/koute/substrate/blob/2aebf63b859f5f7a01f9b631828d90b5b54b608b/utils/wasm-builder/src/wasm_project.rs#L635C4-L635C7
+rustflags = "-C target-feature=-sign-ext"

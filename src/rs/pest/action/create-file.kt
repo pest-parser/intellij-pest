@@ -13,6 +13,7 @@ import com.intellij.psi.PsiDirectory
 import icons.PestIcons
 import rs.pest.PestBundle
 import java.util.*
+import java.util.Locale
 
 class NewPestFile : CreateFileFromTemplateAction(
 	PestBundle.message("pest.actions.new-file.name"),
@@ -22,7 +23,7 @@ class NewPestFile : CreateFileFromTemplateAction(
 		fun createProperties(project: Project, className: String): Properties {
 			val properties = FileTemplateManager.getInstance(project).defaultProperties
 			properties += "NAME" to className
-			properties += "NAME_SNAKE" to className.toLowerCase().replace(Regex("[ \r\t-()!@#~]+"), "_")
+			properties += "NAME_SNAKE" to className.lowercase(Locale.getDefault()).replace(Regex("[ \r\t-()!@#~]+"), "_")
 			return properties
 		}
 	}

@@ -116,3 +116,5 @@ exportToHTML
 pinpoint_piggy
 grammar/*.scm
 asmble
+
+.intellijPlatform

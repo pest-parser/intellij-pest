@@ -7,7 +7,6 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
-import com.intellij.openapi.progress.PerformInBackgroundOption
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
@@ -43,7 +42,9 @@ class PestLivePreviewToHtmlAction : AnAction() {
 
 	override fun actionPerformed(e: AnActionEvent) {
 		val file = CommonDataKeys.PSI_FILE.getData(e.dataContext) as? LivePreviewFile ?: return
-		ProgressManager.getInstance().run(object : Task.Backgroundable(file.project, "HTML Generation", true, PerformInBackgroundOption.ALWAYS_BACKGROUND) {
+		ProgressManager.getInstance().run(object : Task.Backgroundable(file.project, "HTML generation", true,
+			ALWAYS_BACKGROUND
+		) {
 			override fun run(indicator: ProgressIndicator) {
 				val startTime = System.currentTimeMillis()
 				defaultPreviewToHtml(file, indicator)
