@@ -14,9 +14,6 @@ loaded in the plugin.
 Thus no JNI.
 */
 
-#![feature(box_patterns)]
-#[rustc_box]
-
 use std::alloc::System;
 use std::ffi::CString;
 use std::{mem, str};
@@ -203,6 +200,7 @@ fn join_pairs(result: &mut Vec<String>, pair: Pair<&str>) {
 }
 
 #[unsafe(no_mangle)]
+#[allow(static_mut_refs)]
 /// After loading the VM, this function can parse the code with the
 /// currently loaded VM.
 /// Assumes the VM is already loaded, otherwise it'll panic.
