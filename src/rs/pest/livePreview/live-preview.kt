@@ -27,7 +27,7 @@ fun livePreview(file: PestFile, selected: String) {
 	psiFile.ruleName = selected
 	file.livePreviewFile.add(psiFile)
 	val editorManager = FileEditorManagerEx.getInstanceEx(project)
-	editorManager.currentWindow.split(SwingConstants.HORIZONTAL, false, virtualFile, true)
+	editorManager.currentWindow?.split(SwingConstants.HORIZONTAL, false, virtualFile, true)
 	editorManager.openFile(virtualFile, true)
 }
 

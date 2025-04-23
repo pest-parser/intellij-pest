@@ -28,6 +28,4 @@ class PestParserDefinition : ParserDefinition {
 	override fun getWhitespaceTokens() = PestTokenType.WHITE_SPACE
 	override fun getCommentTokens() = PestTokenType.COMMENTS
 	override fun getFileNodeType() = FILE
-	// TODO: replace after dropping support for 183
-	override fun spaceExistanceTypeBetweenTokens(left: ASTNode?, right: ASTNode?) = ParserDefinition.SpaceRequirements.MAY
 }

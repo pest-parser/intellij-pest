@@ -32,7 +32,7 @@ import com.intellij.psi.impl.search.IndexPatternBuilder
 import com.intellij.psi.search.UsageSearchContext
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.TokenSet
-import com.intellij.spellchecker.PsiIdentifierTokenizer
+import com.intellij.spellchecker.tokenizer.PsiIdentifierOwnerTokenizer
 import com.intellij.spellchecker.tokenizer.SpellcheckingStrategy
 import com.intellij.spellchecker.tokenizer.Tokenizer
 import rs.pest.*
@@ -143,7 +143,7 @@ class PestSpellCheckingStrategy : SpellcheckingStrategy() {
 	override fun getTokenizer(element: PsiElement): Tokenizer<*> = when (element) {
 		is PestIdentifier -> {
 			val parent = element.parent
-			if (parent is PestGrammarRule && parent.firstChild === element) PsiIdentifierTokenizer()
+			if (parent is PestGrammarRule && parent.firstChild === element) PsiIdentifierOwnerTokenizer()
 			else EMPTY_TOKENIZER
 		}
 		is PestString, is PestCharacter -> EMPTY_TOKENIZER

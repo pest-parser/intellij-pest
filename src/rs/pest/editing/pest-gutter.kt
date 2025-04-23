@@ -1,6 +1,5 @@
 package rs.pest.editing
 
-import com.intellij.codeHighlighting.Pass
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.codeInsight.daemon.LineMarkerProvider
 import com.intellij.icons.AllIcons
@@ -12,7 +11,7 @@ import rs.pest.psi.impl.PestGrammarRuleMixin
 
 class PestRecursionLineMarkerProvider : LineMarkerProvider {
 	override fun getLineMarkerInfo(element: PsiElement): LineMarkerInfo<*>? = null
-	override fun collectSlowLineMarkers(elements: List<PsiElement>, result: MutableCollection<LineMarkerInfo<*>>) {
+	override fun collectSlowLineMarkers(elements: List<PsiElement?>, result: MutableCollection<in LineMarkerInfo<*>>) {
 		elements
 			.asSequence()
 			.filterIsInstance<PestGrammarRuleMixin>()
@@ -23,8 +22,8 @@ class PestRecursionLineMarkerProvider : LineMarkerProvider {
 
 /// This constructor is deprecated but #6
 @Suppress("DEPRECATION")
-private class RecMarkerInfo internal constructor(id: PsiElement) : LineMarkerInfo<PsiElement>(
-	id, id.textRange, AllIcons.Gutter.RecursiveMethod, Pass.LINE_MARKERS,
+private class RecMarkerInfo constructor(id: PsiElement) : LineMarkerInfo<PsiElement>(
+	id, id.textRange, AllIcons.Gutter.RecursiveMethod,
 	FunctionUtil.constant("Recursive rule"), null,
 	GutterIconRenderer.Alignment.RIGHT) {
 	override fun createGutterRenderer(): LineMarkerGutterIconRenderer<PsiElement>? =

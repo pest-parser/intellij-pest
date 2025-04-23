@@ -3,22 +3,24 @@ package rs.pest.format
 import com.intellij.formatting.*
 import com.intellij.lang.ASTNode
 import com.intellij.openapi.util.TextRange
-import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.codeStyle.CodeStyleSettings
-import com.intellij.psi.tree.TokenSet
 import rs.pest.PestLanguage
 import rs.pest.psi.PestTypes
 
 class PestFormattingModelBuilder : FormattingModelBuilder {
-	override fun createModel(element: PsiElement, settings: CodeStyleSettings): FormattingModel {
+	override fun createModel(formattingContext: FormattingContext): FormattingModel {
 		return FormattingModelProvider
-			.createFormattingModelForPsiFile(element.containingFile,
-				PestSimpleBlock(createSpaceBuilder(settings),
-					element.node,
+			.createFormattingModelForPsiFile(
+				formattingContext.containingFile,
+				PestSimpleBlock(
+					createSpaceBuilder(formattingContext.codeStyleSettings),
+					formattingContext.node,
 					Wrap.createWrap(WrapType.NONE, false),
-					Alignment.createAlignment(true)),
-				settings)
+					Alignment.createAlignment(true)
+				),
+				formattingContext.codeStyleSettings
+			)
 	}
 
 	private fun createSpaceBuilder(settings: CodeStyleSettings) = SpacingBuilder(settings, PestLanguage.INSTANCE)
