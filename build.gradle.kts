@@ -1,7 +1,6 @@
 import de.undercouch.gradle.tasks.download.Download
-import org.jetbrains.grammarkit.tasks.GenerateLexer
-import org.jetbrains.grammarkit.tasks.GenerateParser
-import org.jetbrains.intellij.tasks.PatchPluginXmlTask
+import org.jetbrains.grammarkit.tasks.GenerateParserTask
+import org.jetbrains.grammarkit.tasks.GenerateLexerTask
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.*
@@ -29,8 +28,10 @@ plugins {
 	java
 	// Kotlin support
 	kotlin("jvm") version "2.1.0"
+	// https://plugins.gradle.org/plugin/de.undercouch.download
+	id("de.undercouch.download") version "5.6.0"
 	// https://github.com/JetBrains/gradle-intellij-plugin
-	id("org.jetbrains.intellij.platform") version "2.2.1"
+	id("org.jetbrains.intellij.platform") version "2.5.0"
 	// https://github.com/JetBrains/gradle-changelog-plugin
 	id("org.jetbrains.changelog") version "2.2.1"
 	// https://github.com/JetBrains/gradle-grammar-kit-plugin
@@ -39,46 +40,36 @@ plugins {
 
 // Configure project's dependencies
 repositories {
-  mavenCentral()
-  intellijPlatform.defaultRepositories()
+	mavenCentral()
+	intellijPlatform.defaultRepositories()
 }
 
 intellijPlatform.pluginConfiguration {
-  name = "IntelliJ Pest"
-}
-
-intellij {
-	if (!isCI) setPlugins("PsiViewer:201.6251.22-EAP-SNAPSHOT.3")
-	else version = "2020.1"
-	setPlugins("org.rust.lang:251.23774.445", "org.toml.lang:0.2.120.37-193", "java")
+	name = "IntelliJ Pest"
 }
 
 java {
-  withSourcesJar()
-  toolchain {
-    languageVersion.set(JavaLanguageVersion.of(21))
-  }
+	withSourcesJar()
+	toolchain {
+		languageVersion.set(JavaLanguageVersion.of(21))
+	}
 }
 
 tasks.patchPluginXml {
-	changeNotes(file("res/META-INF/change-notes.html").readText())
-	pluginDescription(file("res/META-INF/description.html").readText())
-	version(pluginVersion)
-	pluginId(packageName)
+	changeNotes = file("res/META-INF/change-notes.html").readText()
+	pluginDescription = file("res/META-INF/description.html").readText()
+	version = pluginVersion
+	pluginId = packageName
 }
 
-sourceSets {
+kotlin.sourceSets {
 	main {
-		withConvention(KotlinSourceSet::class) {
-			listOf(java, kotlin).forEach { it.srcDirs("src", "gen") }
-		}
+		kotlin.srcDirs("src", "gen")
 		resources.srcDirs("res", rustTarget.resolve("java").absolutePath)
 	}
 
 	test {
-		withConvention(KotlinSourceSet::class) {
-			listOf(java, kotlin).forEach { it.srcDirs("test") }
-		}
+		kotlin.srcDirs("test")
 		resources.srcDirs("testData")
 	}
 }
@@ -89,11 +80,11 @@ repositories {
 }
 
 dependencies {
-	implementation(kotlin("stdlib-jdk8"))
+	implementation(kotlin("stdlib"))
 	implementation("org.eclipse.mylyn.github", "org.eclipse.egit.github.core", "2.1.5") {
 		exclude(module = "gson")
 	}
-	implementation("org.jetbrains.kotlinx", "kotlinx-html-jvm", "0.7.1") {
+	implementation("org.jetbrains.kotlinx", "kotlinx-html-jvm", "0.12.0") {
 		exclude(module = "kotlin-stdlib")
 	}
 	implementation(files("$projectDir/rust/target/java"))
@@ -101,19 +92,7 @@ dependencies {
 	testImplementation("junit", "junit", "4.12")
 }
 
-task("displayCommitHash") {
-	group = "help"
-	description = "Display the newest commit hash"
-	doFirst { println("Commit hash: $commitHash") }
-}
-
-task("isCI") {
-	group = "help"
-	description = "Check if it's running in a continuous-integration"
-	doFirst { println(if (isCI) "Yes, I'm on a CI." else "No, I'm not on CI.") }
-}
-
-val downloadAsmble = task<Download>("downloadAsmble") {
+val downloadAsmble = tasks.register<Download>("downloadAsmble") {
 	group = asmble
 	src("https://github.com/pest-parser/intellij-pest/files/3592625/asmble.zip")
 	dest(buildDir.absolutePath)
@@ -190,33 +169,26 @@ val compileWasm = task<Exec>("compileWasm") {
 
 fun path(more: Iterable<*>) = more.joinToString(File.separator)
 
-val genParser = task<GenerateParser>("genParser") {
+val genParser = task<GenerateParserTask>("genParser") {
 	group = tasks["init"].group!!
 	description = "Generate the Parser and PsiElement classes"
-	source = "grammar/pest.bnf"
-	targetRoot = "gen/"
+	sourceFile.set(file("grammar/pest.bnf"))
+	targetRootOutputDir.set(file("gen/"))
 	val parserRoot = Paths.get("rs", "pest")
-	pathToParser = path(parserRoot + "PestParser.java")
-	pathToPsiRoot = path(parserRoot + "psi")
-	purgeOldFiles = true
+	pathToParser.set(path(parserRoot + "PestParser.java"))
+	pathToPsiRoot.set(path(parserRoot + "psi"))
+	purgeOldFiles.set(true)
 }
 
-val genLexer = task<GenerateLexer>("genLexer") {
+val genLexer = task<GenerateLexerTask>("genLexer") {
 	group = genParser.group
 	description = "Generate the Lexer"
-	source = "grammar/pest.flex"
-	targetDir = path(Paths.get("gen", "rs", "pest", "psi"))
-	targetClass = "PestLexer"
+	sourceFile.set(file("grammar/pest.flex"))
+	targetOutputDir.set(file("gen/rs/pest/psi"))
 	purgeOldFiles = true
 	dependsOn(genParser)
 }
 
 tasks.withType<KotlinCompile> {
 	dependsOn(genParser, genLexer, compileWasm)
-	kotlinOptions {
-		jvmTarget = "1.8"
-		languageVersion = "1.3"
-		apiVersion = "1.3"
-		freeCompilerArgs = listOf("-Xjvm-default=enable")
-	}
 }
