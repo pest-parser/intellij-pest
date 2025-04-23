@@ -1,11 +1,12 @@
 import de.undercouch.gradle.tasks.download.Download
 import org.jetbrains.grammarkit.tasks.GenerateLexerTask
 import org.jetbrains.grammarkit.tasks.GenerateParserTask
+import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.nio.file.Paths
 
 val isCI = !System.getenv("CI").isNullOrBlank()
-val commitHash = Runtime.getRuntime().exec("git rev-parse --short HEAD").run {
+val commitHash = ProcessBuilder().command("git", "rev-parse", "--short", "HEAD").start().run {
 	waitFor()
 	val output = inputStream.use { inputStream.use { it.readBytes().let(::String) } }
 	destroy()
@@ -72,9 +73,11 @@ kotlin.sourceSets {
 	}
 }
 
-repositories { mavenCentral() }
-
 dependencies {
+	intellijPlatform {
+		rustRover("2025.1", useInstaller = false)
+		testFramework(TestFrameworkType.Platform)
+	}
 	implementation(kotlin("stdlib"))
 	implementation("org.eclipse.mylyn.github", "org.eclipse.egit.github.core", "2.1.5") {
 		exclude(module = "gson")
