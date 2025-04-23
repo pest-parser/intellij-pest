@@ -1,9 +1,7 @@
 import de.undercouch.gradle.tasks.download.Download
-import org.jetbrains.grammarkit.tasks.GenerateParserTask
 import org.jetbrains.grammarkit.tasks.GenerateLexerTask
-import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
+import org.jetbrains.grammarkit.tasks.GenerateParserTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import java.io.*
 import java.nio.file.Paths
 
 val isCI = !System.getenv("CI").isNullOrBlank()
@@ -74,10 +72,7 @@ kotlin.sourceSets {
 	}
 }
 
-repositories {
-	mavenCentral()
-	jcenter()
-}
+repositories { mavenCentral() }
 
 dependencies {
 	implementation(kotlin("stdlib"))
@@ -95,15 +90,15 @@ dependencies {
 val downloadAsmble = tasks.register<Download>("downloadAsmble") {
 	group = asmble
 	src("https://github.com/pest-parser/intellij-pest/files/3592625/asmble.zip")
-	dest(buildDir.absolutePath)
+	dest(layout.buildDirectory.asFile.get().absolutePath)
 	overwrite(false)
 }
 
-val unzipAsmble = task<Copy>("unzipAsmble") {
+val unzipAsmble = tasks.register<Copy>("unzipAsmble") {
 	group = asmble
 	dependsOn(downloadAsmble)
-	from(zipTree(buildDir.resolve("asmble.zip")))
-	into(buildDir)
+	from(zipTree(layout.buildDirectory.asFile.get().resolve("asmble.zip")))
+	into(layout.buildDirectory)
 }
 
 val wasmFile = rustTarget
@@ -113,13 +108,13 @@ val wasmFile = rustTarget
 val wasmGcFile = wasmFile.resolveSibling("pest_ide_gc.wasm")
 
 val asmbleExe by lazy {
-	buildDir
+	layout.buildDirectory.asFile.get()
 		.resolve("asmble")
 		.resolve("bin")
 		.resolve(if (System.getProperty("os.name").startsWith("Windows")) "asmble.bat" else "asmble")
 }
 
-val compileRust = task<Exec>("compileRust") {
+val compileRust = tasks.register<Exec>("compileRust") {
 	val rustDir = projectDir.resolve("rust")
 	workingDir(rustDir)
 	inputs.dir(rustDir.resolve("src"))
@@ -127,7 +122,7 @@ val compileRust = task<Exec>("compileRust") {
 	commandLine("rustup", "run", "nightly", "cargo", "build", "--release")
 }
 
-val gcWasm = task/*<Exec>*/("gcWasm") {
+val gcWasm = tasks.register/*<Exec>*/("gcWasm") {
 	dependsOn(compileRust)
 /* Asmble is broken for GCed wasm.
 	workingDir(projectDir)
@@ -138,7 +133,7 @@ val gcWasm = task/*<Exec>*/("gcWasm") {
 	doFirst { wasmFile.copyTo(wasmGcFile, overwrite = true) }
 }
 
-val translateWasm = task<Exec>("translateWasm") {
+val translateWasm = tasks.register<Exec>("translateWasm") {
 	group = asmble
 	dependsOn(unzipAsmble, gcWasm)
 	workingDir(projectDir)
@@ -148,7 +143,7 @@ val translateWasm = task<Exec>("translateWasm") {
 	doFirst { println("Output file: $outPath") }
 }
 
-val compileWasm = task<Exec>("compileWasm") {
+val compileWasm = tasks.register<Exec>("compileWasm") {
 	group = asmble
 	dependsOn(unzipAsmble, gcWasm)
 	workingDir(projectDir.absolutePath)
@@ -169,7 +164,7 @@ val compileWasm = task<Exec>("compileWasm") {
 
 fun path(more: Iterable<*>) = more.joinToString(File.separator)
 
-val genParser = task<GenerateParserTask>("genParser") {
+val genParser = tasks.register<GenerateParserTask>("genParser") {
 	group = tasks["init"].group!!
 	description = "Generate the Parser and PsiElement classes"
 	sourceFile.set(file("grammar/pest.bnf"))
@@ -180,8 +175,8 @@ val genParser = task<GenerateParserTask>("genParser") {
 	purgeOldFiles.set(true)
 }
 
-val genLexer = task<GenerateLexerTask>("genLexer") {
-	group = genParser.group
+val genLexer = tasks.register<GenerateLexerTask>("genLexer") {
+	group = tasks["init"].group!!
 	description = "Generate the Lexer"
 	sourceFile.set(file("grammar/pest.flex"))
 	targetOutputDir.set(file("gen/rs/pest/psi"))
